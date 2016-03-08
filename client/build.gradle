@@ -1,0 +1,20 @@
+jar {
+    baseName = 'snakebot-client'
+    version = "$moduleVersion"
+}
+
+dependencies {
+    compile project(':api')
+    compile("org.apache.commons:commons-math3:$commonsMathVersion")
+    compile("org.apache.commons:commons-lang3:$commonsLangVersion")
+    compile("commons-collections:commons-collections:$commonsCollectionsVersion")
+    compile("ch.qos.logback:logback-classic:$logbackVersion")
+    compile("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
+    compile("org.slf4j:slf4j-api:$slf4jVersion")
+    compile("org.slf4j:jcl-over-slf4j:$slf4jVersion")
+    compile("org.slf4j:log4j-over-slf4j:$slf4jVersion")
+    compile("org.slf4j:jul-to-slf4j:$slf4jVersion")
+    compile("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+    compile("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    compile("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+}

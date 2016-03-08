@@ -1,0 +1,101 @@
+apply plugin: 'com.github.ben-manes.versions'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:1.2"
+    }
+}
+
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'jacoco'
+    apply plugin: 'org.sonarqube'
+    apply plugin: 'maven-publish'
+
+    compileJava {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    ext {
+        moduleVersion = '0.0.2-SNAPSHOT'
+        slf4jVersion = '1.7.18'
+        logbackVersion = '1.1.6'
+        jacksonVersion = '2.7.2'
+        springBootVersion = '1.3.3.RELEASE'
+        springVersion = '4.2.5.RELEASE'
+        commonsMathVersion = '3.6'
+        commonsLangVersion = '3.4'
+        commonsBeanutilsVersion = '1.9.2'
+        commonsCollectionsVersion = '3.2.2'
+        guavaVersion = '19.0'
+    }
+
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId 'se.cygni.snakebot'
+                version "$moduleVersion"
+                from components.java
+            }
+        }
+    }
+    publishing {
+        repositories {
+            maven {
+                // This is for jenkins local filesystem
+                url "/var/mavenrepo"
+            }
+        }
+    }
+
+    dependencies {
+        testCompile "junit:junit:4.12"
+        testCompile 'org.hamcrest:hamcrest-library:1.3'
+    }
+
+    sonarqube {
+        properties {
+            property "sonar.host.url", "http://sonarqube.docker.snake.cygni.se:9000"
+            //property "sonar.host.url", "http://sonarqube.snake.cygni.se"
+            property "sonar.java.source property", "1.8"
+            property "sonar.login", "admin"
+            property "sonar.password", "admin"
+        }
+    }
+
+    test {
+        jacoco {
+            append = false
+        }
+    }
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.11'
+}

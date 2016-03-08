@@ -1,0 +1,750 @@
+{
+  "width": 15,
+  "height": 15,
+  "tiles": [
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "tail": false,
+        "id": 94833189,
+        "order": 1,
+        "content": "snakebody"
+      },
+      {
+        "tail": false,
+        "id": 94833189,
+        "order": 2,
+        "content": "snakebody"
+      },
+      {
+        "tail": true,
+        "id": 94833189,
+        "order": 3,
+        "content": "snakebody"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "name": "cobra",
+        "id": 94833189,
+        "content": "snakehead"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "tail": true,
+        "id": -973197092,
+        "order": 2,
+        "content": "snakebody"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "name": "python",
+        "id": -973197092,
+        "content": "snakehead"
+      },
+      {
+        "tail": false,
+        "id": -973197092,
+        "order": 1,
+        "content": "snakebody"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "food"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "obstacle"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ],
+    [
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      },
+      {
+        "content": "empty"
+      }
+    ]
+  ],
+  "snakeInfos": [
+    {
+      "name": "python",
+      "length": 3,
+      "id": -973197092,
+      "x": 11,
+      "y": 6
+    },
+    {
+      "name": "cobra",
+      "length": 4,
+      "id": 94833189,
+      "x": 4,
+      "y": 7
+    }
+  ],
+  "playerId": null,
+  "messageId": null,
+  "correlationId": null,
+  "type": "se.cygni.snake.api.model.Map"
+}
