@@ -15,6 +15,18 @@ buildscript {
     }
 }
 
+allprojects {
+
+    group = 'se.cygni.snakebot'
+    version = '0.0.3-SNAPSHOT'
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
+}
+
 subprojects {
 
     apply plugin: 'java'
@@ -33,7 +45,6 @@ subprojects {
     }
 
     ext {
-        moduleVersion = '0.0.2-SNAPSHOT'
         slf4jVersion = '1.7.18'
         logbackVersion = '1.1.6'
         jacksonVersion = '2.7.2'
@@ -49,8 +60,7 @@ subprojects {
     publishing {
         publications {
             mavenJava(MavenPublication) {
-                groupId 'se.cygni.snakebot'
-                version "$moduleVersion"
+                artifactId 'snakebot-' + project.name
                 from components.java
             }
         }
@@ -84,16 +94,6 @@ subprojects {
             append = false
         }
     }
-}
-
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
-        }
-    }
-
-
 }
 
 task wrapper(type: Wrapper) {

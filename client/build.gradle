@@ -1,6 +1,5 @@
 jar {
     baseName = 'snakebot-client'
-    version = "$moduleVersion"
 }
 
 dependencies {

@@ -1,6 +1,5 @@
 jar {
     baseName = 'snakebot-common'
-    version = "$moduleVersion"
 }
 
 apply plugin: 'info.solidsoft.pitest'

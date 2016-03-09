@@ -67,8 +67,8 @@ public class GameFeatures {
      * Enforces limits on some values
      */
     public void applyValidation() {
-        width = width > 500 ? 500 : width;
-        height = height > 500 ? 500 : height;
+        width = width > 150 ? 150 : width;
+        height = height > 150 ? 150 : height;
         startSnakeLength = startSnakeLength > 10 ? 10 : startSnakeLength;
         maxNoofPlayers = maxNoofPlayers > 20 ? 20 : maxNoofPlayers;
         spontaneousGrowthEveryNWorldTick = spontaneousGrowthEveryNWorldTick < 2 ? 2 : spontaneousGrowthEveryNWorldTick;
