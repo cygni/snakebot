@@ -46,6 +46,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     public void startGame() {
         StartGame startGame = new StartGame();
         startGame.setReceivingPlayerId(playerId);
+        log.info("Starting game");
         sendMessage(startGame);
     }
 
@@ -60,6 +61,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     private void disconnect() {
+        log.info("Disconnecting from server");
         if (session != null) {
             try {
                 session.close();
@@ -74,6 +76,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     public void connect() {
         WebSocketClient wsClient = new StandardWebSocketClient();
         String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString());
+        log.info("Connecting to {}", uri);
         wsClient.doHandshake(this, uri);
     }
 
@@ -140,7 +143,6 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         }
     }
 
-
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         log.warn("Transport error", exception);
@@ -150,7 +152,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        log.info("Server connection closed");
+        log.warn("Server connection closed");
         disconnect();
         onSessionClosed();
     }

@@ -14,10 +14,10 @@ import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.client.AnsiPrinter;
 import se.cygni.snake.client.BaseSnakeClient;
 
-public class SnakePlayer extends BaseSnakeClient {
+public class ExampleSnakePlayer extends BaseSnakeClient {
 
     private static Logger log = LoggerFactory
-            .getLogger(SnakePlayer.class);
+            .getLogger(ExampleSnakePlayer.class);
 
     private AnsiPrinter ansiPrinter;
 
@@ -26,9 +26,11 @@ public class SnakePlayer extends BaseSnakeClient {
 
         Runnable task = () -> {
 
-            SnakePlayer sp = new SnakePlayer();
+            ExampleSnakePlayer sp = new ExampleSnakePlayer();
             sp.connect();
 
+            // Keep this process alive as long as the
+            // Snake is connected and playing.
             do {
                 try {
                     Thread.sleep(1000);
@@ -36,18 +38,24 @@ public class SnakePlayer extends BaseSnakeClient {
                     e.printStackTrace();
                 }
             } while (sp.isPlaying());
+
+            log.info("Shutting down");
         };
+
 
         Thread thread = new Thread(task);
         thread.start();
     }
 
-    public SnakePlayer() {
+    public ExampleSnakePlayer() {
+        ansiPrinter = new AnsiPrinter(true);
     }
 
     @Override
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
         ansiPrinter.printMap(mapUpdateEvent);
+
+        // Choose action here!
         registerMove(mapUpdateEvent.getGameTick(), SnakeDirection.DOWN);
     }
 
@@ -58,7 +66,9 @@ public class SnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onSnakeDead(SnakeDeadEvent snakeDeadEvent) {
-
+        log.info("A snake {} died by {}",
+                snakeDeadEvent.getPlayerId(),
+                snakeDeadEvent.getDeathReason());
     }
 
     @Override
@@ -69,27 +79,20 @@ public class SnakePlayer extends BaseSnakeClient {
     @Override
     public void onGameStarting(GameStartingEvent gameStartingEvent) {
         log.debug("GameStartingEvent: " + gameStartingEvent);
-        ansiPrinter = new AnsiPrinter(true);
     }
 
     @Override
     public void onPlayerRegistered(PlayerRegistered playerRegistered) {
         log.info("PlayerRegistered: " + playerRegistered);
 
-//        try {
-//            Thread.sleep(2500);
-//        } catch (Exception e) {}
+        // Disable this if you want to start the game manually from
+        // the web GUI
         startGame();
     }
 
     @Override
-    public String getServerHost() {
-        return "localhost";
-    }
-
-    @Override
     public void onSessionClosed() {
-        log.debug("session closed");
+        log.info("Session closed");
     }
 
     @Override
@@ -109,14 +112,24 @@ public class SnakePlayer extends BaseSnakeClient {
         return "#emil";
     }
 
+    /**
+     * Not, color is currently not used.
+     * 
+     * @return
+     */
     @Override
     public String getColor() {
         return "black";
     }
 
     @Override
+    public String getServerHost() {
+        return "snake.cygni.se";
+    }
+
+    @Override
     public int getServerPort() {
-        return 8080;
+        return 80;
     }
 
     @Override

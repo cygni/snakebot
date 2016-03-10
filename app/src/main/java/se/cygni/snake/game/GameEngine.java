@@ -18,7 +18,6 @@ import se.cygni.game.worldobject.Food;
 import se.cygni.game.worldobject.Obstacle;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.model.DeathReason;
-import se.cygni.snake.apiconversion.WorldStateConverter;
 import se.cygni.snake.event.InternalGameEvent;
 
 import java.util.*;
@@ -172,9 +171,6 @@ public class GameEngine {
                         world);
                 globalEventBus.post(gevent);
                 globalEventBus.post(gevent.getGameMessage());
-
-                System.out.println("Tick: " + currentWorldTick + "\n" +
-                        WorldStateConverter.convertWorldState(world, currentWorldTick).toString());
             }
         };
 
