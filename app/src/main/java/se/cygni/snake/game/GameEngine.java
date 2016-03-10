@@ -101,7 +101,6 @@ public class GameEngine {
                     countDownLatch = new CountDownLatch(game.getLivePlayers().size());
                     registerMoveQueue = new ConcurrentLinkedQueue<>();
 
-                    long tstart = System.currentTimeMillis();
                     game.getLivePlayers().stream().forEach( player -> {
                         player.onWorldUpdate(
                                 world, game.getGameId(), currentWorldTick
@@ -112,6 +111,7 @@ public class GameEngine {
                     gevent.onWorldUpdate(world, game.getGameId(), currentWorldTick);
                     globalEventBus.post(gevent);
 
+                    long tstart = System.currentTimeMillis();
                     try {
                         countDownLatch.await(gameFeatures.timeInMsPerTick, TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
@@ -119,7 +119,7 @@ public class GameEngine {
                     }
 
                     long timeSpent = System.currentTimeMillis() - tstart;
-                    System.out.println("Tick: " + currentWorldTick + ", time waiting: " + timeSpent + "ms");
+                    log.info("GameId: {}, tick: {}, time waiting: " + timeSpent + "ms", game.getGameId(), currentWorldTick);
 
                     currentWorldTick++;
 

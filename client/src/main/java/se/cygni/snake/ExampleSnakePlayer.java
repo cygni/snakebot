@@ -113,8 +113,8 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     }
 
     /**
-     * Not, color is currently not used.
-     * 
+     * Note, color is currently not used.
+     *
      * @return
      */
     @Override

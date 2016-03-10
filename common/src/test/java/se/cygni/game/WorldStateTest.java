@@ -1,6 +1,7 @@
 package se.cygni.game;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.exception.OutOfBoundsException;
@@ -432,7 +433,7 @@ public class WorldStateTest {
         assertThat(ArrayUtils.toObject(adjacent), arrayContainingInAnyOrder(209,223));
     }
 
-    @Test
+    @Test @Ignore
     public void testPrintCoordinatePosition() {
         int size = 10;
         int counter = 0;

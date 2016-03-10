@@ -25,7 +25,7 @@ public class WorldStateConverterTest {
         testConversionWithType(Food.class);
     }
 
-    @Test
+    @Test @Ignore
     public void testPrintCoordinatePosition() {
         int size = 15;
         int counter = 0;
@@ -89,16 +89,16 @@ public class WorldStateConverterTest {
 
         // Make sure deserialisation works
         Map reparsedMap = (Map) GameMessageParser.decodeMessage(mapStr);
-        System.out.println(reparsedMap);
+//        System.out.println(reparsedMap);
 
         SnakeInfo sn1 = map.getSnakeInfos()[0];
         SnakeInfo sn2 = map.getSnakeInfos()[1];
 
-        System.out.println(sn1.getName() + ", id: " + sn1.getId() + ", length: " + sn1.getLength());
-        System.out.println(sn2.getName() + ", id: " + sn2.getId() + ", length: " + sn2.getLength());
+//        System.out.println(sn1.getName() + ", id: " + sn1.getId() + ", length: " + sn1.getLength());
+//        System.out.println(sn2.getName() + ", id: " + sn2.getId() + ", length: " + sn2.getLength());
 
-        System.out.println("\n");
-        System.out.println(mapStr);
+//        System.out.println("\n");
+//        System.out.println(mapStr);
     }
 
     @Test
@@ -125,7 +125,6 @@ public class WorldStateConverterTest {
 
         // Make sure deserialisation works
         Map reparsedMap = (Map) GameMessageParser.decodeMessage(mapStr);
-        System.out.println(reparsedMap);
 
         // Assert snakeinfo
         assertEquals(1, reparsedMap.getSnakeInfos().length);

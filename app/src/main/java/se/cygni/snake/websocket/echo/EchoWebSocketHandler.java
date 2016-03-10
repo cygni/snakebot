@@ -15,7 +15,6 @@ public class EchoWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         logger.debug("Opened new session in instance " + this);
-//        System.out.println("newGameSubscriber is: " + newGameSubscriber.toString());
     }
 
     @Override
