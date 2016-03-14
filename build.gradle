@@ -81,7 +81,7 @@ subprojects {
 
     sonarqube {
         properties {
-            property "sonar.host.url", "http://sonarqube.docker.snake.cygni.se:9000"
+            property "sonar.host.url", "http://sonarqube.docker.snake:9000"
             //property "sonar.host.url", "http://sonarqube.snake.cygni.se"
             property "sonar.java.source property", "1.8"
             property "sonar.login", "admin"
