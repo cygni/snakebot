@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import se.cygni.snake.api.event.GameEndedEvent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Component
 public class GameManager {
@@ -46,10 +48,19 @@ public class GameManager {
         return game;
     }
 
+    public List<Game> listActiveGames() {
+        return activeGames
+                .keySet()
+                .stream()
+                .filter(id -> {
+                    return getGame(id).getLiveAndRemotePlayers().size() > 0;
+                }).map(id -> {
+                    return getGame(id);
+                }).collect(Collectors.toList());
+    }
+
     public String[] listGameIds() {
-        activeGames.values().stream().forEach(game -> {
-            log.info("gameId: {}, active remote players: {}", game.getGameId(), game.getLiveAndRemotePlayers().size());
-        });
+
         return activeGames
                 .keySet()
                 .stream()

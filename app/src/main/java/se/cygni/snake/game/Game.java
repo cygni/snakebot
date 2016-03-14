@@ -138,6 +138,10 @@ public class Game {
         return gameId;
     }
 
+    public GameFeatures getGameFeatures() {
+        return gameFeatures;
+    }
+
     public GameEngine getGameEngine() {
         return gameEngine;
     }

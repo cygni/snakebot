@@ -29,6 +29,8 @@ import se.cygni.snake.game.GameManager;
 import se.cygni.snake.websocket.event.api.*;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This is a per-connection websocket. That means a new instance will
@@ -130,7 +132,18 @@ public class EventSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendListOfActiveGames() {
-        ActiveGamesList gamesList = new ActiveGamesList(gameManager.listGameIds());
+        List<Game> games = gameManager.listActiveGames();
+
+        List<ActiveGame> activeGames = games.stream().map(game -> {
+            List<ActiveGamePlayer> players = game.getPlayers().stream().map( player -> {
+                return new ActiveGamePlayer(player.getName(), player.getPlayerId());
+            }).collect(Collectors.toList());
+
+            return new ActiveGame(game.getGameId(), game.getGameFeatures(), players);
+
+        }).collect(Collectors.toList());
+
+        ActiveGamesList gamesList = new ActiveGamesList(activeGames);
         try {
             if (session.isOpen()) {
                 session.sendMessage(new TextMessage(ApiMessageParser.encodeMessage(gamesList)));
@@ -138,6 +151,15 @@ public class EventSocketHandler extends TextWebSocketHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+//        ActiveGamesList gamesList = new ActiveGamesList(gameManager.listGameIds());
+//        try {
+//            if (session.isOpen()) {
+//                session.sendMessage(new TextMessage(ApiMessageParser.encodeMessage(gamesList)));
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void setActiveGameFilter(SetGameFilter gameFilter) {
