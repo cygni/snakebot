@@ -17,6 +17,10 @@ jar {
     baseName = 'snakebot-app'
 }
 
+processResources {
+    expand(project.properties)
+}
+
 configurations {
     compile.exclude module: "spring-boot-starter-tomcat"
 }

@@ -21,7 +21,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     private AnsiPrinter ansiPrinter;
 
-
     public static void main(String[] args) {
 
         Runnable task = () -> {
@@ -124,12 +123,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getServerHost() {
-        return "localhost";
+        return "snake.cygni.se";
     }
 
     @Override
     public int getServerPort() {
-        return 8080;
+        return 80;
     }
 
     @Override
