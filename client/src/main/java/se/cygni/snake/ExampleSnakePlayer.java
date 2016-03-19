@@ -86,7 +86,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-        startGame();
+//        startGame();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
         log.info("Connected, registering for training...");
         GameSettings gameSettings = new GameSettings.GameSettingsBuilder()
                 .withWidth(50)
-                .withHeight(25)
+                .withHeight(50)
                 .withMaxNoofPlayers(5)
                 .build();
 
@@ -123,12 +123,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getServerHost() {
-        return "snake.cygni.se";
+        return "localhost";
     }
 
     @Override
     public int getServerPort() {
-        return 80;
+        return 8080;
     }
 
     @Override
