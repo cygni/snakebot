@@ -154,7 +154,7 @@ public class AnsiPrinter {
                 .append((char)27).append(getSnakeColor(si.getId())).append(SNAKE_PART)
                 .append((char)27).append(fg_Default)
                 .append(" ").append(si.getName())
-                .append(" (l: ").append(si.getLength()).append(")")
+                .append(" (l: ").append(si.getLength()).append(", p:").append(si.getPoints()).append(")")
                 .append("\n");
     }
 

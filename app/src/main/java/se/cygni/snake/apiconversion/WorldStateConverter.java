@@ -47,7 +47,7 @@ public class WorldStateConverter {
         int length = head.getLength();
         Coordinate coord = ws.translatePosition(head.getPosition());
 
-        return new SnakeInfo(head.getName(), length, id, coord.getX(), coord.getY());
+        return new SnakeInfo(head.getName(), length, head.getPoints(), id, coord.getX(), coord.getY());
     }
 
     private static TileContent[][] getTileContents(WorldState ws) {

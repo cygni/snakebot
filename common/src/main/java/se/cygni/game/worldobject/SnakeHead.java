@@ -1,22 +1,26 @@
 package se.cygni.game.worldobject;
 
 
-import se.cygni.game.enums.Direction;
-
 public class SnakeHead implements SnakePart {
 
     private final String name;
     private final String playerId;
+    private int points;
     private int position;
-    private boolean alive;
-    private Direction lastDirection;
     private SnakePart nextSnakePart = null;
 
     public SnakeHead(String name, String playerId, int position) {
         this.name = name;
         this.playerId = playerId;
         this.position = position;
-        this.alive = true;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
     }
 
     @Override

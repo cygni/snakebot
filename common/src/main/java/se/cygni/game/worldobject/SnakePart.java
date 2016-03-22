@@ -6,6 +6,7 @@ public interface SnakePart extends WorldObject {
     void setNextSnakePart(SnakePart nextSnakePart);
     boolean isHead();
     boolean isTail();
+    String getPlayerId();
     int getPosition();
     void setPosition(int position);
 }

@@ -4,16 +4,22 @@ public class SnakeBody implements SnakePart {
 
     private SnakePart nextSnakePart = null;
     private int position;
+    private String playerId;
 
-    public SnakeBody() {
-    }
-
-    public SnakeBody(SnakePart nextSnakePart) {
+    public SnakeBody(String playerId, SnakePart nextSnakePart, int position) {
+        this.playerId = playerId;
         this.nextSnakePart = nextSnakePart;
+        this.position = position;
     }
 
-    public SnakeBody(int position) {
+    public SnakeBody(String playerId, int position) {
+        this.playerId = playerId;
         this.position = position;
+    }
+
+    @Override
+    public String getPlayerId() {
+        return playerId;
     }
 
     @Override

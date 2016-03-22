@@ -11,18 +11,8 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import se.cygni.game.WorldState;
-import se.cygni.game.testutil.SnakeTestUtil;
-import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
-import se.cygni.game.worldobject.Food;
-import se.cygni.game.worldobject.Obstacle;
-import se.cygni.game.worldobject.SnakeBody;
-import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.model.Map;
-import se.cygni.snake.apiconversion.WorldStateConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
@@ -173,56 +163,5 @@ public class EventSocketHandler extends TextWebSocketHandler {
             log.info("Active remote players: {}", game.getLiveAndRemotePlayers().size());
             game.startGame();
         }
-    }
-
-    private MapUpdateEvent getRandomMapUpdateEvent(long gameTick) {
-        return new MapUpdateEvent(gameTick, "666", getRandomMap());
-    }
-
-    private Map getRandomMap() {
-        WorldState ws = new WorldState(15, 15);
-
-        // Snake Python
-        String snakeName = "python";
-        SnakeHead head = new SnakeHead(snakeName, "id_python", 101);
-        SnakeBody body1 = new SnakeBody(116);
-        SnakeBody body2 = new SnakeBody(115);
-
-        head.setNextSnakePart(body1);
-        body1.setNextSnakePart(body2);
-
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, head.getPosition());
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, body1, body1.getPosition());
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, body2, body2.getPosition());
-
-        // Snake Cobra
-        String snakeName2 = "cobra";
-        SnakeHead head2 = new SnakeHead(snakeName2, "id_cobra", 109);
-        SnakeBody body21 = new SnakeBody(108);
-        SnakeBody body22 = new SnakeBody(123);
-        SnakeBody body23 = new SnakeBody(138);
-
-        head2.setNextSnakePart(body21);
-        body21.setNextSnakePart(body22);
-        body22.setNextSnakePart(body23);
-
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, head2, head2.getPosition());
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, body21, body21.getPosition());
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, body22, body22.getPosition());
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, body23, body23.getPosition());
-
-        // 10 Obstacles
-        for (int x=0; x<10; x++) {
-            AddWorldObjectAtRandomPosition ar = new AddWorldObjectAtRandomPosition(new Obstacle());
-            ws = ar.transform(ws);
-        }
-
-        // 5 Foods
-        for (int x=0; x<10; x++) {
-            AddWorldObjectAtRandomPosition ar = new AddWorldObjectAtRandomPosition(new Food());
-            ws = ar.transform(ws);
-        }
-
-        return WorldStateConverter.convertWorldState(ws, 1);
     }
 }

@@ -6,13 +6,12 @@ import org.junit.Test;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.exception.OutOfBoundsException;
 import se.cygni.game.testutil.SnakeTestUtil;
-import se.cygni.game.worldobject.Food;
-import se.cygni.game.worldobject.Obstacle;
-import se.cygni.game.worldobject.SnakeHead;
+import se.cygni.game.worldobject.*;
 
 import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
@@ -431,6 +430,50 @@ public class WorldStateTest {
 
         assertEquals(2, adjacent.length);
         assertThat(ArrayUtils.toObject(adjacent), arrayContainingInAnyOrder(209,223));
+    }
+
+    @Test
+    public void testGetSnakeSpread() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+
+        SnakePart[] parts = SnakeTestUtil.createSnake("test", "id", 13,23,24,25,35);
+        ws = SnakeTestUtil.addSnake(ws, parts);
+
+        int[] snakeSpread = ws.getSnakeSpread((SnakeHead)parts[0]);
+
+        assertEquals(5, snakeSpread.length);
+        assertThat(ArrayUtils.toObject(snakeSpread), arrayContaining(13,23,24,25,35));
+    }
+
+    @Test
+    public void testGetSnakeHeadForBodyAt() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+
+        SnakePart[] parts = SnakeTestUtil.createSnake("test", "id", 13,23,24,25,35);
+        ws = SnakeTestUtil.addSnake(ws, parts);
+
+        SnakeHead head = ws.getSnakeHeadForBodyAt(25);
+
+        assertEquals(parts[0], head);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetSnakeHeadForBodyAtNonSnakePosition() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+
+        SnakePart[] parts = SnakeTestUtil.createSnake("test", "id", 63, 64, 65, 55, 45);
+        ws = SnakeTestUtil.addSnake(ws, parts);
+        ws.getSnakeHeadForBodyAt(101);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testGetSnakeHeadForBodyAtWithSnakeWithoutHead() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+
+        SnakePart[] parts = SnakeTestUtil.createSnake("test", "id", 70, 71, 72, 73, 74, 84, 94);
+
+        ws = SnakeTestUtil.addSnake(ws, ArrayUtils.subarray(parts, 1, 6));
+        ws.getSnakeHeadForBodyAt(73);
     }
 
     @Test @Ignore

@@ -14,13 +14,19 @@ public class MoveSnake implements WorldTransformation {
     private SnakeHead snakeHead;
     private Direction direction;
     private boolean forceGrowth;
+    private boolean consumedFood;
+    private boolean allowNibble;
+    private boolean growthExecuted;
 
     public MoveSnake(SnakeHead snakeHead, Direction direction) {
         this.snakeHead = snakeHead;
         this.direction = direction;
     }
 
-    public MoveSnake(SnakeHead snakeHead, Direction direction, boolean forceGrowth) {
+    public MoveSnake(
+            SnakeHead snakeHead,
+            Direction direction,
+            boolean forceGrowth) {
         this.snakeHead = snakeHead;
         this.direction = direction;
         this.forceGrowth = forceGrowth;
@@ -41,7 +47,8 @@ public class MoveSnake implements WorldTransformation {
             throw new WallCollision(snakeHeadPos);
         }
 
-        // Target tile is not empty, check what's in it
+        // Target tile is not empty, check what's in it (rember that this
+        // move is in a World where only this Snake exists).
         if (!currentWorld.isTileEmpty(targetSnakePos)) {
 
             Tile targetTile = currentWorld.getTile(targetSnakePos);
@@ -50,18 +57,28 @@ public class MoveSnake implements WorldTransformation {
             if (targetContent instanceof Obstacle)
                 throw new ObstacleCollision(targetSnakePos);
 
-            if (targetContent instanceof SnakePart)
-                throw new SnakeCollision(targetSnakePos);
-
-            if (targetContent instanceof Food)
-                grow = true;
+            if (targetContent instanceof SnakePart) {
+                throw new SnakeCollision(targetSnakePos, snakeHead);
+            }
+            if (targetContent instanceof Food) {
+                consumedFood = true;
+            }
         }
 
         Tile[] tiles = currentWorld.getTiles();
 
-        updateSnakeBody(tiles, targetSnakePos, snakeHead, grow || forceGrowth);
+        growthExecuted = consumedFood || forceGrowth;
+        updateSnakeBody(tiles, targetSnakePos, snakeHead, growthExecuted);
 
         return new WorldState(currentWorld.getWidth(), currentWorld.getHeight(), tiles);
+    }
+
+    public boolean isGrowthExecuted() {
+        return growthExecuted;
+    }
+
+    public boolean isFoodConsumed() {
+        return consumedFood;
     }
 
     private void updateSnakeBody(Tile[] tiles, int targetPosition, SnakePart snakePart, boolean grow) {
@@ -72,7 +89,7 @@ public class MoveSnake implements WorldTransformation {
 
         if (snakePart.isTail()) {
             if (grow) {
-                SnakeBody newTail = new SnakeBody(currentPosition);
+                SnakeBody newTail = new SnakeBody(snakePart.getPlayerId(), currentPosition);
                 tiles[currentPosition] = new Tile(newTail);
                 snakePart.setNextSnakePart(newTail);
             } else {
