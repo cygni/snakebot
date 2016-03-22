@@ -8,6 +8,7 @@ import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.apiconversion.GameMessageConverter;
 
 public class RemotePlayer implements IPlayer {
@@ -15,6 +16,7 @@ public class RemotePlayer implements IPlayer {
     private Player player;
     private EventBus outgoingEventBus;
     private boolean alive = true;
+    private int accumulatedPoints = 0;
 
     public RemotePlayer(Player player, EventBus outgoingEventBus) {
         this.player = player;
@@ -80,6 +82,16 @@ public class RemotePlayer implements IPlayer {
     @Override
     public String getPlayerId() {
         return player.getPlayerId();
+    }
+
+    @Override
+    public void addPoints(PointReason reason, int points) {
+        accumulatedPoints += points;
+    }
+
+    @Override
+    public int getTotalPoints() {
+        return accumulatedPoints;
     }
 
     @Override

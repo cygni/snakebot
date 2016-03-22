@@ -5,18 +5,21 @@ import se.cygni.game.enums.Direction;
 import se.cygni.game.exception.OutOfBoundsException;
 import se.cygni.game.worldobject.*;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class WorldState {
 
-    private int width, height;
-    private Tile[] tiles;
+    private final int width, height;
+    private final Tile[] tiles;
 
     public WorldState(int width, int height) {
         this.width = width;
         this.height = height;
-        initEmptyWorld();
+        tiles = createEmptyTiles();
     }
 
     public WorldState(int width, int height, Tile[] tiles) {
@@ -68,6 +71,57 @@ public class WorldState {
 
     public <T extends WorldObject> boolean isTileContentOfType(int position, Class<T> clazz) {
         return getTile(position).getContent().getClass() == clazz;
+    }
+
+    public SnakeHead getSnakeHeadById(String playerId) {
+        int[] snakeHeadPositions = listPositionsWithContentOf(SnakeHead.class);
+        for (int pos : snakeHeadPositions) {
+            SnakeHead head = (SnakeHead)tiles[pos].getContent();
+            if (head.getPlayerId().equals(playerId)) {
+                return head;
+            }
+        }
+        throw new IllegalArgumentException("Could not find SnakeHead with playerId " + playerId);
+    }
+
+    public SnakeHead getSnakeHeadForBodyAt(int position) {
+        if (! (getTile(position).getContent() instanceof SnakePart)) {
+            throw new RuntimeException("Tile at position " + position + " didn't contain a SnakePart");
+        }
+
+        int[] snakeHeadPositions = listPositionsWithContentOf(SnakeHead.class);
+        for (int snakeHeadPosition : snakeHeadPositions) {
+            SnakeHead snakeHead = (SnakeHead)getTile(snakeHeadPosition).getContent();
+            int[] snakeSpread = getSnakeSpread(snakeHead);
+            if (ArrayUtils.contains(snakeSpread, position))
+                return snakeHead;
+        }
+
+        throw new IllegalStateException("Found SnakePart without head");
+    }
+
+    public List<String> listSnakeIds() {
+
+        return Arrays.stream(tiles).filter(tile -> tile.getContent() instanceof SnakeHead)
+                .map(tile1 -> {
+                    return ((SnakeHead)tile1.getContent()).getPlayerId();
+                }).collect(Collectors.toList());
+    }
+
+    /**
+     *
+     * @param snakeHead
+     * @return an array of all positions that this snake occupies
+     */
+    public int[] getSnakeSpread(SnakeHead snakeHead) {
+        int[] snakeSpread = new int[snakeHead.getLength()];
+        int counter = 0;
+        SnakePart snakePart = (SnakePart)snakeHead;
+        while (snakePart != null) {
+            snakeSpread[counter++] = snakePart.getPosition();
+            snakePart = snakePart.getNextSnakePart();
+        }
+        return snakeSpread;
     }
 
     public int getPositionForAdjacent(int position, Direction direction) {
@@ -163,14 +217,15 @@ public class WorldState {
     /**
      * The world is represented by a single array
      */
-    private void initEmptyWorld() {
+    private Tile[] createEmptyTiles() {
         int size = getSize();
-        tiles = new Tile[size];
+        Tile[] tiles = new Tile[size];
 
         IntStream.range(0, size).forEach(
                 pos -> {
                     tiles[pos] = new Tile();
                 }
         );
+        return tiles;
     }
 }

@@ -3,6 +3,7 @@ package se.cygni.snake.player.bot;
 import com.google.common.eventbus.EventBus;
 import se.cygni.game.WorldState;
 import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.player.IPlayer;
 
 public abstract class BotPlayer implements IPlayer {
@@ -10,6 +11,7 @@ public abstract class BotPlayer implements IPlayer {
     private boolean alive = true;
     protected final String playerId;
     protected final EventBus incomingEventbus;
+    private int accumulatedPoints = 0;
 
     public BotPlayer(String playerId, EventBus incomingEventbus) {
         this.playerId = playerId;
@@ -59,6 +61,16 @@ public abstract class BotPlayer implements IPlayer {
     @Override
     public String getPlayerId() {
         return playerId;
+    }
+
+    @Override
+    public void addPoints(PointReason reason, int points) {
+        accumulatedPoints += points;
+    }
+
+    @Override
+    public int getTotalPoints() {
+        return accumulatedPoints;
     }
 
     @Override

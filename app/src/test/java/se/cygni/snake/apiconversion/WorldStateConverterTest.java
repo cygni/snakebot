@@ -44,8 +44,8 @@ public class WorldStateConverterTest {
         // Snake Python
         String snakeName = "python";
         SnakeHead head = new SnakeHead(snakeName, "id_python", 101);
-        SnakeBody body1 = new SnakeBody(116);
-        SnakeBody body2 = new SnakeBody(115);
+        SnakeBody body1 = new SnakeBody("id_python", 116);
+        SnakeBody body2 = new SnakeBody("id_python", 115);
 
         head.setNextSnakePart(body1);
         body1.setNextSnakePart(body2);
@@ -57,9 +57,9 @@ public class WorldStateConverterTest {
         // Snake Cobra
         String snakeName2 = "cobra";
         SnakeHead head2 = new SnakeHead(snakeName2, "id_cobra", 109);
-        SnakeBody body21 = new SnakeBody(108);
-        SnakeBody body22 = new SnakeBody(123);
-        SnakeBody body23 = new SnakeBody(138);
+        SnakeBody body21 = new SnakeBody("id_cobra", 108);
+        SnakeBody body22 = new SnakeBody("id_cobra", 123);
+        SnakeBody body23 = new SnakeBody("id_cobra", 138);
 
         head2.setNextSnakePart(body21);
         body21.setNextSnakePart(body22);
@@ -107,8 +107,8 @@ public class WorldStateConverterTest {
 
         String snakeName = "junit";
         SnakeHead head = new SnakeHead(snakeName, "id", 5);
-        SnakeBody body1 = new SnakeBody(4);
-        SnakeBody body2 = new SnakeBody(3);
+        SnakeBody body1 = new SnakeBody("id", 4);
+        SnakeBody body2 = new SnakeBody("id", 3);
 
         head.setNextSnakePart(body1);
         body1.setNextSnakePart(body2);

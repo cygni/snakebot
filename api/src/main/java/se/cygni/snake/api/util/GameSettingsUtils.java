@@ -17,8 +17,8 @@ public class GameSettingsUtils {
     public static GameSettings fivePlayersMediumWorld() {
         return new GameSettings.GameSettingsBuilder()
                 .withMaxNoofPlayers(5)
-                .withWidth(125)
-                .withHeight(125)
+                .withWidth(50)
+                .withHeight(50)
                 .withFoodEnabled(true)
                 .withObstaclesEnabled(false)
                 .build();
@@ -27,8 +27,8 @@ public class GameSettingsUtils {
     public static GameSettings defaultTournament() {
         return new GameSettings.GameSettingsBuilder()
                 .withMaxNoofPlayers(10)
-                .withWidth(500)
-                .withHeight(500)
+                .withWidth(100)
+                .withHeight(100)
                 .withFoodEnabled(true)
                 .withObstaclesEnabled(true)
                 .build();

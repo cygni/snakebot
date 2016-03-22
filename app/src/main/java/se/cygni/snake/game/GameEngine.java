@@ -6,12 +6,7 @@ import org.slf4j.LoggerFactory;
 import se.cygni.game.Coordinate;
 import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
-import se.cygni.game.exception.ObstacleCollision;
-import se.cygni.game.exception.SnakeCollision;
-import se.cygni.game.exception.TransformationException;
-import se.cygni.game.exception.WallCollision;
 import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
-import se.cygni.game.transformation.MoveSnake;
 import se.cygni.game.transformation.RemoveRandomWorldObject;
 import se.cygni.game.transformation.RemoveSnake;
 import se.cygni.game.worldobject.Food;
@@ -45,6 +40,7 @@ public class GameEngine {
     private java.util.Map<String, Direction> snakeDirections;
     private AtomicBoolean allowedToRun = new AtomicBoolean(false);
     private final EventBus globalEventBus;
+    private final WorldTransformer worldTransformer;
 
     private CountDownLatch countDownLatch;
     private ConcurrentLinkedQueue<String> registerMoveQueue;
@@ -54,6 +50,7 @@ public class GameEngine {
         this.gameFeatures = gameFeatures;
         this.game = game;
         this.globalEventBus = globalEventBus;
+        this.worldTransformer = new WorldTransformer(game);
     }
 
     public void reApplyGameFeatures(GameFeatures gameFeatures) {
@@ -121,29 +118,37 @@ public class GameEngine {
                     long timeSpent = System.currentTimeMillis() - tstart;
                     log.info("GameId: {}, tick: {}, time waiting: " + timeSpent + "ms", game.getGameId(), currentWorldTick);
 
-                    currentWorldTick++;
-
-                    List<SnakeHead> sortedSnakeHeads = getSortedSnakeHeads();
-
-                    for (SnakeHead head : sortedSnakeHeads) {
-
-                        MoveSnake move = new MoveSnake(
-                                head,
-                                snakeDirections.get(head.getPlayerId()),
-                                spontaneousGrowth());
-
-                        try {
-                            world = move.transform(world);
-                        } catch (ObstacleCollision oc) {
-                            snakeDied(head, DeathReason.CollisionWithObstacle, oc.getPosition());
-                        } catch (WallCollision wc) {
-                            snakeDied(head, DeathReason.CollisionWithWall, wc.getPosition());
-                        } catch (SnakeCollision sc) {
-                            snakeDied(head, DeathReason.CollisionWithSnake, sc.getPosition());
-                        } catch (TransformationException oc) {
-                            snakeDied(head, DeathReason.CollisionWithObstacle, 0);
-                        }
+                    try {
+                        world = worldTransformer.transform(snakeDirections, gameFeatures, world, spontaneousGrowth(), currentWorldTick);
+                    } catch (Exception e) {
+                        // This is really undefined, if this happens we have a bug
+                        log.error("Bug found in WorldTransformer:", e);
                     }
+
+                    currentWorldTick++;
+//
+//                    List<SnakeHead> sortedSnakeHeads = getSortedSnakeHeads();
+//
+//                    for (SnakeHead head : sortedSnakeHeads) {
+//
+//                        MoveSnake move = new MoveSnake(
+//                                head,
+//                                snakeDirections.get(head.getPlayerId()),
+//                                spontaneousGrowth(),
+//                                gameFeatures.headToTailConsumes);
+//
+//                        try {
+//                            world = move.transform(world);
+//                        } catch (ObstacleCollision oc) {
+//                            snakeDied(head, DeathReason.CollisionWithObstacle, oc.getPosition());
+//                        } catch (WallCollision wc) {
+//                            snakeDied(head, DeathReason.CollisionWithWall, wc.getPosition());
+//                        } catch (SnakeCollision sc) {
+//                            snakeDied(head, DeathReason.CollisionWithSnake, sc.getPosition());
+//                        } catch (TransformationException oc) {
+//                            snakeDied(head, DeathReason.CollisionWithObstacle, 0);
+//                        }
+//                    }
 
                     // Add random objects
                     if (gameFeatures.foodEnabled) {
@@ -256,6 +261,7 @@ public class GameEngine {
 
     public void registerMove(long gameTick, String playerId, Direction direction) {
         // Todo: Possible sync problem here if a players registers move before game has actually started countDownLatch may be null.
+        // Todo: Must handle misbehaving clients that may send more than one registerMove per world tick!
         if (gameTick == currentWorldTick) {
             registerMoveQueue.add(playerId);
             snakeDirections.put(playerId, direction);

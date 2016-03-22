@@ -2,6 +2,7 @@ package se.cygni.snake.player;
 
 import se.cygni.game.WorldState;
 import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.api.model.PointReason;
 
 public interface IPlayer {
 
@@ -22,4 +23,8 @@ public interface IPlayer {
     public String getColor();
 
     public String getPlayerId();
+
+    public void addPoints(PointReason reason, int points);
+
+    public int getTotalPoints();
 }

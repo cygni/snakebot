@@ -31,7 +31,7 @@ public class GameFeatures {
     // of another snake it will consume that tail part.
     // I.e. the nibbling snake will grow one and
     // victim will loose one.
-    public boolean headToTailConsumes = false;
+    public boolean headToTailConsumes = true;
 
     // Only valid if headToTailConsumes is active.
     // When tailConsumeGrows is set to true the
@@ -62,6 +62,24 @@ public class GameFeatures {
     // Indicates that this is a training game,
     // Bots will be added to fill up remaining players.
     public boolean trainingGame = false;
+
+    // Points given per length unit the Snake has
+    public int pointsPerLength = 1;
+
+    // Points given per Food item consumed
+    public int pointsPerFood = 1;
+
+    // Points given per caused death (i.e. another
+    // snake collides with yours)
+    public int pointsPerCausedDeath = 5;
+
+    // Points given when a snake nibbles the tail
+    // of another snake
+    public int pointsPerNibble = 10;
+
+    // Points given to the last living snake (unless
+    // the game has been stopped before this happens)
+    public int pointsLastSnakeLiving = 5;
 
     /**
      * Enforces limits on some values
@@ -211,5 +229,45 @@ public class GameFeatures {
 
     public void setTrainingGame(boolean trainingGame) {
         this.trainingGame = trainingGame;
+    }
+
+    public int getPointsPerLength() {
+        return pointsPerLength;
+    }
+
+    public void setPointsPerLength(int pointsPerLength) {
+        this.pointsPerLength = pointsPerLength;
+    }
+
+    public int getPointsPerFood() {
+        return pointsPerFood;
+    }
+
+    public void setPointsPerFood(int pointsPerFood) {
+        this.pointsPerFood = pointsPerFood;
+    }
+
+    public int getPointsPerCausedDeath() {
+        return pointsPerCausedDeath;
+    }
+
+    public void setPointsPerCausedDeath(int pointsPerCausedDeath) {
+        this.pointsPerCausedDeath = pointsPerCausedDeath;
+    }
+
+    public int getPointsLastSnakeLiving() {
+        return pointsLastSnakeLiving;
+    }
+
+    public void setPointsLastSnakeLiving(int pointsLastSnakeLiving) {
+        this.pointsLastSnakeLiving = pointsLastSnakeLiving;
+    }
+
+    public int getPointsPerNibble() {
+        return pointsPerNibble;
+    }
+
+    public void setPointsPerNibble(int pointsPerNibble) {
+        this.pointsPerNibble = pointsPerNibble;
     }
 }

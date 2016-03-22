@@ -7,10 +7,7 @@ import se.cygni.game.exception.ObstacleCollision;
 import se.cygni.game.exception.SnakeCollision;
 import se.cygni.game.exception.WallCollision;
 import se.cygni.game.testutil.SnakeTestUtil;
-import se.cygni.game.worldobject.Food;
-import se.cygni.game.worldobject.Obstacle;
-import se.cygni.game.worldobject.SnakeBody;
-import se.cygni.game.worldobject.SnakeHead;
+import se.cygni.game.worldobject.*;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -89,7 +86,7 @@ public class MoveSnakeTest {
         int expectedEndPos = 16;
 
         SnakeHead head = new SnakeHead("test", "id", startPos);
-        SnakeBody body = new SnakeBody(25);
+        SnakeBody body = new SnakeBody("id",25);
         head.setNextSnakePart(body);
 
 
@@ -162,7 +159,32 @@ public class MoveSnakeTest {
 
         assertArrayEquals(new int[] { expectedEndPos }, ws.listPositionsWithContentOf(SnakeHead.class));
         assertArrayEquals(new int[] { startPos }, ws.listPositionsWithContentOf(SnakeBody.class));
-        assertArrayEquals(new int[] { }, ws.listFoodPositions());
+        assertArrayEquals(new int[] {}, ws.listFoodPositions());
 
+    }
+
+    @Test(expected = SnakeCollision.class)
+    public void testNibbleOnSnakeHead() throws Exception {
+
+        WorldState ws = new WorldState(10, 10);
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 12);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 22, 23);
+
+
+        ws = SnakeTestUtil.addSnake(ws, parts1);
+        ws = SnakeTestUtil.addSnake(ws, parts2);
+
+        SnakeHead snakeHead1 = ws.getSnakeHeadForBodyAt(12);
+        SnakeHead snakeHead2 = ws.getSnakeHeadForBodyAt(23);
+
+        assertEquals(1, snakeHead1.getLength());
+        assertEquals(2, snakeHead2.getLength());
+
+        assertEquals(12, snakeHead1.getPosition());
+        assertEquals(22, snakeHead2.getPosition());
+
+        MoveSnake moveSnake = new MoveSnake(snakeHead2, Direction.UP, false);
+        ws = moveSnake.transform(ws);
     }
 }
