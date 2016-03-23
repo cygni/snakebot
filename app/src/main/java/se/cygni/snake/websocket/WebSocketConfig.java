@@ -25,7 +25,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(echoWebSocketHandler(), "/echo").withSockJS();
-        registry.addHandler(eventWebSocketHandler(), "/events").withSockJS();
+        registry.addHandler(eventWebSocketHandler(), "/events").setAllowedOrigins("*").withSockJS();
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
     }
 

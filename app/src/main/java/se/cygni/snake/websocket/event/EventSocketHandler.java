@@ -158,6 +158,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
     private void startGame(StartGame apiMessage) {
         Game game = gameManager.getGame(apiMessage.getGameId());
+        log.info(apiMessage.getGameId());
         if (game != null) {
             log.info("Starting game: {}", game.getGameId());
             log.info("Active remote players: {}", game.getLiveAndRemotePlayers().size());

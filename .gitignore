@@ -16,3 +16,7 @@ out
 
 # OSX
 .DS_Store
+
+#npm stuff
+webclient/node_modules
+

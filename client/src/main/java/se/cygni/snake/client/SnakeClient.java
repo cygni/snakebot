@@ -10,30 +10,30 @@ import se.cygni.snake.api.response.PlayerRegistered;
 
 public interface SnakeClient {
 
-    public void onMapUpdate(MapUpdateEvent mapUpdateEvent);
+    void onMapUpdate(MapUpdateEvent mapUpdateEvent);
 
-    public void onSnakeDead(SnakeDeadEvent snakeDeadEvent);
+    void onSnakeDead(SnakeDeadEvent snakeDeadEvent);
 
-    public void onGameEnded(GameEndedEvent gameEndedEvent);
+    void onGameEnded(GameEndedEvent gameEndedEvent);
 
-    public void onGameStarting(GameStartingEvent gameStartingEvent);
+     void onGameStarting(GameStartingEvent gameStartingEvent);
 
-    public void onPlayerRegistered(PlayerRegistered playerRegistered);
+     void onPlayerRegistered(PlayerRegistered playerRegistered);
 
-    public void onInvalidPlayerName(InvalidPlayerName invalidPlayerName);
+     void onInvalidPlayerName(InvalidPlayerName invalidPlayerName);
 
-    public String getServerHost();
+     String getServerHost();
 
-    public int getServerPort();
+     int getServerPort();
 
-    public void onConnected();
+     void onConnected();
 
-    public void onSessionClosed();
+     void onSessionClosed();
 
-    public String getName();
+     String getName();
 
-    public String getColor();
+     String getColor();
 
-    public GameMode getGameMode();
+     GameMode getGameMode();
 
 }
