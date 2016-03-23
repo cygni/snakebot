@@ -1,6 +1,8 @@
 package se.cygni.snake.game;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.cygni.game.Coordinate;
 import se.cygni.game.Tile;
 import se.cygni.game.TileMultipleContent;
@@ -22,7 +24,11 @@ import java.util.stream.IntStream;
 
 public class WorldTransformer {
 
+    private static Logger log = LoggerFactory
+            .getLogger(WorldTransformer.class);
+
     private final Game game;
+    private int snakesDiedThisRound = 0;
 
     public WorldTransformer(Game game) {
         this.game = game;
@@ -34,6 +40,9 @@ public class WorldTransformer {
             WorldState ws,
             boolean spontaneousGrowth,
             long worldTick) throws TransformationException {
+
+        snakesDiedThisRound = 0;
+        int snakesAliveAtStart = ws.listPositionsWithContentOf(SnakeHead.class).length;
 
         // Get possible world states
         List<WorldState> worldStates = getAllPossibleWorldStates(ws,
@@ -74,12 +83,18 @@ public class WorldTransformer {
 
         syncPoints(resultingWorld);
 
+        int snakesAliveAtEnd = ws.listPositionsWithContentOf(SnakeHead.class).length;
+
+        if (snakesAliveAtStart != snakesAliveAtEnd + snakesDiedThisRound) {
+            log.error("SnakeHead count doesn't match up. Start: {}, End: {}, Died: " + snakesDiedThisRound, snakesAliveAtStart, snakesAliveAtEnd);
+        }
         return resultingWorld;
     }
 
     private void syncPoints(WorldState ws) {
         game.getPlayers().stream().forEach(player -> {
-            ws.getSnakeHeadById(player.getPlayerId()).setPoints(player.getTotalPoints());
+            if (player.isAlive())
+                ws.getSnakeHeadById(player.getPlayerId()).setPoints(player.getTotalPoints());
         });
     }
 
@@ -345,7 +360,8 @@ public class WorldTransformer {
             Coordinate coordinate,
             long worldTick) {
 
-        System.out.println(head.getPlayerId() + " died at: " + coordinate);
+        snakesDiedThisRound++;
+        log.info(head.getPlayerId() + " died at: " + coordinate);
         game.getPlayer(head.getPlayerId()).dead();
 
         game.getPlayers().stream().forEach( player -> {

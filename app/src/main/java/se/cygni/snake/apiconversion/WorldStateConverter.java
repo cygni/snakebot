@@ -5,16 +5,19 @@ import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.worldobject.*;
 import se.cygni.snake.api.model.*;
+import se.cygni.snake.player.IPlayer;
+
+import java.util.Set;
 
 public class WorldStateConverter {
 
-    public static Map convertWorldState(WorldState ws, long worldTick) {
+    public static Map convertWorldState(WorldState ws, long worldTick, Set<IPlayer> players) {
 
         int width = ws.getWidth();
         int height = ws.getHeight();
 
         TileContent[][] mapTiles = getTileContents(ws);
-        SnakeInfo[] snakeInfos = getSnakeInfos(ws);
+        SnakeInfo[] snakeInfos = getSnakeInfos(ws, players);
 
         return new Map(
                 width,
@@ -24,21 +27,31 @@ public class WorldStateConverter {
                 snakeInfos);
     }
 
-    private static SnakeInfo[] getSnakeInfos(WorldState ws) {
-        int[] snakeHeadPositions = ws.listPositionsWithContentOf(SnakeHead.class);
+    private static SnakeInfo[] getSnakeInfos(WorldState ws, Set<IPlayer> players) {
 
-        if (snakeHeadPositions.length == 0) {
-            return new SnakeInfo[0];
-        }
-
-        SnakeInfo[] snakeInfos = new SnakeInfo[snakeHeadPositions.length];
+        SnakeInfo[] snakeInfos = new SnakeInfo[players.size()];
 
         int c = 0;
-        for (int pos : snakeHeadPositions) {
-            snakeInfos[c++] = getSnakeInfo(ws, (SnakeHead)ws.getTile(pos).getContent());
+        for (IPlayer player : players) {
+            snakeInfos[c++] = getSnakeInfo(ws, player);
         }
 
         return snakeInfos;
+    }
+
+    private static SnakeInfo getSnakeInfo(WorldState ws, IPlayer player) {
+        String name = player.getName();
+        String id = player.getPlayerId();
+        int length = 0;
+        int points = player.getTotalPoints();
+        boolean alive = player.isAlive();
+
+        try {
+            SnakeHead snakeHead = ws.getSnakeHeadById(id);
+            return getSnakeInfo(ws, snakeHead);
+        } catch (Exception e) {}
+
+        return new SnakeInfo(name, length, points, id, -1, -1, alive);
     }
 
     private static SnakeInfo getSnakeInfo(WorldState ws, SnakeHead head) {
@@ -47,7 +60,7 @@ public class WorldStateConverter {
         int length = head.getLength();
         Coordinate coord = ws.translatePosition(head.getPosition());
 
-        return new SnakeInfo(head.getName(), length, head.getPoints(), id, coord.getX(), coord.getY());
+        return new SnakeInfo(name, length, head.getPoints(), id, coord.getX(), coord.getY(), true);
     }
 
     private static TileContent[][] getTileContents(WorldState ws) {

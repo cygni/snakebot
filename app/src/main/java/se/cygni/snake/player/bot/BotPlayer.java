@@ -6,6 +6,8 @@ import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.player.IPlayer;
 
+import java.util.Set;
+
 public abstract class BotPlayer implements IPlayer {
 
     private boolean alive = true;
@@ -19,7 +21,7 @@ public abstract class BotPlayer implements IPlayer {
     }
 
     @Override
-    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick) {
+    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
 
     }
 
@@ -29,7 +31,7 @@ public abstract class BotPlayer implements IPlayer {
     }
 
     @Override
-    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState) {
+    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
 
     }
 

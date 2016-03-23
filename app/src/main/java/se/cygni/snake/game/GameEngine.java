@@ -14,6 +14,7 @@ import se.cygni.game.worldobject.Obstacle;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.event.InternalGameEvent;
+import se.cygni.snake.player.IPlayer;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -98,14 +99,15 @@ public class GameEngine {
                     countDownLatch = new CountDownLatch(game.getLivePlayers().size());
                     registerMoveQueue = new ConcurrentLinkedQueue<>();
 
+                    Set<IPlayer> players = game.getPlayers();
                     game.getLivePlayers().stream().forEach( player -> {
                         player.onWorldUpdate(
-                                world, game.getGameId(), currentWorldTick
+                                world, game.getGameId(), currentWorldTick, players
                         );
                     });
 
                     InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());
-                    gevent.onWorldUpdate(world, game.getGameId(), currentWorldTick);
+                    gevent.onWorldUpdate(world, game.getGameId(), currentWorldTick, game.getPlayers());
                     globalEventBus.post(gevent);
 
                     long tstart = System.currentTimeMillis();
@@ -126,29 +128,6 @@ public class GameEngine {
                     }
 
                     currentWorldTick++;
-//
-//                    List<SnakeHead> sortedSnakeHeads = getSortedSnakeHeads();
-//
-//                    for (SnakeHead head : sortedSnakeHeads) {
-//
-//                        MoveSnake move = new MoveSnake(
-//                                head,
-//                                snakeDirections.get(head.getPlayerId()),
-//                                spontaneousGrowth(),
-//                                gameFeatures.headToTailConsumes);
-//
-//                        try {
-//                            world = move.transform(world);
-//                        } catch (ObstacleCollision oc) {
-//                            snakeDied(head, DeathReason.CollisionWithObstacle, oc.getPosition());
-//                        } catch (WallCollision wc) {
-//                            snakeDied(head, DeathReason.CollisionWithWall, wc.getPosition());
-//                        } catch (SnakeCollision sc) {
-//                            snakeDied(head, DeathReason.CollisionWithSnake, sc.getPosition());
-//                        } catch (TransformationException oc) {
-//                            snakeDied(head, DeathReason.CollisionWithObstacle, 0);
-//                        }
-//                    }
 
                     // Add random objects
                     if (gameFeatures.foodEnabled) {
@@ -160,12 +139,14 @@ public class GameEngine {
                     }
                 }
 
+                Set<IPlayer> players = game.getPlayers();
                 game.getPlayers().stream().forEach( player -> {
                     player.onGameEnded(
                             "",
                             game.getGameId(),
                             currentWorldTick,
-                            world
+                            world,
+                            players
                     );
                 });
 
@@ -173,7 +154,8 @@ public class GameEngine {
                 gevent.onGameEnded("",
                         game.getGameId(),
                         currentWorldTick,
-                        world);
+                        world,
+                        game.getPlayers());
                 globalEventBus.post(gevent);
                 globalEventBus.post(gevent.getGameMessage());
             }

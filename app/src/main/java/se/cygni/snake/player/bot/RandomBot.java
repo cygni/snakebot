@@ -9,9 +9,11 @@ import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.apiconversion.DirectionConverter;
+import se.cygni.snake.player.IPlayer;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,7 +25,7 @@ public class RandomBot extends BotPlayer {
     }
 
     @Override
-    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick) {
+    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
 
         CompletableFuture cf = CompletableFuture.runAsync(() -> {
             postNextMove(worldState, gameId, gameTick);
@@ -92,8 +94,8 @@ public class RandomBot extends BotPlayer {
     }
 
     @Override
-    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState) {
-        super.onGameEnded(playerWinnerId, gameId, gameTick, worldState);
+    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
+        super.onGameEnded(playerWinnerId, gameId, gameTick, worldState, players);
     }
 
     @Override

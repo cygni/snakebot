@@ -6,15 +6,18 @@ import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.player.IPlayer;
+
+import java.util.Set;
 
 public class GameMessageConverter {
 
-    public static MapUpdateEvent onWorldUpdate(WorldState worldState, String gameId, long gameTick) {
+    public static MapUpdateEvent onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
 
         MapUpdateEvent mue = new MapUpdateEvent(
                 gameTick,
                 gameId,
-                WorldStateConverter.convertWorldState(worldState, gameTick));
+                WorldStateConverter.convertWorldState(worldState, gameTick, players));
 
         return mue;
     }
@@ -26,11 +29,11 @@ public class GameMessageConverter {
         return sde;
     }
 
-    public static GameEndedEvent onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState) {
+    public static GameEndedEvent onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
 
         GameEndedEvent gee = new GameEndedEvent(
                 playerWinnerId, gameId, gameTick,
-                WorldStateConverter.convertWorldState(worldState, gameTick)
+                WorldStateConverter.convertWorldState(worldState, gameTick, players)
         );
 
         return gee;

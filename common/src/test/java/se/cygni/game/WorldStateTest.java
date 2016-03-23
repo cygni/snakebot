@@ -6,14 +6,15 @@ import org.junit.Test;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.exception.OutOfBoundsException;
 import se.cygni.game.testutil.SnakeTestUtil;
-import se.cygni.game.worldobject.*;
+import se.cygni.game.worldobject.Food;
+import se.cygni.game.worldobject.Obstacle;
+import se.cygni.game.worldobject.SnakeHead;
+import se.cygni.game.worldobject.SnakePart;
 
 import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class WorldStateTest {
@@ -355,7 +356,7 @@ public class WorldStateTest {
     public void testListAdjacentTilesMiddle() throws Exception {
         WorldState ws = new WorldState(15, 15);
         int[] adjacent = ws.listAdjacentTiles(112);
-
+ 
         assertEquals(4, adjacent.length);
         assertThat(ArrayUtils.toObject(adjacent), arrayContainingInAnyOrder(111,113,97,127));
     }

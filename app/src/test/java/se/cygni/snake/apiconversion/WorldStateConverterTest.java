@@ -8,7 +8,10 @@ import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
 import se.cygni.game.worldobject.*;
 import se.cygni.snake.api.GameMessageParser;
 import se.cygni.snake.api.model.*;
+import se.cygni.snake.player.IPlayer;
+import se.cygni.snake.player.bot.RandomBot;
 
+import java.util.HashSet;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
@@ -82,7 +85,11 @@ public class WorldStateConverterTest {
             ws = ar.transform(ws);
         }
 
-        Map map = WorldStateConverter.convertWorldState(ws, 1);
+        HashSet<IPlayer> players = new HashSet<>();
+        players.add(new RandomBot("id_cobra", null));
+        players.add(new RandomBot("id_python", null));
+
+        Map map = WorldStateConverter.convertWorldState(ws, 1, players);
 
         // Make sure serialisation works
         String mapStr = GameMessageParser.encodeMessage(map);
@@ -117,8 +124,11 @@ public class WorldStateConverterTest {
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, body1, 4); // 4 => (1,1)
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, body2, 3); // 3 => (0,1)
 
+        HashSet<IPlayer> players = new HashSet<>();
+        players.add(new RandomBot("id", null));
+
         WorldStateConverter converter = new WorldStateConverter();
-        Map map = converter.convertWorldState(ws, 1);
+        Map map = converter.convertWorldState(ws, 1, players);
 
         // Make sure serialisation works
         String mapStr = GameMessageParser.encodeMessage(map);
@@ -166,7 +176,7 @@ public class WorldStateConverterTest {
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, worldObject, 4);
 
         WorldStateConverter converter = new WorldStateConverter();
-        Map map = converter.convertWorldState(ws, 1);
+        Map map = converter.convertWorldState(ws, 1, new HashSet<>());
 
         // Make sure serialisation works
         String mapStr = GameMessageParser.encodeMessage(map);

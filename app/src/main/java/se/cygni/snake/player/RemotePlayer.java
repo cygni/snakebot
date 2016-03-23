@@ -11,6 +11,8 @@ import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.apiconversion.GameMessageConverter;
 
+import java.util.Set;
+
 public class RemotePlayer implements IPlayer {
 
     private Player player;
@@ -24,9 +26,9 @@ public class RemotePlayer implements IPlayer {
     }
 
     @Override
-    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick) {
+    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
 
-        MapUpdateEvent mue = GameMessageConverter.onWorldUpdate(worldState, gameId, gameTick);
+        MapUpdateEvent mue = GameMessageConverter.onWorldUpdate(worldState, gameId, gameTick, players);
         mue.setReceivingPlayerId(player.getPlayerId());
 
         outgoingEventBus.post(mue);
@@ -42,9 +44,9 @@ public class RemotePlayer implements IPlayer {
     }
 
     @Override
-    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState) {
+    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
 
-        GameEndedEvent gee = GameMessageConverter.onGameEnded(playerWinnerId, gameId, gameTick, worldState);
+        GameEndedEvent gee = GameMessageConverter.onGameEnded(playerWinnerId, gameId, gameTick, worldState, players);
         gee.setReceivingPlayerId(player.getPlayerId());
 
         outgoingEventBus.post(gee);

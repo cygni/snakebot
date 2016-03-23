@@ -11,6 +11,7 @@ public class SnakeInfo {
     final String id;
     final int x;
     final int y;
+    final boolean alive;
 
     @JsonCreator
     public SnakeInfo(
@@ -18,8 +19,9 @@ public class SnakeInfo {
             @JsonProperty("length") int length,
             @JsonProperty("points") int points,
             @JsonProperty("playerId")String playerId,
-            @JsonProperty("x")int x,
-            @JsonProperty("y")int y
+            @JsonProperty("x") int x,
+            @JsonProperty("y") int y,
+            @JsonProperty("alive") boolean alive
     )
     {
 
@@ -29,6 +31,7 @@ public class SnakeInfo {
         this.id = playerId;
         this.x = x;
         this.y = y;
+        this.alive = alive;
     }
 
     public String getName() {
@@ -53,5 +56,9 @@ public class SnakeInfo {
 
     public int getY() {
         return y;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 }
