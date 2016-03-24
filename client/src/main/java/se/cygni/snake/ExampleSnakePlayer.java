@@ -7,10 +7,13 @@ import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
-import se.cygni.snake.api.model.*;
+import se.cygni.snake.api.model.GameMode;
+import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.client.AnsiPrinter;
 import se.cygni.snake.client.BaseSnakeClient;
+import se.cygni.snake.client.MapUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +25,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
             .getLogger(ExampleSnakePlayer.class);
 
     private AnsiPrinter ansiPrinter;
-
-    private String playerId;
 
     public static void main(String[] args) {
 
@@ -58,61 +59,34 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
         ansiPrinter.printMap(mapUpdateEvent);
 
-        // Choose action here!
-        Map map = mapUpdateEvent.getMap();
-        Coord myPos = getMyPosition(map);
+        // MapUtil contains lot's of useful methods for querying the map!
+        MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), getPlayerId());
+
+
         List<SnakeDirection> directions = new ArrayList<>();
 
-        if (isTileEmpty(new Coord(myPos.x - 1, myPos.y), map))
+        // Let's see in which directions I can move
+        if (mapUtil.canIMoveInDirection(SnakeDirection.LEFT))
             directions.add(SnakeDirection.LEFT);
-        if (isTileEmpty(new Coord(myPos.x + 1, myPos.y), map))
+        if (mapUtil.canIMoveInDirection(SnakeDirection.RIGHT))
             directions.add(SnakeDirection.RIGHT);
-        if (isTileEmpty(new Coord(myPos.x, myPos.y - 1), map))
+        if (mapUtil.canIMoveInDirection(SnakeDirection.UP))
             directions.add(SnakeDirection.UP);
-        if (isTileEmpty(new Coord(myPos.x, myPos.y + 1), map))
+        if (mapUtil.canIMoveInDirection(SnakeDirection.DOWN))
             directions.add(SnakeDirection.DOWN);
 
         Random r = new Random();
-        SnakeDirection choosenDirection = SnakeDirection.DOWN;
+        SnakeDirection chosenDirection = SnakeDirection.DOWN;
 
+        // Choose a random direction
         if (!directions.isEmpty())
-            choosenDirection = directions.get(r.nextInt(directions.size()));
+            chosenDirection = directions.get(r.nextInt(directions.size()));
 
-        registerMove(mapUpdateEvent.getGameTick(), choosenDirection);
+        // Register action here!
+        registerMove(mapUpdateEvent.getGameTick(), chosenDirection);
     }
 
-    private boolean isTileEmpty(Coord coord, Map map) {
-        try {
-            return map.getTiles()[coord.x][coord.y] instanceof MapEmpty;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
-    private Coord getMyPosition(Map map) {
-
-        for (int x = 0; x < map.getWidth(); x++) {
-            for (int y = 0; y < map.getHeight(); y++) {
-                if (map.getTiles()[x][y] instanceof MapSnakeHead) {
-
-                    MapSnakeHead head = (MapSnakeHead)map.getTiles()[x][y];
-                    if (head.getPlayerId().equals(playerId))
-                        return new Coord(x, y);
-                }
-            }
-        }
-
-        throw new IllegalStateException("Could not find my position");
-    }
-
-    public class Coord {
-        public int x,y;
-
-        public Coord(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
 
     @Override
     public void onInvalidPlayerName(InvalidPlayerName invalidPlayerName) {
@@ -139,9 +113,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     @Override
     public void onPlayerRegistered(PlayerRegistered playerRegistered) {
         log.info("PlayerRegistered: " + playerRegistered);
-
-        playerId = playerRegistered.getReceivingPlayerId();
-        log.info("My player ID: " + playerId);
 
         // Disable this if you want to start the game manually from
         // the web GUI
@@ -182,12 +153,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getServerHost() {
-        return "localhost";
+        return "snake.cygni.se";
     }
 
     @Override
     public int getServerPort() {
-        return 8080;
+        return 80;
     }
 
     @Override

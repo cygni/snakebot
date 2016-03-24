@@ -60,6 +60,10 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         return session != null && !gameEnded;
     }
 
+    public String getPlayerId() {
+        return playerId;
+    }
+
     private void disconnect() {
         log.info("Disconnecting from server");
         if (session != null) {
