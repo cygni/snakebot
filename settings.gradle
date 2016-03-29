@@ -1,1 +1,6 @@
-include ":api", ":common", ":app", ":client", ":javafxclient"
+include ":api", ":common", ":app", ":client"
+
+
+if (!System.getenv()['JENKINS_HOME']) {
+    include ":javafxclient"
+}
