@@ -2,6 +2,7 @@ package se.cygni.snake.client;
 
 import se.cygni.snake.api.model.*;
 
+import java.util.HashMap;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
@@ -10,11 +11,13 @@ public class MapUtil {
     private final Map map;
     private final String playerId;
     private final TileContent[] mapFlat;
+    private final java.util.Map<String, Integer> snakeLengths;
 
     public MapUtil(Map map, String playerId) {
         this.map = map;
         this.playerId = playerId;
         mapFlat = flattenMap();
+        snakeLengths = new HashMap<>();
     }
 
     public boolean canIMoveInDirection(SnakeDirection direction) {
@@ -70,6 +73,17 @@ public class MapUtil {
                     return body1.getOrder() < body2.getOrder() ? -1 : 1;
                 })
                 .toArray(MapCoordinate[]::new);
+    }
+
+    public int getPlayerLength(String playerId) {
+        if (snakeLengths.containsKey(playerId))
+            return snakeLengths.get(playerId);
+
+        int length = (int)IntStream.range(0, mapFlat.length)
+                .filter(pos -> contentAtPosHasPlayerId(pos, playerId)).count();
+
+        snakeLengths.put(playerId, length);
+        return length;
     }
 
     private boolean contentAtPosHasPlayerId(int position, String playerId) {

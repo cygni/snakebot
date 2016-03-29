@@ -7,7 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import se.cygni.snake.api.event.GameAbortedEvent;
+import se.cygni.snake.api.event.GameCreatedEvent;
 import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.event.InternalGameEvent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +48,18 @@ public class GameManager {
     public Game createGame(GameFeatures gameFeatures) {
         Game game = new Game(gameFeatures, globalEventBus);
         registerGame(game);
+
         return game;
+    }
+
+    public List<Game> listAllGames() {
+        return activeGames
+                .keySet()
+                .stream()
+                .map(id -> {
+                    return getGame(id);
+                })
+                .collect(Collectors.toList());
     }
 
     public List<Game> listActiveGames() {
@@ -76,10 +90,20 @@ public class GameManager {
 
     private void registerGame(Game game) {
         activeGames.put(game.getGameId(), game);
+
+        log.info("Registered new game, posting to GlobalEventBus...");
+        globalEventBus.post(new InternalGameEvent(
+                System.currentTimeMillis(),
+                new GameCreatedEvent(game.getGameId())));
     }
 
     @Subscribe
     public void onGameEndedEvent(GameEndedEvent gameEndedEvent) {
         activeGames.remove(gameEndedEvent.getGameId());
+    }
+
+    @Subscribe
+    public void onGameAbortedEvent(GameAbortedEvent gameAbortedEvent) {
+        activeGames.remove(gameAbortedEvent.getGameId());
     }
 }

@@ -83,7 +83,7 @@ public class WorldTransformer {
 
         syncPoints(resultingWorld);
 
-        int snakesAliveAtEnd = ws.listPositionsWithContentOf(SnakeHead.class).length;
+        int snakesAliveAtEnd = resultingWorld.listPositionsWithContentOf(SnakeHead.class).length;
 
         if (snakesAliveAtStart != snakesAliveAtEnd + snakesDiedThisRound) {
             log.error("SnakeHead count doesn't match up. Start: {}, End: {}, Died: " + snakesDiedThisRound, snakesAliveAtStart, snakesAliveAtEnd);

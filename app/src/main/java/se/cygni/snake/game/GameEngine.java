@@ -142,7 +142,7 @@ public class GameEngine {
                 Set<IPlayer> players = game.getPlayers();
                 game.getPlayers().stream().forEach( player -> {
                     player.onGameEnded(
-                            "",
+                            getLeaderPlayerId(),
                             game.getGameId(),
                             currentWorldTick,
                             world,
@@ -151,7 +151,7 @@ public class GameEngine {
                 });
 
                 InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());
-                gevent.onGameEnded("",
+                gevent.onGameEnded(getLeaderPlayerId(),
                         game.getGameId(),
                         currentWorldTick,
                         world,
@@ -237,8 +237,27 @@ public class GameEngine {
 
     public boolean isGameRunning() {
         return (allowedToRun.get() &&
-                game.getLiveAndRemotePlayers().size() > 0);
+                game.getLiveAndRemotePlayers().size() > 0 &&
+                noofLiveSnakesInWorld() > 1);
 
+    }
+
+    public int noofLiveSnakesInWorld() {
+        return (int) game.getPlayers().stream()
+                .filter(player -> player.isAlive())
+                .count();
+    }
+
+    public String getLeaderPlayerId() {
+        IPlayer winner = game.getPlayers().stream()
+                .max((player1, player2) -> {
+                    return Integer.compare(
+                            player1.getTotalPoints(),
+                            player2.getTotalPoints());
+                })
+                .get();
+
+        return winner.getPlayerId();
     }
 
     public void registerMove(long gameTick, String playerId, Direction direction) {

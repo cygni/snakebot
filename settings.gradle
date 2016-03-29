@@ -1,1 +1,1 @@
-include ":api", ":common", ":app", ":client"
+include ":api", ":common", ":app", ":client", ":javafxclient"

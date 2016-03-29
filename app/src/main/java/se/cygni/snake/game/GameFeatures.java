@@ -18,7 +18,7 @@ public class GameFeatures {
     public int timeInMsPerTick = 250;
 
     // Randomly place obstacles
-    public boolean obstaclesEnabled = false;
+    public boolean obstaclesEnabled = true;
 
     // Randomly place food
     public boolean foodEnabled = true;
@@ -49,11 +49,11 @@ public class GameFeatures {
 
     // Likelihood (in percent) that a new obstacle will be
     // added to the world
-    public int addObstacleLikelihood = 15;
+    public int addObstacleLikelihood = 10;
 
     // Likelihood (in percent) that an
     // obstacle will be removed from the world
-    public int removeObstacleLikelihood = 15;
+    public int removeObstacleLikelihood = 5;
 
     // Snake grow every N world ticks.
     // 0 for disabled

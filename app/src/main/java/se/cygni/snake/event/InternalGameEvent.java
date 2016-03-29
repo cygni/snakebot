@@ -44,4 +44,12 @@ public class InternalGameEvent {
     public void onGameStart(String gameId, int noofPlayers, int width, int height) {
         this.gameMessage = GameMessageConverter.onGameStart(gameId, noofPlayers, width, height);
     }
+
+    public void onGameAborted(String gameId) {
+        this.gameMessage = GameMessageConverter.onGameAborted(gameId);
+    }
+
+    public void onGameChanged(String gameId) {
+        this.gameMessage = GameMessageConverter.onGameChanged(gameId);
+    }
 }

@@ -97,12 +97,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onSnakeDead(SnakeDeadEvent snakeDeadEvent) {
         log.info("A snake {} died by {}",
                 snakeDeadEvent.getPlayerId(),
-                snakeDeadEvent.getDeathReason());
+                snakeDeadEvent.getDeathReason() + " at tick: " + snakeDeadEvent.getGameTick());
     }
 
     @Override
     public void onGameEnded(GameEndedEvent gameEndedEvent) {
-        log.debug("GameEndedEvent: " + gameEndedEvent);
+        log.info("GameEnded, winner: {}", gameEndedEvent.getPlayerWinnerId());
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-        startGame();
+         startGame();
     }
 
     @Override
@@ -128,8 +128,8 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onConnected() {
         log.info("Connected, registering for training...");
         GameSettings gameSettings = new GameSettings.GameSettingsBuilder()
-                .withWidth(25)
-                .withHeight(25)
+                .withWidth(75)
+                .withHeight(75)
                 .withMaxNoofPlayers(5)
                 .build();
 
@@ -153,12 +153,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getServerHost() {
-        return "snake.cygni.se";
+        return "localhost";
     }
 
     @Override
     public int getServerPort() {
-        return 80;
+        return 8080;
     }
 
     @Override

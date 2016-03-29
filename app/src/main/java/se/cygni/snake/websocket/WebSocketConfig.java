@@ -26,6 +26,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(echoWebSocketHandler(), "/echo").withSockJS();
         registry.addHandler(eventWebSocketHandler(), "/events").setAllowedOrigins("*").withSockJS();
+        registry.addHandler(eventWebSocketHandler(), "/events-native").setAllowedOrigins("*");
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
     }
 
@@ -36,7 +37,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler eventWebSocketHandler() {
-        return new PerConnectionWebSocketHandler(EventSocketHandler.class, false);
+        return new PerConnectionWebSocketHandler(EventSocketHandler.class, true);
     }
 
     @Bean

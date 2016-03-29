@@ -118,6 +118,24 @@ public class MapUtilTest {
         assertEquals(6, position);
     }
 
+    @Test
+    public void testGetPlayerLength() throws Exception {
+        Map map = createMap();
+
+        map.getTiles()[2][2] = new MapSnakeHead("test", "a");
+        map.getTiles()[1][2] = new MapSnakeBody(false, "a", 1);
+        map.getTiles()[1][1] = new MapSnakeBody(false, "a", 2);
+        map.getTiles()[1][0] = new MapSnakeBody(true, "a", 3);
+
+        map.getTiles()[0][1] = new MapSnakeHead("test-other", "b");
+        map.getTiles()[0][0] = new MapSnakeBody(false, "b", 1);
+
+        MapUtil mapUtil = new MapUtil(map, "a");
+
+        assertEquals(4, mapUtil.getPlayerLength("a"));
+        assertEquals(2, mapUtil.getPlayerLength("b"));
+    }
+
     private Map createMap() {
         TileContent[][] contents = new TileContent[][] {
                 {new MapEmpty(), new MapEmpty(), new MapEmpty()},

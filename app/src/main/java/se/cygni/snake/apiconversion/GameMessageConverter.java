@@ -1,10 +1,7 @@
 package se.cygni.snake.apiconversion;
 
 import se.cygni.game.WorldState;
-import se.cygni.snake.api.event.GameEndedEvent;
-import se.cygni.snake.api.event.GameStartingEvent;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.player.IPlayer;
 
@@ -44,5 +41,15 @@ public class GameMessageConverter {
         GameStartingEvent gse = new GameStartingEvent(gameId, noofPlayers, width, height);
 
         return gse;
+    }
+
+    public static GameAbortedEvent onGameAborted(String gameId) {
+
+        return new GameAbortedEvent(gameId);
+    }
+
+    public static GameChangedEvent onGameChanged(String gameId) {
+
+        return new GameChangedEvent(gameId);
     }
 }

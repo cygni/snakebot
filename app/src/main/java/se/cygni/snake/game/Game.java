@@ -17,6 +17,7 @@ import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.apiconversion.DirectionConverter;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
+import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
 import se.cygni.snake.player.bot.RandomBot;
@@ -87,6 +88,7 @@ public class Game {
         MessageUtils.copyCommonAttributes(registerPlayer, playerRegistered);
 
         outgoingEventBus.post(playerRegistered);
+        publishGameChanged();
     }
 
     @Subscribe
@@ -160,6 +162,12 @@ public class Game {
 
     public void playerLostConnection(String playerId) {
         getPlayer(playerId).dead();
+
+        if (getLiveAndRemotePlayers().size() == 0) {
+            abort();
+        } else {
+            publishGameChanged();
+        }
     }
 
     public EventBus getGlobalEventBus() {
@@ -179,5 +187,16 @@ public class Game {
     public void abort() {
         players.clear();
         gameEngine.abort();
+
+        InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());
+        gevent.onGameAborted(getGameId());
+        globalEventBus.post(gevent);
+        globalEventBus.post(gevent.getGameMessage());
+    }
+
+    public void publishGameChanged() {
+        InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());
+        gevent.onGameChanged(getGameId());
+        globalEventBus.post(gevent);
     }
 }

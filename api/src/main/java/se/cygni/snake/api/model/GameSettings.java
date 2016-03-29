@@ -17,7 +17,7 @@ public class GameSettings {
     private int timeInMsPerTick = 250;
 
     // Randomly place obstacles
-    private boolean obstaclesEnabled = false;
+    private boolean obstaclesEnabled = true;
 
     // Randomly place food
     private boolean foodEnabled = true;
@@ -245,7 +245,7 @@ public class GameSettings {
         private int timeInMsPerTick = 250;
 
         // Randomly place obstacles
-        private boolean obstaclesEnabled = false;
+        private boolean obstaclesEnabled = true;
 
         // Randomly place food
         private boolean foodEnabled = true;

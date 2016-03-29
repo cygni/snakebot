@@ -13,6 +13,11 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
+import se.cygni.snake.api.event.GameAbortedEvent;
+import se.cygni.snake.api.event.GameChangedEvent;
+import se.cygni.snake.api.event.GameCreatedEvent;
+import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
@@ -47,26 +52,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
         log.info("Opened new event session for " + session.getId());
         this.session = session;
         globalEventBus.register(this);
-
-        /*
-        this.session = session;
-        isConnected = true;
-        // Lambda Runnable
-        Runnable eventGenerator = () -> {
-            while (isConnected) {
-                long worldTick = 0;
-                try {
-                    session.sendMessage(new TextMessage(GameMessageParser.encodeMessage(getRandomMapUpdateEvent(worldTick))));
-                    worldTick++;
-                    Thread.sleep(250);
-                    log.info("World tick: {}", worldTick);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        new Thread(eventGenerator).start();
-        */
+        sendListOfActiveGames();
     }
 
     @Override
@@ -104,6 +90,19 @@ public class EventSocketHandler extends TextWebSocketHandler {
     public void onInternalGameEvent(InternalGameEvent event) {
 
         log.info("EventSocketHandler got a message: " + event.getGameMessage().getType());
+        GameMessage gameMessage = event.getGameMessage();
+
+        if (gameMessage instanceof GameCreatedEvent ||
+                gameMessage instanceof GameChangedEvent ||
+                gameMessage instanceof GameAbortedEvent) {
+            sendListOfActiveGames();
+            return;
+        }
+
+        if (gameMessage instanceof GameEndedEvent) {
+            sendListOfActiveGames();
+        }
+
         sendEvent(event.getGameMessage());
     }
 
@@ -122,14 +121,20 @@ public class EventSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendListOfActiveGames() {
-        List<Game> games = gameManager.listActiveGames();
+//        List<Game> games = gameManager.listActiveGames();
+        log.info("Seding updated list of games");
+        List<Game> games = gameManager.listAllGames();
 
         List<ActiveGame> activeGames = games.stream().map(game -> {
             List<ActiveGamePlayer> players = game.getPlayers().stream().map( player -> {
                 return new ActiveGamePlayer(player.getName(), player.getPlayerId());
             }).collect(Collectors.toList());
 
-            return new ActiveGame(game.getGameId(), game.getGameFeatures(), players);
+            return new ActiveGame(
+                    game.getGameId(),
+                    ArrayUtils.contains(filterGameIds, game.getGameId()),
+                    GameSettingsConverter.toGameSettings(game.getGameFeatures()),
+                    players);
 
         }).collect(Collectors.toList());
 
