@@ -58,7 +58,8 @@ public class Main extends Application implements EventListener {
     @Override
     public void start(Stage primaryStage) {
 
-        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
+//        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
+        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
 
         BorderPane root = new BorderPane();
 
@@ -104,7 +105,6 @@ public class Main extends Application implements EventListener {
                     if (mapevent.getGameTick() == 0)
                         populatePlayerColors(mapevent);
 
-                    System.out.println("Updating map, tick: " + mapevent.getGameTick());
                     logMessage("Rendering game tick: " + mapevent.getGameTick());
                     populateWorldPane(mapevent, gridModel);
                     gridView.requestLayout();
@@ -179,6 +179,7 @@ public class Main extends Application implements EventListener {
         return eventLog;
     }
 
+
     private FlowPane createControlPane() {
         FlowPane flow = new FlowPane(Orientation.VERTICAL);
         flow.setVgap(5);
@@ -187,6 +188,8 @@ public class Main extends Application implements EventListener {
         flow.getChildren().add(new Text("Select game:"));
 
         activeGameListView = new ListView<>();
+        activeGameListView.setPrefHeight(125);
+        activeGameListView.setPrefWidth(150);
 
         activeGameListView.setCellFactory(cellfactory -> {
             return new ListCell<ActiveGame>() {
@@ -356,15 +359,6 @@ public class Main extends Application implements EventListener {
 
         int length = mapUtil.getPlayerLength(snakeBody.getPlayerId());
         int currBodyPartOrder = snakeBody.getOrder();
-
-        /*
-        l=8
-        o=8 -> 4
-
-        l=8
-        o=7 -> 3
-        7-8+4
-        */
 
         int tailOrder = currBodyPartOrder - length + 3;
         boolean isTail = false;
