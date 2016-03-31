@@ -57,7 +57,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
-        ansiPrinter.printMap(mapUpdateEvent);
+//        ansiPrinter.printMap(mapUpdateEvent);
 
         // MapUtil contains lot's of useful methods for querying the map!
         MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), getPlayerId());
@@ -128,8 +128,8 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onConnected() {
         log.info("Connected, registering for training...");
         GameSettings gameSettings = new GameSettings.GameSettingsBuilder()
-                .withWidth(75)
-                .withHeight(75)
+                .withWidth(100)
+                .withHeight(100)
                 .withMaxNoofPlayers(5)
                 .build();
 

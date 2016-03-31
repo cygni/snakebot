@@ -49,13 +49,7 @@ public class EventSocketClient {
     }
 
     public void connect() {
-//        List<Transport> transports = new ArrayList<>(2);
-//        transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-//        transports.add(new RestTemplateXhrTransport());
-
         WebSocketClient wsClient = new StandardWebSocketClient();
-
-//        SockJsClient sockJsClient = new SockJsClient(transports);
 
         wsClient.doHandshake(new TextWebSocketHandler() {
             @Override
@@ -93,7 +87,9 @@ public class EventSocketClient {
                     } else if (gameMessage instanceof InvalidPlayerName) {
                         listener.onInvalidPlayerName((InvalidPlayerName)gameMessage);
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 try {
                     ApiMessage apiMessage = ApiMessageParser.decodeMessage(msgPayload);
@@ -101,8 +97,9 @@ public class EventSocketClient {
                     if (apiMessage instanceof ActiveGamesList) {
                         listener.onActiveGamesList((ActiveGamesList) apiMessage);
                     }
-                } catch (Exception e) {}
-
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

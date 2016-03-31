@@ -3,14 +3,23 @@ package se.cygni.snake.websocket.tournament;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import se.cygni.snake.game.TournamentManager;
 
 public class TournamentWebSocketHandler extends TextWebSocketHandler {
 
     private static Logger logger = LoggerFactory.getLogger(TournamentWebSocketHandler.class);
+
+    private TournamentManager tournamentManager;
+
+    @Autowired
+    public TournamentWebSocketHandler(TournamentManager tournamentManager) {
+        this.tournamentManager = tournamentManager;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
