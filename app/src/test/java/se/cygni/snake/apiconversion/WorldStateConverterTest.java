@@ -12,9 +12,9 @@ import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.bot.RandomBot;
 
 import java.util.HashSet;
-import java.util.stream.IntStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class WorldStateConverterTest {
 
@@ -93,19 +93,20 @@ public class WorldStateConverterTest {
 
         // Make sure serialisation works
         String mapStr = GameMessageParser.encodeMessage(map);
+        System.out.println(mapStr);
 
         // Make sure deserialisation works
         Map reparsedMap = (Map) GameMessageParser.decodeMessage(mapStr);
-//        System.out.println(reparsedMap);
 
         SnakeInfo sn1 = map.getSnakeInfos()[0];
         SnakeInfo sn2 = map.getSnakeInfos()[1];
 
-//        System.out.println(sn1.getName() + ", id: " + sn1.getId() + ", length: " + sn1.getLength());
-//        System.out.println(sn2.getName() + ", id: " + sn2.getId() + ", length: " + sn2.getLength());
+        assertArrayEquals(new int[] {101,116,115}, sn1.getPositions());
+        assertArrayEquals(new int[] {109,108,123,138}, sn2.getPositions());
 
-//        System.out.println("\n");
-//        System.out.println(mapStr);
+        assertEquals(10, reparsedMap.getFoodPositions().length);
+        assertEquals(10, reparsedMap.getObstaclePositions().length);
+
     }
 
     @Test
@@ -142,28 +143,8 @@ public class WorldStateConverterTest {
         assertEquals(3, si.getLength());
         assertEquals("junit", si.getName());
         assertEquals("id", si.getId());
-        assertEquals(2, si.getX());
-        assertEquals(1, si.getY());
+        assertArrayEquals(new int[]{5,4,3}, si.getPositions());
 
-        // Assert snake position
-        assertEquals(MapSnakeHead.class, reparsedMap.getTiles()[2][1].getClass());
-        assertEquals(MapSnakeBody.class, reparsedMap.getTiles()[1][1].getClass());
-        assertEquals(MapSnakeBody.class, reparsedMap.getTiles()[0][1].getClass());
-
-        // Assert snake values
-        MapSnakeHead mapSnakeHead = (MapSnakeHead)reparsedMap.getTiles()[2][1];
-        assertEquals(snakeName, mapSnakeHead.getName());
-        assertEquals("id", mapSnakeHead.getPlayerId());
-
-        MapSnakeBody mapSnakeBody1 = (MapSnakeBody)reparsedMap.getTiles()[1][1];
-        assertEquals("id", mapSnakeBody1.getPlayerId());
-        assertEquals(1, mapSnakeBody1.getOrder());
-        assertFalse(mapSnakeBody1.isTail());
-
-        MapSnakeBody mapSnakeBody2 = (MapSnakeBody)reparsedMap.getTiles()[0][1];
-        assertEquals("id", mapSnakeBody2.getPlayerId());
-        assertEquals(2, mapSnakeBody2.getOrder());
-        assertTrue(mapSnakeBody2.isTail());
 
     }
 
@@ -190,15 +171,14 @@ public class WorldStateConverterTest {
 
         Class mapType = getCorrespondingMapType(worldObject);
 
-        IntStream.range(0, 3).forEach(x -> {
-            IntStream.range(0, 4).forEach(y -> {
-                if (x == 1 && y == 1) {
-                    assertEquals(mapType, reparsedMap.getTiles()[x][y].getClass());
-                } else {
-                    assertEquals(MapEmpty.class, reparsedMap.getTiles()[x][y].getClass());
-                }
-            });
-        });
+        if (clazz == Obstacle.class) {
+            assertArrayEquals(new int[] {4}, reparsedMap.getObstaclePositions());
+        } else {
+            assertArrayEquals(new int[] {4}, reparsedMap.getFoodPositions());
+
+        }
+
+
 
         // No snakeinfo
         assertEquals(0, map.getSnakeInfos().length);
@@ -217,17 +197,4 @@ public class WorldStateConverterTest {
         throw new IllegalArgumentException(obj.getClass() + " is not a known type");
     }
 
-    @Test @Ignore
-    public void testStreams() throws Exception {
-        int [] result = IntStream.concat(
-                IntStream.range(0, 10),
-                IntStream.range(0, 10).flatMap(x -> IntStream.of(generate(x))))
-                .toArray();
-
-        assertEquals(40, result.length);
-    }
-
-    private int[] generate(int x) {
-        return new int[] {66,66,66};
-    }
 }

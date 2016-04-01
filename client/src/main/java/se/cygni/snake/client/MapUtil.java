@@ -1,23 +1,39 @@
 package se.cygni.snake.client;
 
+import org.apache.commons.lang3.ArrayUtils;
 import se.cygni.snake.api.model.*;
 
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
-import java.util.OptionalInt;
-import java.util.stream.IntStream;
 
 public class MapUtil {
 
     private final Map map;
+    private final int mapSize;
     private final String playerId;
-    private final TileContent[] mapFlat;
-    private final java.util.Map<String, Integer> snakeLengths;
+    private final java.util.Map<String, SnakeInfo> snakeInfoMap;
+    private final java.util.Map<String, BitSet> snakeSpread;
+    private final BitSet foods;
+    private final BitSet obstacles;
+    private final BitSet snakes;
+
 
     public MapUtil(Map map, String playerId) {
         this.map = map;
+        this.mapSize = map.getHeight() * map.getWidth();
+
         this.playerId = playerId;
-        mapFlat = flattenMap();
-        snakeLengths = new HashMap<>();
+        snakeInfoMap = new HashMap<>();
+        snakeSpread = new HashMap<>();
+
+        int mapLength = map.getHeight() * map.getWidth();
+        foods = new BitSet(mapLength);
+        obstacles = new BitSet(mapLength);
+        snakes = new BitSet(mapLength);
+
+        populateSnakeInfo();
+        populateTileBits();
     }
 
     public boolean canIMoveInDirection(SnakeDirection direction) {
@@ -49,57 +65,13 @@ public class MapUtil {
      * @return an array of MapCoordinate for the snake with matching playerId
      */
     public MapCoordinate[] getSnakeSpread(String playerId) {
-        return IntStream.range(0, mapFlat.length)
-                .filter(pos -> contentAtPosHasPlayerId(pos, playerId))
-                .mapToObj(pos -> translatePosition(pos))
-                .sorted((coordinate1, coordinate2) -> {
-
-                    // a negative integer, zero, or a positive integer as the first object
-                    // is less than, equal to, or greater than the second object.
-                    TileContent c1 = getTileAt(coordinate1);
-                    TileContent c2 = getTileAt(coordinate2);
-                    if (c1 instanceof MapSnakeHead) {
-                        return -1;
-                    }
-
-                    if (c2 instanceof MapSnakeHead) {
-                        return 1;
-                    }
-
-                    // We have two SnakeBodies
-                    MapSnakeBody body1 = (MapSnakeBody)c1;
-                    MapSnakeBody body2 = (MapSnakeBody)c2;
-
-                    return body1.getOrder() < body2.getOrder() ? -1 : 1;
-                })
-                .toArray(MapCoordinate[]::new);
+        return convertPositions(
+                snakeInfoMap.get(playerId).getPositions());
     }
 
     public int getPlayerLength(String playerId) {
-        if (snakeLengths.containsKey(playerId))
-            return snakeLengths.get(playerId);
-
-        int length = (int)IntStream.range(0, mapFlat.length)
-                .filter(pos -> contentAtPosHasPlayerId(pos, playerId)).count();
-
-        snakeLengths.put(playerId, length);
-        return length;
-    }
-
-    private boolean contentAtPosHasPlayerId(int position, String playerId) {
-        TileContent content = getTileAt(position);
-
-        if (content instanceof MapSnakeHead) {
-            MapSnakeHead head = (MapSnakeHead)content;
-            return head.getPlayerId().equals(playerId);
-        }
-
-        if (content instanceof MapSnakeBody) {
-            MapSnakeBody body = (MapSnakeBody)content;
-            return body.getPlayerId().equals(playerId);
-        }
-
-        return false;
+        return snakeInfoMap.get(playerId)
+                .getLength();
     }
 
     /**
@@ -107,7 +79,7 @@ public class MapUtil {
      * @return An array containing all MapCoordinates where there's Food
      */
     public MapCoordinate[] listCoordinatesContainingFood() {
-        return listCoordinatesContainingType(MapFood.class);
+        return convertPositions(map.getFoodPositions());
     }
 
     /**
@@ -115,14 +87,11 @@ public class MapUtil {
      * @return An array containing all MapCoordinates where there's an Obstacle
      */
     public MapCoordinate[] listCoordinatesContainingObstacle() {
-        return listCoordinatesContainingType(MapObstacle.class);
+        return convertPositions(map.getObstaclePositions());
     }
 
-    private <T extends TileContent> MapCoordinate[]
-        listCoordinatesContainingType(Class<T> type) {
-
-        return IntStream.range(0, mapFlat.length)
-                .filter(pos -> getTileAt(pos).getClass().equals(type))
+    private MapCoordinate[] convertPositions(int[] positions) {
+        return Arrays.stream(positions)
                 .mapToObj(pos -> translatePosition(pos))
                 .toArray(MapCoordinate[]::new);
     }
@@ -130,15 +99,15 @@ public class MapUtil {
     /**
      *
      * @param coordinate
-     * @return true if the TileContent at coordinate is Empty of contains Food
+     * @return true if the TileContent at coordinate is Empty or contains Food
      */
     public boolean isTileAvailableForMovementTo(MapCoordinate coordinate) {
-        try {
-            TileContent content = getTileAt(coordinate);
-            return (content instanceof MapEmpty) || (content instanceof MapFood);
-        } catch (Exception e) {
+        int position = translateCoordinate(coordinate);
+        if (position < 0 ||
+                position >= mapSize)
             return false;
-        }
+
+        return !(obstacles.get(position) || snakes.get(position));
     }
 
     /**
@@ -147,32 +116,8 @@ public class MapUtil {
      */
     public MapCoordinate getMyPosition() {
 
-        OptionalInt optionalPosition = IntStream.range(0, mapFlat.length)
-                .filter(pos -> getTileAt(pos) instanceof MapSnakeHead)
-                .filter(snakeHeadPos -> {
-                    MapSnakeHead head = (MapSnakeHead)getTileAt(snakeHeadPos);
-                    return head.getPlayerId().equals(playerId);
-                })
-                .findFirst();
-
-        if (optionalPosition.isPresent()) {
-            return translatePosition(optionalPosition.getAsInt());
-        }
-
-        throw new IllegalStateException("Could not find my position");
-    }
-
-    /**
-     * Represents the Map as a single array. Use the translatePosition(...) and
-     * translateCoordinate(...) to convert between the different systems.
-     *
-     * @return A single array containing all the Tiles of the Map.
-     */
-    public TileContent[] flattenMap() {
-
-        return IntStream.range(0, map.getWidth() * map.getHeight())
-                .mapToObj(pos -> getTileAt(translatePosition(pos)))
-                .toArray(TileContent[]::new);
+        return translatePosition(
+                snakeInfoMap.get(playerId).getPositions()[0]);
     }
 
     /**
@@ -181,7 +126,19 @@ public class MapUtil {
      * @return the TileContent at the specified position of the flattened map.
      */
     public TileContent getTileAt(int position) {
-        return mapFlat[position];
+        if (foods.get(position)) {
+            return new MapFood();
+        }
+
+        if (obstacles.get(position)) {
+            return new MapObstacle();
+        }
+
+        if (snakes.get(position)) {
+            return getSnakePart(position);
+        }
+
+        return new MapEmpty();
     }
 
     /**
@@ -190,7 +147,7 @@ public class MapUtil {
      * @return the TileContent at the specified coordinate
      */
     public TileContent getTileAt(MapCoordinate coordinate) {
-        return map.getTiles()[coordinate.x][coordinate.y];
+        return getTileAt(translateCoordinate(coordinate));
     }
 
     /**
@@ -215,5 +172,57 @@ public class MapUtil {
      */
     public int translateCoordinate(MapCoordinate coordinate) {
         return coordinate.x + coordinate.y * map.getWidth();
+    }
+
+    private TileContent getSnakePart(int position) {
+        String playerId = getPlayerIdAtPosition(position);
+
+        SnakeInfo snakeInfo = snakeInfoMap.get(playerId);
+
+        int order = ArrayUtils.indexOf(snakeInfo.getPositions(), position);
+
+        if (order == 0) {
+            return new MapSnakeHead(snakeInfo.getName(), playerId);
+        }
+
+        if (order == snakeInfo.getLength()-1) {
+            return new MapSnakeBody(true, playerId, order);
+        }
+        return new MapSnakeBody(false, playerId, order);
+    }
+
+    private String getPlayerIdAtPosition(int position) {
+        for (SnakeInfo snakeInfo : map.getSnakeInfos()) {
+            if (snakeSpread
+                    .get(snakeInfo.getId())
+                    .get(position)) {
+
+                return snakeInfo.getId();
+            }
+        }
+        throw new RuntimeException("No snake at position: " + position);
+    }
+
+    private void populateSnakeInfo() {
+        for (SnakeInfo snakeInfo : map.getSnakeInfos()) {
+            snakeInfoMap.put(snakeInfo.getId(), snakeInfo);
+
+            BitSet snakePositions = new BitSet(map.getHeight() * map.getWidth());
+            for (int pos : snakeInfo.getPositions()) {
+                snakes.set(pos);
+                snakePositions.set(pos);
+            }
+
+            snakeSpread.put(snakeInfo.getId(), snakePositions);
+        }
+    }
+
+    private void populateTileBits() {
+        for (int pos : map.getFoodPositions()) {
+            foods.set(pos);
+        }
+        for (int pos : map.getObstaclePositions()) {
+            obstacles.set(pos);
+        }
     }
 }
