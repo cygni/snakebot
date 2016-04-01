@@ -88,7 +88,6 @@ public class EventSocketClient {
                         listener.onInvalidPlayerName((InvalidPlayerName)gameMessage);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
                 try {
@@ -98,7 +97,6 @@ public class EventSocketClient {
                         listener.onActiveGamesList((ActiveGamesList) apiMessage);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
 

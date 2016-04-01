@@ -116,12 +116,13 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-//         startGame();
+         startGame();
     }
 
     @Override
     public void onSessionClosed() {
         log.info("Session closed");
+        this.connect();
     }
 
     @Override
