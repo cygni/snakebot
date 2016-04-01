@@ -1,45 +1,37 @@
 package se.cygni.snake.api.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SnakeInfo {
 
     final String name;
-    final int length;
     final int points;
     final String id;
-    final int x;
-    final int y;
-    final boolean alive;
+    final int[] positions;
 
     @JsonCreator
     public SnakeInfo(
             @JsonProperty("name") String name,
-            @JsonProperty("length") int length,
             @JsonProperty("points") int points,
             @JsonProperty("playerId")String playerId,
-            @JsonProperty("x") int x,
-            @JsonProperty("y") int y,
-            @JsonProperty("alive") boolean alive
+            @JsonProperty("positions") int[] positions
     )
     {
-
         this.name = name;
-        this.length = length;
         this.points = points;
         this.id = playerId;
-        this.x = x;
-        this.y = y;
-        this.alive = alive;
+        this.positions = positions;
     }
 
     public String getName() {
         return name;
     }
 
+    @JsonIgnore
     public int getLength() {
-        return length;
+        return positions.length;
     }
 
     public int getPoints() {
@@ -50,15 +42,12 @@ public class SnakeInfo {
         return id;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
+    @JsonIgnore
     public boolean isAlive() {
-        return alive;
+        return getLength() > 0;
+    }
+
+    public int[] getPositions() {
+        return positions;
     }
 }

@@ -63,12 +63,15 @@ public class AnsiPrinter {
                 .append("Game tick: ").append(event.getGameTick())
                 .append("\n\n");
 
-        TileContent[][] tiles = map.getTiles();
+        MapUtil mapUtil = new MapUtil(map, "notused");
+
+//        TileContent[][] tiles = map.getTiles();
 
         for (int y = 0; y < height; y++) {
             TileContent[] row = new TileContent[width];
             for (int x = 0; x < width; x++) {
-                row[x] = tiles[x][y];
+                row[x] = mapUtil.getTileAt(new MapCoordinate(x,y));
+//                        tiles[x][y];
             }
             printRow(row, event, sb);
             appendLegendForRow(y, map, sb);
