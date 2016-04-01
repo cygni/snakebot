@@ -27,7 +27,6 @@ import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
-import se.cygni.snake.api.model.*;
 import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.websocket.event.api.ActiveGame;
 import se.cygni.snake.websocket.event.api.ActiveGamesList;
@@ -98,9 +97,6 @@ public class SnakeGameViewer extends Application implements EventListener {
 
                     MapUpdateEvent mapevent = mapUpdates.poll();
 
-                    if (mapevent.getGameTick() == 0)
-                        populatePlayerColors(mapevent);
-
                     logMessage("Rendering game tick: " + mapevent.getGameTick());
                     boardPane.drawMapUpdate(mapevent);
                 }
@@ -135,19 +131,22 @@ public class SnakeGameViewer extends Application implements EventListener {
 
     @Override
     public void onSnakeDead(SnakeDeadEvent snakeDeadEvent) {
-        logMessage(String.format("Snake: %s died by: %s",
-                snakeDeadEvent.getPlayerId(),
-                snakeDeadEvent.getDeathReason().toString()));
+        Platform.runLater(() -> {
+            logMessage(String.format("Snake: %s died by: %s",
+                    snakeDeadEvent.getPlayerId(),
+                    snakeDeadEvent.getDeathReason().toString()));
+        });
     }
 
     @Override
     public void onGameEnded(GameEndedEvent gameEndedEvent) {
+        Platform.runLater(() -> {
+            logMessage(String.format("Game ended, winner: %s",
+                    gameEndedEvent.getPlayerWinnerId()));
 
-        logMessage(String.format("Game ended, winner: %s",
-                gameEndedEvent.getPlayerWinnerId()));
-
-        System.out.println("Game ended event...");
-        // Should clear game/player color map
+            System.out.println("Game ended event...");
+            // Should clear game/player color map
+        });
     }
 
     @Override
@@ -231,22 +230,6 @@ public class SnakeGameViewer extends Application implements EventListener {
     private Node createWorldPane() {
         boardPane = new BoardPane(Color.WHITE);
         return boardPane;
-    }
-
-    private Color createColorWithOpacity(Color c, double opacity) {
-        return new Color(c.getRed(), c.getGreen(), c.getBlue(), opacity);
-    }
-
-    private void populatePlayerColors(MapUpdateEvent mapUpdateEvent) {
-
-        String gameId = mapUpdateEvent.getGameId();
-        gamePlayerColorMap.put(gameId,
-                new HashMap<>());
-
-        int c = 1;
-        for (SnakeInfo snakeInfo : mapUpdateEvent.getMap().getSnakeInfos()) {
-            gamePlayerColorMap.get(gameId).put(snakeInfo.getId(), c++);
-        }
     }
 
     private void startGame(ActiveGame game) {
