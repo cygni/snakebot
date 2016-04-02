@@ -87,7 +87,7 @@ public class SnakeGameViewer extends Application implements EventListener {
         eventSocketClient.connect();
 
 
-        Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.millis(16), new EventHandler<ActionEvent>() {
+        Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.millis(125), new EventHandler<ActionEvent>() {
 
             @Override
             public void handle(ActionEvent event) {

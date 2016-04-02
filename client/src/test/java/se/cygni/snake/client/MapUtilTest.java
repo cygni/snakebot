@@ -6,28 +6,35 @@ import se.cygni.snake.api.model.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MapUtilTest {
+    /*
+        0 1 2
+        3 4 5
+        6 7 8
+    */
+    @Test
+    public void testCanIMoveInDirectionNearEdge() throws Exception {
+        SnakeInfo[] snakeInfos = new SnakeInfo[] {
+                new SnakeInfo("a", 3, "a", new int[] {5, 8, 7}),
+        };
+        Map map = createMap(snakeInfos, new int[6], new int[3]);
+
+        MapUtil mapUtil = new MapUtil(map, "a");
+
+        assertTrue(mapUtil.canIMoveInDirection(SnakeDirection.UP));
+        assertTrue(mapUtil.canIMoveInDirection(SnakeDirection.LEFT));
+        assertFalse(mapUtil.canIMoveInDirection(SnakeDirection.DOWN));
+        assertFalse(mapUtil.canIMoveInDirection(SnakeDirection.RIGHT));
+    }
 
     @Test
     public void testCanIMoveInDirection() throws Exception {
-
-    }
-
-/*
-0 1 2
-3 4 5
-6 7 8
-*/
-    @Test
-    public void testIsTileAvailableForMovementTo() throws Exception {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
                 new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}),
         };
-        Map map = createMap(snakeInfos, new int[0], new int[0]);
+        Map map = createMap(snakeInfos, new int[6], new int[3]);
 
         MapUtil mapUtil = new MapUtil(map, "a");
 
@@ -35,6 +42,26 @@ public class MapUtilTest {
         assertTrue(mapUtil.canIMoveInDirection(SnakeDirection.LEFT));
         assertFalse(mapUtil.canIMoveInDirection(SnakeDirection.DOWN));
         assertFalse(mapUtil.canIMoveInDirection(SnakeDirection.RIGHT));
+    }
+
+    @Test
+    public void testIsTileAvailableForMovementTo() throws Exception {
+        SnakeInfo[] snakeInfos = new SnakeInfo[] {
+                new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}),
+        };
+        Map map = createMap(snakeInfos, new int[0], new int[]{0});
+
+        MapUtil mapUtil = new MapUtil(map, "a");
+
+        assertFalse(mapUtil.isTileAvailableForMovementTo(7));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(4));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(5));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(8));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(0));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(1));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(2));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(3));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(6));
     }
 
     @Test
@@ -95,11 +122,6 @@ public class MapUtilTest {
         });
     }
 
-/*
-0 1 2
-3 4 5
-6 7 8
-*/
     @Test
     public void testGetMyPosition() throws Exception {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
@@ -132,6 +154,37 @@ public class MapUtilTest {
     }
 
     @Test
+    public void testTranslatePositions() throws Exception {
+        MapUtil mapUtil = new MapUtil(createMap(
+                new SnakeInfo[0], new int[0], new int[0]
+        ), "a");
+
+        int[] positions = new int[] {0,4,8};
+        MapCoordinate[] coordinates = mapUtil.translatePositions(positions);
+
+        assertArrayEquals(new MapCoordinate[] {
+                new MapCoordinate(0,0),
+                new MapCoordinate(1,1),
+                new MapCoordinate(2,2) },
+                coordinates);
+    }
+
+    @Test
+    public void testTranslateCoordinates() throws Exception {
+        MapUtil mapUtil = new MapUtil(createMap(
+                new SnakeInfo[0], new int[0], new int[0]
+        ), "a");
+
+        MapCoordinate[] coordinates = new MapCoordinate[] {
+                new MapCoordinate(0,0),
+                new MapCoordinate(1,1),
+                new MapCoordinate(2,2) };
+
+        assertArrayEquals(new int[] {0,4,8},
+                mapUtil.translateCoordinates(coordinates));
+    }
+
+    @Test
     public void testGetPlayerLength() throws Exception {
 
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
@@ -146,6 +199,11 @@ public class MapUtilTest {
         assertEquals(2, mapUtil.getPlayerLength("b"));
     }
 
+    /*
+        0 1 2
+        3 4 5
+        6 7 8
+    */
     private Map createMap(SnakeInfo[] snakeInfos, int[] foods, int[] obstacles) {
         Map map = new Map(3, 3, 8, snakeInfos, foods, obstacles);
         return map;
