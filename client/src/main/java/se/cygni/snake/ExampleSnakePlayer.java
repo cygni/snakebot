@@ -118,7 +118,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-//         startGame();
+         //startGame();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onConnected() {
         log.info("Connected, registering for training...");
         GameSettings gameSettings = new GameSettings.GameSettingsBuilder()
-                .withWidth(25)
+                .withWidth(100)
                 .withHeight(25)
                 .withMaxNoofPlayers(5)
                 .build();
