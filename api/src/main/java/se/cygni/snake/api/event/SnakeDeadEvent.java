@@ -32,6 +32,15 @@ public class SnakeDeadEvent extends GameMessage {
         this.gameTick = gameTick;
     }
 
+    public SnakeDeadEvent(SnakeDeadEvent sde) {
+        this.deathReason = sde.getDeathReason();
+        this.playerId = sde.getPlayerId();
+        this.x = sde.getX();
+        this.y = sde.getY();
+        this.gameId = sde.getGameId();
+        this.gameTick = sde.getGameTick();
+    }
+
     /**
      *
      * @return the reason for this death

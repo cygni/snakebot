@@ -32,14 +32,32 @@ pitest {
 }
 
 dependencies {
-    compile project(':common')
+    compile project(':domain')
     compile project(':api')
-    compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-jersey')
+    compile project(':client-util')
+
+    compile("ch.qos.logback:logback-classic:$logbackVersion")
+    compile("org.slf4j:slf4j-api:$slf4jVersion")
+    compile("org.slf4j:jcl-over-slf4j:$slf4jVersion")
+    compile("org.slf4j:log4j-over-slf4j:$slf4jVersion")
+    compile("org.slf4j:jul-to-slf4j:$slf4jVersion")
+
+    compile('org.springframework.boot:spring-boot-starter-actuator') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+    compile('org.springframework.boot:spring-boot-starter-jersey') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+    compile('org.springframework.boot:spring-boot-starter-websocket') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+    compile('org.springframework.boot:spring-boot-starter-web') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
+    compile('org.springframework.boot:spring-boot-starter-jetty') {
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+    }
 //    compile('org.springframework.boot:spring-boot-starter-security')
-    compile('org.springframework.boot:spring-boot-starter-websocket')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-jetty')
 
     compile("com.google.guava:guava:$guavaVersion")
     compile("commons-beanutils:commons-beanutils:$commonsBeanutilsVersion")

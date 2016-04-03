@@ -37,7 +37,6 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     public void registerForGame(GameSettings gameSettings) {
         RegisterPlayer registerPlayer = new RegisterPlayer(
                 getName(),
-                getColor(),
                 gameSettings
         );
         sendMessage(registerPlayer);

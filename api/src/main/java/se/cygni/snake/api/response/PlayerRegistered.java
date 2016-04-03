@@ -12,7 +12,6 @@ public class PlayerRegistered extends GameMessage {
 
     private final String gameId;
     private final String name;
-    private final String color;
     private final GameSettings gameSettings;
     private final GameMode gameMode;
 
@@ -20,13 +19,11 @@ public class PlayerRegistered extends GameMessage {
     public PlayerRegistered(
             @JsonProperty("gameId") String gameId,
             @JsonProperty("name") String name,
-            @JsonProperty("color") String color,
             @JsonProperty("gameSettings") GameSettings gameSettings,
             @JsonProperty("gameMode") GameMode gameMode) {
 
         this.gameId = gameId;
         this.name = name;
-        this.color = color;
         this.gameSettings = gameSettings;
         this.gameMode = gameMode;
     }
@@ -37,10 +34,6 @@ public class PlayerRegistered extends GameMessage {
 
     public String getName() {
         return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public GameSettings getGameSettings() {
@@ -56,7 +49,6 @@ public class PlayerRegistered extends GameMessage {
         return "PlayerRegistered{" +
                 "gameId='" + gameId + '\'' +
                 ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
                 ", gameSettings=" + gameSettings +
                 ", gameMode=" + gameMode +
                 '}';

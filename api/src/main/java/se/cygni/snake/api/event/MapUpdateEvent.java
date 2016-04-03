@@ -24,6 +24,12 @@ public class MapUpdateEvent extends GameMessage {
         this.map = map;
     }
 
+    public MapUpdateEvent(MapUpdateEvent mue) {
+        this.gameTick = mue.getGameTick();
+        this.gameId = mue.getGameId();
+        this.map = mue.getMap();
+    }
+
     public long getGameTick() {
         return gameTick;
     }

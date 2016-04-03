@@ -26,6 +26,13 @@ public class GameStartingEvent extends GameMessage {
         this.height = gameHeight;
     }
 
+    public GameStartingEvent(GameStartingEvent gse) {
+        this.gameId = gse.getGameId();
+        this.noofPlayers = gse.getNoofPlayers();
+        this.width = gse.getWidth();
+        this.height = gse.getHeight();
+    }
+
     public String getGameId() {
         return gameId;
     }

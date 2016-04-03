@@ -1,12 +1,12 @@
 package se.cygni.snake.player.bot;
 
 import com.google.common.eventbus.EventBus;
-import se.cygni.game.WorldState;
-import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.api.event.GameStartingEvent;
+import se.cygni.snake.api.event.MapUpdateEvent;
+import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.player.IPlayer;
-
-import java.util.Set;
 
 public abstract class BotPlayer implements IPlayer {
 
@@ -21,22 +21,22 @@ public abstract class BotPlayer implements IPlayer {
     }
 
     @Override
-    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
+    public void onWorldUpdate(MapUpdateEvent mapUpdateEvent) {
 
     }
 
     @Override
-    public void onPlayerDied(DeathReason reason, String playerId, int x, int y, String gameId, long gameTick) {
+    public void onSnakeDead(SnakeDeadEvent snakeDeadEvent) {
 
     }
 
     @Override
-    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
+    public void onGameEnded(GameEndedEvent gameEndedEvent) {
 
     }
 
     @Override
-    public void onGameStart(String gameId, int noofPlayers, int width, int height) {
+    public void onGameStart(GameStartingEvent gameStartingEvent) {
 
     }
 
@@ -53,11 +53,6 @@ public abstract class BotPlayer implements IPlayer {
     @Override
     public String getName() {
         return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public String getColor() {
-        return null;
     }
 
     @Override

@@ -28,6 +28,13 @@ public class GameEndedEvent extends GameMessage {
         this.map = map;
     }
 
+    public GameEndedEvent(GameEndedEvent gee) {
+        this.playerWinnerId = gee.getPlayerWinnerId();
+        this.gameId = gee.getGameId();
+        this.gameTick = gee.getGameTick();
+        this.map = gee.getMap();
+    }
+
     public String getPlayerWinnerId() {
         return playerWinnerId;
     }

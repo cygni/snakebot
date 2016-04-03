@@ -1,32 +1,39 @@
 package se.cygni.snake.player;
 
-import se.cygni.game.WorldState;
-import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.api.event.GameStartingEvent;
+import se.cygni.snake.api.event.MapUpdateEvent;
+import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.model.PointReason;
-
-import java.util.Set;
 
 public interface IPlayer {
 
-    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players);
+    /*
+    void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players);
 
-    public void onPlayerDied(DeathReason reason, String playerId, int x, int y, String gameId, long gameTick);
+    void onPlayerDied(DeathReason reason, String playerId, int x, int y, String gameId, long gameTick);
 
-    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players);
+    void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players);
 
-    public void onGameStart(String gameId, int noofPlayers, int width, int height);
+    void onGameStart(String gameId, int noofPlayers, int width, int height);
+*/
+    void onWorldUpdate(MapUpdateEvent mapUpdateEvent);
 
-    public boolean isAlive();
+    void onSnakeDead(SnakeDeadEvent snakeDeadEvent);
 
-    public void dead();
+    void onGameEnded(GameEndedEvent gameEndedEvent);
 
-    public String getName();
+    void onGameStart(GameStartingEvent gameStartingEvent);
 
-    public String getColor();
+    boolean isAlive();
 
-    public String getPlayerId();
+    void dead();
 
-    public void addPoints(PointReason reason, int points);
+    String getName();
 
-    public int getTotalPoints();
+    String getPlayerId();
+
+    void addPoints(PointReason reason, int points);
+
+    int getTotalPoints();
 }

@@ -1,12 +1,7 @@
 package se.cygni.snake.event;
 
-import se.cygni.game.WorldState;
 import se.cygni.snake.api.GameMessage;
-import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.apiconversion.GameMessageConverter;
-import se.cygni.snake.player.IPlayer;
-
-import java.util.Set;
 
 public class InternalGameEvent {
     private final long tstamp;
@@ -29,6 +24,7 @@ public class InternalGameEvent {
         return gameMessage;
     }
 
+    /*
     public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
         this.gameMessage = GameMessageConverter.onWorldUpdate(worldState, gameId, gameTick, players);
     }
@@ -44,7 +40,7 @@ public class InternalGameEvent {
     public void onGameStart(String gameId, int noofPlayers, int width, int height) {
         this.gameMessage = GameMessageConverter.onGameStart(gameId, noofPlayers, width, height);
     }
-
+*/
     public void onGameAborted(String gameId) {
         this.gameMessage = GameMessageConverter.onGameAborted(gameId);
     }

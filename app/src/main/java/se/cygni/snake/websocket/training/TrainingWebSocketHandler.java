@@ -125,6 +125,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         log.debug("Compressed: " + output.length / 1024 + " Kb");
         return output;
     }
+
     public static byte[] decompress(byte[] data) throws IOException, DataFormatException {
         Inflater inflater = new Inflater();
         inflater.setInput(data);
