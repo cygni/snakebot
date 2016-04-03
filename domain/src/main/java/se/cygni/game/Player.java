@@ -2,20 +2,14 @@ package se.cygni.game;
 
 public class Player {
     private final String name;
-    private final String color;
     private String playerId;
 
-    public Player(String name, String color) {
+    public Player(String name) {
         this.name = name;
-        this.color = color;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getColor() {
-        return color;
     }
 
     public String getPlayerId() {

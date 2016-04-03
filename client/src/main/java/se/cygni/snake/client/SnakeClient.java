@@ -32,8 +32,6 @@ public interface SnakeClient {
 
      String getName();
 
-     String getColor();
-
      GameMode getGameMode();
 
 }

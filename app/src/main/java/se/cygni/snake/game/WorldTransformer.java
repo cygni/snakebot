@@ -14,8 +14,10 @@ import se.cygni.game.exception.TransformationException;
 import se.cygni.game.exception.WallCollision;
 import se.cygni.game.transformation.*;
 import se.cygni.game.worldobject.*;
+import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.api.model.PointReason;
+import se.cygni.snake.apiconversion.GameMessageConverter;
 import se.cygni.snake.event.InternalGameEvent;
 
 import java.util.*;
@@ -364,22 +366,19 @@ public class WorldTransformer {
         log.info(head.getPlayerId() + " died at: " + coordinate);
         game.getPlayer(head.getPlayerId()).dead();
 
-        game.getPlayers().stream().forEach( player -> {
-            player.onPlayerDied(
-                    deathReason,
-                    head.getPlayerId(),
-                    coordinate.getX(), coordinate.getY(),
-                    game.getGameId(), worldTick
-            );
-        });
-
-        InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());
-        gevent.onPlayerDied(deathReason,
+        SnakeDeadEvent snakeDeadEvent = GameMessageConverter.onPlayerDied(
+                deathReason,
                 head.getPlayerId(),
                 coordinate.getX(), coordinate.getY(),
-                game.getGameId(), worldTick
-        );
+                game.getGameId(), worldTick);
 
+        game.getPlayers().stream().forEach( player -> {
+            player.onSnakeDead(snakeDeadEvent);
+        });
+
+        InternalGameEvent gevent = new InternalGameEvent(
+                System.currentTimeMillis(),
+                snakeDeadEvent);
         game.getGlobalEventBus().post(gevent);
     }
 }

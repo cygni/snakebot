@@ -62,7 +62,7 @@ public class Game {
 
     @Subscribe
     public void registerPlayer(RegisterPlayer registerPlayer) {
-        Player player = new Player(registerPlayer.getPlayerName(), registerPlayer.getColor());
+        Player player = new Player(registerPlayer.getPlayerName());
         player.setPlayerId(registerPlayer.getReceivingPlayerId());
 
         if (players.contains(player)) {
@@ -84,7 +84,7 @@ public class Game {
         }
 
         GameSettings gameSettings = GameSettingsConverter.toGameSettings(gameFeatures);
-        PlayerRegistered playerRegistered = new PlayerRegistered(gameId, player.getName(), player.getColor(), gameSettings, GameMode.training);
+        PlayerRegistered playerRegistered = new PlayerRegistered(gameId, player.getName(), gameSettings, GameMode.training);
         MessageUtils.copyCommonAttributes(registerPlayer, playerRegistered);
 
         outgoingEventBus.post(playerRegistered);

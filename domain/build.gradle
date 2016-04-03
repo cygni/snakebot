@@ -1,5 +1,5 @@
 jar {
-    baseName = 'snakebot-common'
+    baseName = 'snakebot-domain'
 }
 
 apply plugin: 'info.solidsoft.pitest'

@@ -131,8 +131,8 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onConnected() {
         log.info("Connected, registering for training...");
         GameSettings gameSettings = new GameSettings.GameSettingsBuilder()
-                .withWidth(100)
-                .withHeight(25)
+                .withWidth(50)
+                .withHeight(50)
                 .withMaxNoofPlayers(5)
                 .build();
 
@@ -142,16 +142,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     @Override
     public String getName() {
         return "#emil";
-    }
-
-    /**
-     * Note, color is currently not used.
-     *
-     * @return
-     */
-    @Override
-    public String getColor() {
-        return "black";
     }
 
     @Override

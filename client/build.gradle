@@ -3,6 +3,7 @@ jar {
 }
 
 dependencies {
+    compile project(':client-util')
     compile project(':api')
     compile("org.apache.commons:commons-math3:$commonsMathVersion")
     compile("org.apache.commons:commons-lang3:$commonsLangVersion")

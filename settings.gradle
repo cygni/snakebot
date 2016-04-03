@@ -1,4 +1,4 @@
-include ":api", ":common", ":app", ":client"
+include ":api", ":domain", ":app", ":client", ":client-util"
 
 
 if (!System.getenv()['JENKINS_HOME']) {

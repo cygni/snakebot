@@ -2,16 +2,11 @@ package se.cygni.snake.player;
 
 import com.google.common.eventbus.EventBus;
 import se.cygni.game.Player;
-import se.cygni.game.WorldState;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
-import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.api.model.PointReason;
-import se.cygni.snake.apiconversion.GameMessageConverter;
-
-import java.util.Set;
 
 public class RemotePlayer implements IPlayer {
 
@@ -25,6 +20,35 @@ public class RemotePlayer implements IPlayer {
         this.outgoingEventBus = outgoingEventBus;
     }
 
+    @Override
+    public void onWorldUpdate(MapUpdateEvent mue) {
+        MapUpdateEvent mapUpdateEvent = new MapUpdateEvent(mue);
+        mapUpdateEvent.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(mapUpdateEvent);
+    }
+
+    @Override
+    public void onSnakeDead(SnakeDeadEvent sde) {
+        SnakeDeadEvent snakeDeadEvent = new SnakeDeadEvent(sde);
+        snakeDeadEvent.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(snakeDeadEvent);
+    }
+
+    @Override
+    public void onGameEnded(GameEndedEvent gee) {
+        GameEndedEvent gameEndedEvent = new GameEndedEvent(gee);
+        gameEndedEvent.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(gameEndedEvent);
+    }
+
+    @Override
+    public void onGameStart(GameStartingEvent gse) {
+        GameStartingEvent gameStartingEvent = new GameStartingEvent(gse);
+        gameStartingEvent.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(gameStartingEvent);
+    }
+
+    /*
     @Override
     public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
 
@@ -60,7 +84,7 @@ public class RemotePlayer implements IPlayer {
 
         outgoingEventBus.post(gse);
     }
-
+*/
     @Override
     public boolean isAlive() {
         return alive;
@@ -74,11 +98,6 @@ public class RemotePlayer implements IPlayer {
     @Override
     public String getName() {
         return player.getName();
-    }
-
-    @Override
-    public String getColor() {
-        return player.getColor();
     }
 
     @Override

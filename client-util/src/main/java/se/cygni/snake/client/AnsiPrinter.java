@@ -7,6 +7,7 @@ import se.cygni.snake.api.model.*;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 
 public class AnsiPrinter {
     int width, height;
@@ -21,32 +22,35 @@ public class AnsiPrinter {
     }
 
     public AnsiPrinter(boolean includeLegend) {
-        this.includeLegend = true;
+        this.includeLegend = includeLegend;
     }
 
     public void printMap(MapUpdateEvent event) {
-        if (event.getMap().getSnakeInfos().length > event.getMap().getHeight()-5) {
-            System.out.println("Sorry, too many snakes I can't render this.");
-            return;
-        }
+        CompletableFuture cf = CompletableFuture.runAsync(() -> {
 
-        if (event.getMap().getSnakeInfos().length > 11) {
-            System.out.println("Sorry, too many snakes I can't render this.");
-            return;
-        }
+            if (event.getMap().getSnakeInfos().length > event.getMap().getHeight()-5) {
+                System.out.println("Sorry, too many snakes I can't render this.");
+                return;
+            }
 
-        if (event.getMap().getWidth() > 120) {
-            System.out.println("Sorry, the map is too wide, I can't render this.");
-            return;
-        }
+            if (event.getMap().getSnakeInfos().length > 11) {
+                System.out.println("Sorry, too many snakes I can't render this.");
+                return;
+            }
 
-        if (event.getMap().getHeight() > 120) {
-            System.out.println("Sorry, the map is too high, I can't render this.");
-            return;
-        }
+            if (event.getMap().getWidth() > 120) {
+                System.out.println("Sorry, the map is too wide, I can't render this.");
+                return;
+            }
 
-        populateSnakeColors(event);
-        printMapActual(event);
+            if (event.getMap().getHeight() > 120) {
+                System.out.println("Sorry, the map is too high, I can't render this.");
+                return;
+            }
+
+            populateSnakeColors(event);
+            printMapActual(event);
+        });
     }
 
     private void printMapActual(MapUpdateEvent event) {
@@ -65,13 +69,10 @@ public class AnsiPrinter {
 
         MapUtil mapUtil = new MapUtil(map, "notused");
 
-//        TileContent[][] tiles = map.getTiles();
-
         for (int y = 0; y < height; y++) {
             TileContent[] row = new TileContent[width];
             for (int x = 0; x < width; x++) {
                 row[x] = mapUtil.getTileAt(new MapCoordinate(x,y));
-//                        tiles[x][y];
             }
             printRow(row, event, sb);
             appendLegendForRow(y, map, sb);
