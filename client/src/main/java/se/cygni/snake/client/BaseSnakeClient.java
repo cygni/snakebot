@@ -14,6 +14,7 @@ import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameSettings;
 import se.cygni.snake.api.model.SnakeDirection;
@@ -35,6 +36,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private boolean gameEnded = false;
 
     public void registerForGame(GameSettings gameSettings) {
+        log.info("Register for game...");
         RegisterPlayer registerPlayer = new RegisterPlayer(
                 getName(),
                 gameSettings
@@ -43,9 +45,9 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public void startGame() {
+        log.info("Starting game...");
         StartGame startGame = new StartGame();
         startGame.setReceivingPlayerId(playerId);
-        log.info("Starting game");
         sendMessage(startGame);
     }
 
@@ -89,6 +91,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (log.isDebugEnabled()) {
                 log.debug("Sending: {}", GameMessageParser.encodeMessage(message));
             }
+
             session.sendMessage(new TextMessage(
                     GameMessageParser.encodeMessage(message)
             ));
@@ -114,11 +117,16 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             return;
         }
 
-        // Deserialize message
-        GameMessage gameMessage = GameMessageParser.decodeMessage(msgBuffer.toString());
-        log.debug(msgBuffer.toString());
+        String messageRaw = msgBuffer.toString();
         msgBuffer = new StringBuilder();
+
+        log.debug("Incoming message: {}", messageRaw);
         try {
+
+            // Deserialize message
+            GameMessage gameMessage = GameMessageParser.decodeMessage(messageRaw);
+            log.debug(messageRaw);
+
             if (gameMessage instanceof PlayerRegistered) {
                 this.onPlayerRegistered((PlayerRegistered) gameMessage);
                 this.playerId = gameMessage.getReceivingPlayerId();
@@ -141,8 +149,16 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (gameMessage instanceof InvalidPlayerName) {
                 this.onInvalidPlayerName((InvalidPlayerName) gameMessage);
             }
+
+            if (gameMessage instanceof InvalidMessage) {
+                InvalidMessage invalidMessage = (InvalidMessage)gameMessage;
+
+                log.error("Server did not understand my last message");
+                log.error("Message sent: " + invalidMessage.getReceivedMessage());
+                log.error("Error message: " + invalidMessage.getErrorMessage());
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Could not understand received message from server: {}", messageRaw, e);
         }
     }
 

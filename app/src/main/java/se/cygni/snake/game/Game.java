@@ -161,8 +161,11 @@ public class Game {
     }
 
     public void playerLostConnection(String playerId) {
-        getPlayer(playerId).dead();
-
+        try {
+            getPlayer(playerId).dead();
+        } catch (Exception e) {
+            log.warn("Player: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
+        }
         if (getLiveAndRemotePlayers().size() == 0) {
             abort();
         } else {

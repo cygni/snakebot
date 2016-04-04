@@ -13,6 +13,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
+import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
 
@@ -50,6 +51,8 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         outgoingEventBus.register(this);
 
         incomingEventBus = game.getIncomingEventBus();
+
+
     }
 
     @Override
@@ -64,14 +67,31 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
             throws Exception {
         log.debug(message.getPayload());
 
-        // Deserialize message
-        GameMessage gameMessage = GameMessageParser.decodeMessage(message.getPayload());
+        try {
+            // Deserialize message
+            GameMessage gameMessage = GameMessageParser.decodeMessage(message.getPayload());
 
-        // Overwrite playerId to hinder any cheating
-        gameMessage.setReceivingPlayerId(playerId);
+            // Overwrite playerId to hinder any cheating
+            gameMessage.setReceivingPlayerId(playerId);
 
-        // Send to game
-        incomingEventBus.post(gameMessage);
+            // Send to game
+            incomingEventBus.post(gameMessage);
+        } catch (Throwable e) {
+            log.error("Could not handle incoming text message: {}", e.getMessage());
+
+            InvalidMessage invalidMessage = new InvalidMessage(
+                    "Could not understand this message. Error:" + e.getMessage(),
+                    message.getPayload()
+            );
+            invalidMessage.setReceivingPlayerId(playerId);
+
+            try {
+                log.info("Sending InvalidMessage to client.");
+                outgoingEventBus.post(invalidMessage);
+            } catch (Throwable ee) {
+                ee.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -106,7 +126,13 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         if (!StringUtils.isEmpty(message.getReceivingPlayerId()) && !playerId.equals(message.getReceivingPlayerId())) {
             return;
         }
-        webSocketSession.sendMessage(new TextMessage(GameMessageParser.encodeMessage(message)));
+        try {
+            String msg = GameMessageParser.encodeMessage(message);
+            log.debug("Sending: {}", msg);
+            webSocketSession.sendMessage(new TextMessage(msg));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static byte[] compress(byte[] data) throws IOException {

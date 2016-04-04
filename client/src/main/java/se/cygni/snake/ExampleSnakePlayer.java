@@ -124,7 +124,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     @Override
     public void onSessionClosed() {
         log.info("Session closed");
-        this.connect();
     }
 
     @Override

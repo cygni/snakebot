@@ -42,7 +42,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Bean
     public WebSocketHandler snakeTrainingWebSocketHandler() {
-        return new PerConnectionWebSocketHandler(TrainingWebSocketHandler.class, false);
+        return new PerConnectionWebSocketHandler(TrainingWebSocketHandler.class, true);
     }
 
     @Bean
