@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import se.cygni.game.render.BoardPane;
+import se.cygni.game.render.HighscorePane;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
@@ -40,6 +41,7 @@ public class SnakeGameViewer extends Application implements EventListener {
 
     private TextArea eventLog = new TextArea();
     private BoardPane boardPane;
+    private HighscorePane highscorePane;
     private EventSocketClient eventSocketClient;
     private ListView<ActiveGame> activeGameListView;
     private ObservableList<ActiveGame> activeGames = FXCollections.observableArrayList();
@@ -53,8 +55,8 @@ public class SnakeGameViewer extends Application implements EventListener {
     @Override
     public void start(Stage primaryStage) {
 
-        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
-//        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
+//        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
+        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
 
         BorderPane root = new BorderPane();
 
@@ -76,7 +78,7 @@ public class SnakeGameViewer extends Application implements EventListener {
 
         Scene scene = new Scene(root);
 
-        primaryStage.setWidth(700);
+        primaryStage.setWidth(800);
         primaryStage.setHeight(600);
         primaryStage.setTitle("Snake bots");
         primaryStage.setScene(scene);
@@ -99,6 +101,7 @@ public class SnakeGameViewer extends Application implements EventListener {
 
                     logMessage("Rendering game tick: " + mapevent.getGameTick());
                     boardPane.drawMapUpdate(mapevent);
+                    highscorePane.setSnakeInfos(mapevent.getMap().getSnakeInfos());
                 }
             }
         }));
@@ -174,7 +177,6 @@ public class SnakeGameViewer extends Application implements EventListener {
         eventLog.setWrapText(false);
         eventLog.setPrefColumnCount(25);
         eventLog.setPrefRowCount(4);
-        eventLog.setMaxWidth(Double.MAX_VALUE);
         return eventLog;
     }
 
@@ -224,6 +226,10 @@ public class SnakeGameViewer extends Application implements EventListener {
         });
 
         flow.getChildren().add(startButton);
+
+        highscorePane = new HighscorePane();
+        flow.getChildren().add(highscorePane);
+
         return flow;
     }
 

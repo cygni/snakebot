@@ -46,6 +46,13 @@ public class BoardPane extends Pane {
         getChildren().add(canvas);
     }
 
+    public SnakeColor getSnakeColor(String playerId) {
+        if (snakeColorMap.containsKey(playerId)) {
+            return snakeColorMap.get(playerId);
+        }
+        return new SnakeColor(Color.WHEAT, Color.WHITE);
+    }
+
     public void drawMapUpdate(MapUpdateEvent mapUpdateEvent) {
         lastMapUpdateEvent = mapUpdateEvent;
 
