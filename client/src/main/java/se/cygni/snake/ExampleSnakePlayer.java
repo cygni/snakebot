@@ -145,7 +145,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getServerHost() {
-        return "snake.cygni.se";
+        return "192.168.0.100";
     }
 
     @Override

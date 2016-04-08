@@ -21,6 +21,7 @@ import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
+import se.cygni.snake.security.TokenService;
 import se.cygni.snake.websocket.event.api.*;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
     private GameManager gameManager;
 
     @Autowired
-    public EventSocketHandler(EventBus globalEventBus, GameManager gameManager) {
+    public EventSocketHandler(EventBus globalEventBus, GameManager gameManager, TokenService tokenService) {
         this.globalEventBus = globalEventBus;
         this.gameManager = gameManager;
         log.info("EventSocketHandler started!");

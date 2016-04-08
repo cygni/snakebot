@@ -79,7 +79,10 @@ public class GameFeatures {
 
     // Points given to the last living snake (unless
     // the game has been stopped before this happens)
-    public int pointsLastSnakeLiving = 5;
+    public int pointsLastSnakeLiving = 10;
+
+    // Number of rounds a tail is protected after nibble
+    public int noofRoundsTailProtectedAfterNibble = 3;
 
     /**
      * Enforces limits on some values
@@ -269,5 +272,13 @@ public class GameFeatures {
 
     public void setPointsPerNibble(int pointsPerNibble) {
         this.pointsPerNibble = pointsPerNibble;
+    }
+
+    public int getNoofRoundsTailProtectedAfterNibble() {
+        return noofRoundsTailProtectedAfterNibble;
+    }
+
+    public void setNoofRoundsTailProtectedAfterNibble(int noofRoundsTailProtectedAfterNibble) {
+        this.noofRoundsTailProtectedAfterNibble = noofRoundsTailProtectedAfterNibble;
     }
 }

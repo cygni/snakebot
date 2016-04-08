@@ -149,25 +149,33 @@ public class WorldTransformer {
 
                 // Special case when head hits tail and that feature is enabled
                 if (gameFeatures.headToTailConsumes &&
+                        tile.size() == 2 &&
+                        tile.listSnakeIdsPresent().size() > 1 && // Not ok to eat you own tail!
                         tile.containsExactlyOneOfEachType(new Class[] {SnakeHead.class, SnakeBody.class}) &&
                         tile.listContentsOfType(SnakeBody.class).get(0).isTail()) {
 
-                    SnakeBody body = tile.listContentsOfType(SnakeBody.class).get(0);
+                    SnakeBody snakeBodyTail = tile.listContentsOfType(SnakeBody.class).get(0);
+                    SnakeHead head = tile.listContentsOfType(SnakeHead.class).get(0);
 
                     // Need to remove tail from original world state!
-                    WorldState tailWorldState = snakeToWorldState.get(body.getPlayerId());
+                    WorldState tailWorldState = snakeToWorldState.get(snakeBodyTail.getPlayerId());
 
-                    TailNibbled tailNibbled = new TailNibbled(body.getPlayerId(), body.getPosition());
+                    TailNibbled tailNibbled = new TailNibbled(
+                            snakeBodyTail.getPlayerId(),
+                            snakeBodyTail.getPosition());
                     tailWorldState = tailNibbled.transform(tailWorldState);
 
-                    snakeToWorldState.put(body.getPlayerId(), tailWorldState);
+                    snakeToWorldState.put(snakeBodyTail.getPlayerId(), tailWorldState);
 
                     // Assign points
-                    SnakeHead head = tile.listContentsOfType(SnakeHead.class).get(0);
                     game.getPlayer(head.getPlayerId()).addPoints(
                             PointReason.NIBBLE,
                             game.getGameFeatures().getPointsPerNibble()
                     );
+
+                    // Protect nibbled player
+                    // Todo: Tailprotection not done.
+                    tailWorldState.getSnakeHeadById(snakeBodyTail.getPlayerId());
                     continue;
                 }
 
@@ -197,6 +205,13 @@ public class WorldTransformer {
         return snakeToWorldState.values().stream().collect(Collectors.toList());
     }
 
+    /**
+     * Two Snakes may overlap on more than one tile if the
+     * heads meet and pass through each other.
+     *
+     * @param tiles
+     * @return List of playerIds of Snakes that overlap
+     */
     private Set<String> getOverlappingSnakes(TileMultipleContent[] tiles) {
         Set<String> overlappingSnakes = new HashSet<>();
 

@@ -40,116 +40,79 @@ public class GameSettings {
 
     // Likelihood (in percent) that a new food will be
     // added to the world
-    private final int addFoodLikelihood = 15;
+    private int addFoodLikelihood = 15;
 
     // Likelihood (in percent) that a
     // food will be removed from the world
-    private final int removeFoodLikelihood = 5;
+    private int removeFoodLikelihood = 5;
 
     // Likelihood (in percent) that a new obstacle will be
     // added to the world
-    private final int addObstacleLikelihood = 15;
+    private int addObstacleLikelihood = 15;
 
     // Likelihood (in percent) that an
     // obstacle will be removed from the world
-    private final int removeObstacleLikelihood = 15;
+    private int removeObstacleLikelihood = 15;
 
     // Points given per length unit the Snake has
-    public int pointsPerLength = 1;
+    private int pointsPerLength = 1;
 
     // Points given per Food item consumed
-    public int pointsPerFood = 1;
+    private int pointsPerFood = 1;
 
     // Points given per caused death (i.e. another
     // snake collides with yours)
-    public int pointsPerCausedDeath = 5;
+    private int pointsPerCausedDeath = 5;
 
     // Points given when a snake nibbles the tail
     // of another snake
-    public int pointsPerNibble = 10;
+    private int pointsPerNibble = 10;
 
     // Points given to the last living snake (unless
     // the game has been stopped before this happens)
-    public int pointsLastSnakeLiving = 5;
+    private int pointsLastSnakeLiving = 10;
+
+    // Number of rounds a tail is protected after nibble
+    private int noofRoundsTailProtectedAfterNibble = 3;
 
     public int getWidth() {
         return width;
-    }
-
-    private void setWidth(int width) {
-        this.width = width;
     }
 
     public int getHeight() {
         return height;
     }
 
-    private void setHeight(int height) {
-        this.height = height;
-    }
-
     public int getMaxNoofPlayers() {
         return maxNoofPlayers;
-    }
-
-    private void setMaxNoofPlayers(int maxNoofPlayers) {
-        this.maxNoofPlayers = maxNoofPlayers;
     }
 
     public int getStartSnakeLength() {
         return startSnakeLength;
     }
 
-    private void setStartSnakeLength(int startSnakeLength) {
-        this.startSnakeLength = startSnakeLength;
-    }
-
     public int getTimeInMsPerTick() {
         return timeInMsPerTick;
-    }
-
-    private void setTimeInMsPerTick(int timeInMsPerTick) {
-        this.timeInMsPerTick = timeInMsPerTick;
     }
 
     public boolean isObstaclesEnabled() {
         return obstaclesEnabled;
     }
 
-    private void setObstaclesEnabled(boolean obstaclesEnabled) {
-        this.obstaclesEnabled = obstaclesEnabled;
-    }
-
     public boolean isFoodEnabled() {
         return foodEnabled;
-    }
-
-    private void setFoodEnabled(boolean foodEnabled) {
-        this.foodEnabled = foodEnabled;
     }
 
     public boolean isEdgeWrapsAround() {
         return edgeWrapsAround;
     }
 
-    private void setEdgeWrapsAround(boolean edgeWrapsAround) {
-        this.edgeWrapsAround = edgeWrapsAround;
-    }
-
     public boolean isHeadToTailConsumes() {
         return headToTailConsumes;
     }
 
-    private void setHeadToTailConsumes(boolean headToTailConsumes) {
-        this.headToTailConsumes = headToTailConsumes;
-    }
-
     public boolean isTailConsumeGrows() {
         return tailConsumeGrows;
-    }
-
-    private void setTailConsumeGrows(boolean tailConsumeGrows) {
-        this.tailConsumeGrows = tailConsumeGrows;
     }
 
     public int getAddFoodLikelihood() {
@@ -172,59 +135,129 @@ public class GameSettings {
         return pointsPerLength;
     }
 
-    public void setPointsPerLength(int pointsPerLength) {
-        this.pointsPerLength = pointsPerLength;
-    }
-
     public int getPointsPerFood() {
         return pointsPerFood;
-    }
-
-    public void setPointsPerFood(int pointsPerFood) {
-        this.pointsPerFood = pointsPerFood;
     }
 
     public int getPointsPerCausedDeath() {
         return pointsPerCausedDeath;
     }
 
-    public void setPointsPerCausedDeath(int pointsPerCausedDeath) {
-        this.pointsPerCausedDeath = pointsPerCausedDeath;
-    }
-
     public int getPointsPerNibble() {
         return pointsPerNibble;
-    }
-
-    public void setPointsPerNibble(int pointsPerNibble) {
-        this.pointsPerNibble = pointsPerNibble;
     }
 
     public int getPointsLastSnakeLiving() {
         return pointsLastSnakeLiving;
     }
 
-    public void setPointsLastSnakeLiving(int pointsLastSnakeLiving) {
+    public int getNoofRoundsTailProtectedAfterNibble() {
+        return noofRoundsTailProtectedAfterNibble;
+    }
+
+    private void setWidth(int width) {
+        this.width = width;
+    }
+
+    private void setHeight(int height) {
+        this.height = height;
+    }
+
+    private void setMaxNoofPlayers(int maxNoofPlayers) {
+        this.maxNoofPlayers = maxNoofPlayers;
+    }
+
+    private void setStartSnakeLength(int startSnakeLength) {
+        this.startSnakeLength = startSnakeLength;
+    }
+
+    private void setTimeInMsPerTick(int timeInMsPerTick) {
+        this.timeInMsPerTick = timeInMsPerTick;
+    }
+
+    private void setObstaclesEnabled(boolean obstaclesEnabled) {
+        this.obstaclesEnabled = obstaclesEnabled;
+    }
+
+    private void setFoodEnabled(boolean foodEnabled) {
+        this.foodEnabled = foodEnabled;
+    }
+
+    private void setEdgeWrapsAround(boolean edgeWrapsAround) {
+        this.edgeWrapsAround = edgeWrapsAround;
+    }
+
+    private void setHeadToTailConsumes(boolean headToTailConsumes) {
+        this.headToTailConsumes = headToTailConsumes;
+    }
+
+    private void setTailConsumeGrows(boolean tailConsumeGrows) {
+        this.tailConsumeGrows = tailConsumeGrows;
+    }
+
+    private void setAddFoodLikelihood(int addFoodLikelihood) {
+        this.addFoodLikelihood = addFoodLikelihood;
+    }
+
+    private void setRemoveFoodLikelihood(int removeFoodLikelihood) {
+        this.removeFoodLikelihood = removeFoodLikelihood;
+    }
+
+    private void setAddObstacleLikelihood(int addObstacleLikelihood) {
+        this.addObstacleLikelihood = addObstacleLikelihood;
+    }
+
+    private void setRemoveObstacleLikelihood(int removeObstacleLikelihood) {
+        this.removeObstacleLikelihood = removeObstacleLikelihood;
+    }
+
+    private void setPointsPerLength(int pointsPerLength) {
+        this.pointsPerLength = pointsPerLength;
+    }
+
+    private void setPointsPerFood(int pointsPerFood) {
+        this.pointsPerFood = pointsPerFood;
+    }
+
+    private void setPointsPerCausedDeath(int pointsPerCausedDeath) {
+        this.pointsPerCausedDeath = pointsPerCausedDeath;
+    }
+
+    private void setPointsPerNibble(int pointsPerNibble) {
+        this.pointsPerNibble = pointsPerNibble;
+    }
+
+    private void setPointsLastSnakeLiving(int pointsLastSnakeLiving) {
         this.pointsLastSnakeLiving = pointsLastSnakeLiving;
+    }
+
+    private void setNoofRoundsTailProtectedAfterNibble(int noofRoundsTailProtectedAfterNibble) {
+        this.noofRoundsTailProtectedAfterNibble = noofRoundsTailProtectedAfterNibble;
     }
 
     @Override
     public String toString() {
         return "GameSettings{" +
                 "width=" + width +
-                ", height=" + height +
-                ", maxNoofPlayers=" + maxNoofPlayers +
-                ", startSnakeLength=" + startSnakeLength +
-                ", timeInMsPerTick=" + timeInMsPerTick +
-                ", obstaclesEnabled=" + obstaclesEnabled +
-                ", foodEnabled=" + foodEnabled +
-                ", edgeWrapsAround=" + edgeWrapsAround +
-                ", headToTailConsumes=" + headToTailConsumes +
-                ", tailConsumeGrows=" + tailConsumeGrows +
-                ", addFoodLikelihood=" + addFoodLikelihood +
-                ", removeFoodLikelihood=" + removeFoodLikelihood +
-                ", addObstacleLikelihood=" + addObstacleLikelihood +
-                ", removeObstacleLikelihood=" + removeObstacleLikelihood +
+                ",\nheight=" + height +
+                ",\nmaxNoofPlayers=" + maxNoofPlayers +
+                ",\nstartSnakeLength=" + startSnakeLength +
+                ",\ntimeInMsPerTick=" + timeInMsPerTick +
+                ",\nobstaclesEnabled=" + obstaclesEnabled +
+                ",\nfoodEnabled=" + foodEnabled +
+                ",\nedgeWrapsAround=" + edgeWrapsAround +
+                ",\nheadToTailConsumes=" + headToTailConsumes +
+                ",\ntailConsumeGrows=" + tailConsumeGrows +
+                ",\naddFoodLikelihood=" + addFoodLikelihood +
+                ",\nremoveFoodLikelihood=" + removeFoodLikelihood +
+                ",\naddObstacleLikelihood=" + addObstacleLikelihood +
+                ",\nremoveObstacleLikelihood=" + removeObstacleLikelihood +
+                ",\npointsPerLength=" + pointsPerLength +
+                ",\npointsPerFood=" + pointsPerFood +
+                ",\npointsPerCausedDeath=" + pointsPerCausedDeath +
+                ",\npointsPerNibble=" + pointsPerNibble +
+                ",\npointsLastSnakeLiving=" + pointsLastSnakeLiving +
+                ",\nnoofRoundsTailProtectedAfterNibble=" + noofRoundsTailProtectedAfterNibble +
                 '}';
     }
 
@@ -267,22 +300,25 @@ public class GameSettings {
         private boolean tailConsumeGrows = false;
 
         // Points given per length unit the Snake has
-        public int pointsPerLength = 1;
+        private int pointsPerLength = 1;
 
         // Points given per Food item consumed
-        public int pointsPerFood = 1;
+        private int pointsPerFood = 1;
 
         // Points given per caused death (i.e. another
         // snake collides with yours)
-        public int pointsPerCausedDeath = 5;
+        private int pointsPerCausedDeath = 5;
 
         // Points given when a snake nibbles the tail
         // of another snake
-        public int pointsPerNibble = 10;
+        private int pointsPerNibble = 10;
 
         // Points given to the last living snake (unless
         // the game has been stopped before this happens)
-        public int pointsLastSnakeLiving = 5;
+        private int pointsLastSnakeLiving = 5;
+
+        // Number of rounds a tail is protected after nibble
+        private int noofRoundsTailProtectedAfterNibble = 3;
 
         public GameSettingsBuilder() {
         }
@@ -362,6 +398,11 @@ public class GameSettings {
             return this;
         }
 
+        public GameSettingsBuilder withNoofRoundsTailProtectedAfterNibble(int noofRoundsTailProtectedAfterNibble) {
+            this.noofRoundsTailProtectedAfterNibble = noofRoundsTailProtectedAfterNibble;
+            return this;
+        }
+
         public GameSettings build() {
             GameSettings gameSettings = new GameSettings();
             gameSettings.setWidth(width);
@@ -379,6 +420,7 @@ public class GameSettings {
             gameSettings.setPointsPerFood(pointsPerFood);
             gameSettings.setPointsPerLength(pointsPerLength);
             gameSettings.setPointsPerNibble(pointsPerNibble);
+            gameSettings.setNoofRoundsTailProtectedAfterNibble(noofRoundsTailProtectedAfterNibble);
             return gameSettings;
         }
     }

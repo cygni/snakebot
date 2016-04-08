@@ -287,4 +287,9 @@ public class AnsiPrinter {
 
     public static String bg_Default = "[49m";
     public static String bg_Light_gray = "[47m";
+
+    public static void main(String[] args) {
+        String s = "█";
+        System.out.println((int)s.charAt(0));
+    }
 }

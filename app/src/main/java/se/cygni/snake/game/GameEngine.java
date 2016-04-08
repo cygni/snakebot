@@ -13,6 +13,7 @@ import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
+import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.apiconversion.GameMessageConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
@@ -149,6 +150,16 @@ public class GameEngine {
                     }
                 }
 
+                // Game is Over, assign points to last man standing
+                Set<IPlayer> livingPlayers = game.getLivePlayers();
+
+                for (IPlayer player : livingPlayers) {
+                    player.addPoints(
+                            PointReason.LAST_SNAKE_ALIVE,
+                            gameFeatures.pointsLastSnakeLiving);
+                }
+
+                // Notify of GameEnded
                 Set<IPlayer> players = game.getPlayers();
                 GameEndedEvent gameEndedEvent = GameMessageConverter.onGameEnded(
                         getLeaderPlayerId(),
