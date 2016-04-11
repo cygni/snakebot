@@ -50,7 +50,7 @@ public class WorldStateConverter {
             return getSnakeInfo(ws, snakeHead);
         } catch (Exception e) {}
 
-        return new SnakeInfo(name, points, id, new int[] {});
+        return new SnakeInfo(name, points, id, new int[] {}, 0);
     }
 
     private static SnakeInfo getSnakeInfo(WorldState ws, SnakeHead head) {
@@ -59,7 +59,7 @@ public class WorldStateConverter {
 
         int[] positions = ws.getSnakeSpread(head);
 
-        return new SnakeInfo(name, head.getPoints(), id, positions);
+        return new SnakeInfo(name, head.getPoints(), id, positions, head.getTailProtectedForGameTicks());
     }
 
 }

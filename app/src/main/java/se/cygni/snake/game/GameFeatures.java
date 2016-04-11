@@ -9,7 +9,7 @@ public class GameFeatures {
     public int height = 25;
 
     // Maximum noof players in this game
-    public int maxNoofPlayers = 5;
+    public int maxNoofPlayers = 10;
 
     // The starting length of a snake
     public int startSnakeLength = 1;
@@ -57,7 +57,7 @@ public class GameFeatures {
 
     // Snake grow every N world ticks.
     // 0 for disabled
-    public int spontaneousGrowthEveryNWorldTick = 2;
+    public int spontaneousGrowthEveryNWorldTick = 3;
 
     // Indicates that this is a training game,
     // Bots will be added to fill up remaining players.
@@ -67,7 +67,7 @@ public class GameFeatures {
     public int pointsPerLength = 1;
 
     // Points given per Food item consumed
-    public int pointsPerFood = 1;
+    public int pointsPerFood = 2;
 
     // Points given per caused death (i.e. another
     // snake collides with yours)
@@ -83,6 +83,10 @@ public class GameFeatures {
 
     // Number of rounds a tail is protected after nibble
     public int noofRoundsTailProtectedAfterNibble = 3;
+
+    // If a snake kills itself by hitting a wall or another
+    // snake.
+    public int pointsSuicide = -10;
 
     /**
      * Enforces limits on some values
@@ -280,5 +284,13 @@ public class GameFeatures {
 
     public void setNoofRoundsTailProtectedAfterNibble(int noofRoundsTailProtectedAfterNibble) {
         this.noofRoundsTailProtectedAfterNibble = noofRoundsTailProtectedAfterNibble;
+    }
+
+    public int getPointsSuicide() {
+        return pointsSuicide;
+    }
+
+    public void setPointsSuicide(int pointsSuicide) {
+        this.pointsSuicide = pointsSuicide;
     }
 }

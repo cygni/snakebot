@@ -23,14 +23,16 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import se.cygni.game.render.BoardPane;
 import se.cygni.game.render.HighscorePane;
+import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
+import se.cygni.snake.api.model.Map;
 import se.cygni.snake.api.response.PlayerRegistered;
-import se.cygni.snake.websocket.event.api.ActiveGame;
-import se.cygni.snake.websocket.event.api.ActiveGamesList;
+import se.cygni.snake.eventapi.model.ActiveGame;
+import se.cygni.snake.eventapi.response.ActiveGamesList;
 
 import java.util.HashMap;
 import java.util.Queue;
@@ -45,7 +47,7 @@ public class SnakeGameViewer extends Application implements EventListener {
     private EventSocketClient eventSocketClient;
     private ListView<ActiveGame> activeGameListView;
     private ObservableList<ActiveGame> activeGames = FXCollections.observableArrayList();
-    private Queue<MapUpdateEvent> mapUpdates = new ConcurrentLinkedDeque<>();
+    private Queue<GameMessage> mapUpdates = new ConcurrentLinkedDeque<>();
     private java.util.Map<String, java.util.Map<String, Integer>> gamePlayerColorMap = new HashMap<>();
 
     public static void main(String[] args) {
@@ -55,8 +57,8 @@ public class SnakeGameViewer extends Application implements EventListener {
     @Override
     public void start(Stage primaryStage) {
 
-//        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
-        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
+        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
+//        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
 
         BorderPane root = new BorderPane();
 
@@ -97,11 +99,26 @@ public class SnakeGameViewer extends Application implements EventListener {
                     if (boardPane.isNeedsLayout())
                         return;
 
-                    MapUpdateEvent mapevent = mapUpdates.poll();
+                    GameMessage message = mapUpdates.poll();
 
-                    logMessage("Rendering game tick: " + mapevent.getGameTick());
-                    boardPane.drawMapUpdate(mapevent);
-                    highscorePane.setSnakeInfos(mapevent.getMap().getSnakeInfos(), boardPane.getSnakeColorMap());
+                    Map map = null;
+                    long gameTick = 0;
+
+                    if (message instanceof MapUpdateEvent) {
+                        map = ((MapUpdateEvent)message).getMap();
+                        gameTick = ((MapUpdateEvent)message).getGameTick();
+                    } else if (message instanceof GameEndedEvent) {
+                        map = ((GameEndedEvent)message).getMap();
+                        gameTick = ((GameEndedEvent)message).getGameTick();
+                    }
+
+                    if (map == null) {
+                        return;
+                    }
+
+                    logMessage("Rendering game tick: " + gameTick);
+                    boardPane.drawMapUpdate(map);
+                    highscorePane.setSnakeInfos(map.getSnakeInfos(), boardPane.getSnakeColorMap());
                 }
             }
         }));
@@ -148,6 +165,7 @@ public class SnakeGameViewer extends Application implements EventListener {
                     gameEndedEvent.getPlayerWinnerId()));
 
             System.out.println("Game ended event...");
+            mapUpdates.add(gameEndedEvent);
             // Should clear game/player color map
         });
     }

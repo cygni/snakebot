@@ -14,8 +14,6 @@ import se.cygni.snake.websocket.echo.EchoWebSocketHandler;
 import se.cygni.snake.websocket.event.EventSocketHandler;
 import se.cygni.snake.websocket.training.TrainingWebSocketHandler;
 
-//import org.eclipse.jetty.websocket.common.extensions.compress.PerMessageDeflateExtension;
-//import org.eclipse.jetty.websocket.server.WebSocketServerFactory;
 
 @Configuration
 @EnableAutoConfiguration

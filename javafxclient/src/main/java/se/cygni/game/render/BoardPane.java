@@ -4,7 +4,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.model.Map;
 import se.cygni.snake.api.model.SnakeInfo;
 import se.cygni.snake.client.MapCoordinate;
@@ -24,7 +23,8 @@ public class BoardPane extends Pane {
     private double gameOffsetX = 0.0;
     private double gameOffsetY = 0.0;
     private double tileSize = 0.0;
-    private MapUpdateEvent lastMapUpdateEvent = null;
+//    private MapUpdateEvent lastMapUpdateEvent = null;
+    private Map lastMap = null;
 
     private List<SnakeColor> snakeColors = new ArrayList<SnakeColor>() {{
         add(new SnakeColor(Color.DARKORANGE, Color.DARKTURQUOISE));
@@ -53,18 +53,20 @@ public class BoardPane extends Pane {
         return new SnakeColor(Color.WHEAT, Color.WHITE);
     }
 
-    public void drawMapUpdate(MapUpdateEvent mapUpdateEvent) {
-        lastMapUpdateEvent = mapUpdateEvent;
+    public void drawMapUpdate(Map map) {
+//        lastMapUpdateEvent = mapUpdateEvent;
+        lastMap = map;
 
-        populateSnakeColors(mapUpdateEvent.getMap().getSnakeInfos());
+//        populateSnakeColors(mapUpdateEvent.getMap().getSnakeInfos());
+        populateSnakeColors(map.getSnakeInfos());
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        drawGrid(gc, mapUpdateEvent.getMap());
+        drawGrid(gc, map);
 
-        MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), "fake");
+        MapUtil mapUtil = new MapUtil(map, "fake");
 
-        for (SnakeInfo snakeInfo : mapUpdateEvent.getMap().getSnakeInfos()) {
+        for (SnakeInfo snakeInfo : map.getSnakeInfos()) {
             drawSnake(
                     gc,
                     mapUtil.getSnakeSpread(snakeInfo.getId()),
@@ -104,8 +106,8 @@ public class BoardPane extends Pane {
             g.setFill(background);
             g.fillRect(0, 0, w, h);
 
-            if (lastMapUpdateEvent != null) {
-                drawMapUpdate(lastMapUpdateEvent);
+            if (lastMap != null) {
+                drawMapUpdate(lastMap);
             }
         }
     }
