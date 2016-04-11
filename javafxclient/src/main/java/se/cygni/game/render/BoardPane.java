@@ -112,8 +112,8 @@ public class BoardPane extends Pane {
 
     private double getTileSize(double width, double height, Map map) {
 
-        double maxTileWidth = (width - (map.getWidth() - 1)*lineWidth) / map.getWidth();
-        double maxTileHeight = (height - (map.getHeight() - 1)*lineWidth) / map.getHeight();
+        double maxTileWidth = (width - (map.getWidth() - 1) * lineWidth) / map.getWidth();
+        double maxTileHeight = (height - (map.getHeight() - 1) * lineWidth) / map.getHeight();
 
         return Math.min(maxTileWidth, maxTileHeight);
     }
@@ -132,19 +132,19 @@ public class BoardPane extends Pane {
         double availableHeight = height - (inset + borderWidth) * 2;
 
         tileSize = getTileSize(availableWidth, availableHeight, map);
-        double gameWidth = tileSize * map.getWidth() + lineWidth * (map.getWidth()-1);
-        double gameHeight = tileSize * map.getHeight() + lineWidth * (map.getHeight()-1);
+        double gameWidth = tileSize * map.getWidth() + lineWidth * (map.getWidth() - 1);
+        double gameHeight = tileSize * map.getHeight() + lineWidth * (map.getHeight() - 1);
 
-        double borderOffsetX = (width - gameWidth - borderWidth)/2.0;
-        double borderOffsetY = (height - gameHeight - borderWidth)/2.0;
+        double borderOffsetX = (width - gameWidth - borderWidth) / 2.0;
+        double borderOffsetY = (height - gameHeight - borderWidth) / 2.0;
 
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(borderWidth);
 
-        gc.strokeLine(borderOffsetX, borderOffsetY, width-borderOffsetX, borderOffsetY);
-        gc.strokeLine(width-borderOffsetX, borderOffsetY, width-borderOffsetX, height-borderOffsetY);
-        gc.strokeLine(width-borderOffsetX, height-borderOffsetY, borderOffsetX, height-borderOffsetY);
-        gc.strokeLine(borderOffsetX, height-borderOffsetY, borderOffsetX, borderOffsetY);
+        gc.strokeLine(borderOffsetX, borderOffsetY, width - borderOffsetX, borderOffsetY);
+        gc.strokeLine(width - borderOffsetX, borderOffsetY, width - borderOffsetX, height - borderOffsetY);
+        gc.strokeLine(width - borderOffsetX, height - borderOffsetY, borderOffsetX, height - borderOffsetY);
+        gc.strokeLine(borderOffsetX, height - borderOffsetY, borderOffsetX, borderOffsetY);
 
         gameOffsetX = (width - gameWidth) / 2.0;
         gameOffsetY = (height - gameHeight) / 2.0;
@@ -155,14 +155,14 @@ public class BoardPane extends Pane {
         // Vertical lines
         double vPos = tileSize + gameOffsetX;
         for (int i = 1; i < map.getWidth(); i++) {
-            gc.strokeLine(vPos, gameOffsetY, vPos, height-gameOffsetY);
+            gc.strokeLine(vPos, gameOffsetY, vPos, height - gameOffsetY);
             vPos += tileSize + lineWidth;
         }
 
         // Horizontal lines
         double hPos = tileSize + gameOffsetY;
         for (int i = 1; i < map.getHeight(); i++) {
-            gc.strokeLine(gameOffsetX, hPos, width-gameOffsetX, hPos);
+            gc.strokeLine(gameOffsetX, hPos, width - gameOffsetX, hPos);
             hPos += tileSize + lineWidth;
         }
 
@@ -174,18 +174,28 @@ public class BoardPane extends Pane {
         int c = 0;
         int length = snakeSpread.length;
         for (MapCoordinate coordinate : snakeSpread) {
-            double x = coordinate.x * tileSize + (coordinate.x-1) * lineWidth + gameOffsetX;
-            double y = coordinate.y * tileSize + (coordinate.y-1) * lineWidth + gameOffsetY;
+            double x = coordinate.x * tileSize + (coordinate.x - 1) * lineWidth + gameOffsetX;
+            double y = coordinate.y * tileSize + (coordinate.y - 1) * lineWidth + gameOffsetY;
 
             if (isHead) {
                 gc.setFill(snakeColorMap.get(snakeId).head);
             } else {
-                switch (length-c) {
-                    case 1 : gc.setFill(snakeColorMap.get(snakeId).tail1); break;
-                    case 2 : gc.setFill(snakeColorMap.get(snakeId).tail2); break;
-                    case 3 : gc.setFill(snakeColorMap.get(snakeId).tail3); break;
-                    case 4 : gc.setFill(snakeColorMap.get(snakeId).tail4); break;
-                    default: gc.setFill(snakeColorMap.get(snakeId).body); break;
+                switch (length - c) {
+                    case 1:
+                        gc.setFill(snakeColorMap.get(snakeId).tail1);
+                        break;
+                    case 2:
+                        gc.setFill(snakeColorMap.get(snakeId).tail2);
+                        break;
+                    case 3:
+                        gc.setFill(snakeColorMap.get(snakeId).tail3);
+                        break;
+                    case 4:
+                        gc.setFill(snakeColorMap.get(snakeId).tail4);
+                        break;
+                    default:
+                        gc.setFill(snakeColorMap.get(snakeId).body);
+                        break;
                 }
             }
 
@@ -198,15 +208,15 @@ public class BoardPane extends Pane {
     private void drawStaticObjects(GraphicsContext gc, MapUtil mapUtil, Color food, Color obstacle) {
 
         for (MapCoordinate coordinate : mapUtil.listCoordinatesContainingFood()) {
-            double x = coordinate.x * tileSize + (coordinate.x-1) * lineWidth + gameOffsetX;
-            double y = coordinate.y * tileSize + (coordinate.y-1) * lineWidth + gameOffsetY;
+            double x = coordinate.x * tileSize + (coordinate.x - 1) * lineWidth + gameOffsetX;
+            double y = coordinate.y * tileSize + (coordinate.y - 1) * lineWidth + gameOffsetY;
             gc.setFill(food);
             gc.fillRect(x, y, tileSize, tileSize);
         }
 
         for (MapCoordinate coordinate : mapUtil.listCoordinatesContainingObstacle()) {
-            double x = coordinate.x * tileSize + (coordinate.x-1) * lineWidth + gameOffsetX;
-            double y = coordinate.y * tileSize + (coordinate.y-1) * lineWidth + gameOffsetY;
+            double x = coordinate.x * tileSize + (coordinate.x - 1) * lineWidth + gameOffsetX;
+            double y = coordinate.y * tileSize + (coordinate.y - 1) * lineWidth + gameOffsetY;
             gc.setFill(obstacle);
             gc.fillRect(x, y, tileSize, tileSize);
         }
@@ -225,4 +235,7 @@ public class BoardPane extends Pane {
         }
     }
 
+    public java.util.Map<String, SnakeColor> getSnakeColorMap() {
+        return snakeColorMap;
+    }
 }

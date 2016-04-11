@@ -68,9 +68,9 @@ public class SnakeGameViewer extends Application implements EventListener {
         BorderPane.setAlignment(eventLogPane, Pos.CENTER);
         BorderPane.setAlignment(worldPane, Pos.CENTER);
 
-        BorderPane.setMargin(controlPane, new Insets(12,12,12,12));
-        BorderPane.setMargin(eventLogPane, new Insets(5,5,5,5));
-        BorderPane.setMargin(worldPane, new Insets(12,12,12,12));
+        BorderPane.setMargin(controlPane, new Insets(12, 12, 12, 12));
+        BorderPane.setMargin(eventLogPane, new Insets(5, 5, 5, 5));
+        BorderPane.setMargin(worldPane, new Insets(12, 12, 12, 12));
 
         root.setLeft(controlPane);
         root.setBottom(eventLogPane);
@@ -101,7 +101,7 @@ public class SnakeGameViewer extends Application implements EventListener {
 
                     logMessage("Rendering game tick: " + mapevent.getGameTick());
                     boardPane.drawMapUpdate(mapevent);
-                    highscorePane.setSnakeInfos(mapevent.getMap().getSnakeInfos());
+                    highscorePane.setSnakeInfos(mapevent.getMap().getSnakeInfos(), boardPane.getSnakeColorMap());
                 }
             }
         }));

@@ -2,6 +2,7 @@ package se.cygni.game.render;
 
 import javafx.geometry.HPos;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -9,6 +10,7 @@ import se.cygni.snake.api.model.SnakeInfo;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HighscorePane extends GridPane {
@@ -33,7 +35,7 @@ public class HighscorePane extends GridPane {
         setHalignment(title, HPos.CENTER);
     }
 
-    public void setSnakeInfos(SnakeInfo[] snakeInfos) {
+    public void setSnakeInfos(SnakeInfo[] snakeInfos, Map<String, SnakeColor> snakeColorMap) {
         this.getChildren().clear();
 
         addTitle();
@@ -59,11 +61,17 @@ public class HighscorePane extends GridPane {
 
         for (SnakeInfo snakeInfo : snakeInfosSorted) {
 
-            Text pos = new Text((c-1) + ".");
+            Text pos = new Text((c - 1) + ".");
             add(pos, 0, c);
             setHalignment(pos, HPos.RIGHT);
 
+            Color snakeColour = Color.BLACK;
+            if (snakeColorMap.containsKey(snakeInfo.getId())) {
+                snakeColour = snakeColorMap.get(snakeInfo.getId()).body;
+            }
+
             Text name = new Text(snakeInfo.getName());
+            name.setFill(snakeColour);
             add(name, 1, c);
             setHalignment(name, HPos.LEFT);
 
