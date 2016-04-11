@@ -145,12 +145,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getServerHost() {
-        return "localhost";
+        return "snake.cygni.se";
     }
 
     @Override
     public int getServerPort() {
-        return 8080;
+        return 80;
     }
 
     @Override

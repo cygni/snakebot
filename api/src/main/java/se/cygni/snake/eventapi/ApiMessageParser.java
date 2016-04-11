@@ -1,4 +1,4 @@
-package se.cygni.snake.websocket.event.api;
+package se.cygni.snake.eventapi;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
-import se.cygni.snake.websocket.event.api.type.ApiMessageType;
+import se.cygni.snake.eventapi.type.ApiMessageType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class ApiMessageParser {
         scanner.addIncludeFilter(new AnnotationTypeFilter(ApiMessageType.class));
 
         for (final BeanDefinition bd : scanner
-                .findCandidateComponents("se.cygni.snake.websocket.event.api")) {
+                .findCandidateComponents("se.cygni.snake.eventapi")) {
             try {
                 typeToClass.put(bd.getBeanClassName(),
                         (Class<? extends ApiMessage>) Class.forName(bd

@@ -12,10 +12,12 @@ public class TailNibbled implements WorldTransformation {
 
     private final String snakeId;
     private final int position;
+    private final int protectedForTicks;
 
-    public TailNibbled(String snakeId, int position) {
+    public TailNibbled(String snakeId, int position, int protectedForTicks) {
         this.snakeId = snakeId;
         this.position = position;
+        this.protectedForTicks = protectedForTicks;
     }
 
     @Override
@@ -36,6 +38,7 @@ public class TailNibbled implements WorldTransformation {
         SnakePart previousPart = (SnakePart)tiles[previousPartPosition].getContent();
         previousPart.setNextSnakePart(null);
 
+        head.setTailProtectedForGameTicks(protectedForTicks+1);
         return new WorldState(currentWorld.getWidth(), currentWorld.getHeight(), tiles);
     }
 }

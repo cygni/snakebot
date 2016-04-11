@@ -1,9 +1,11 @@
-package se.cygni.snake.websocket.event.api;
+package se.cygni.snake.eventapi.response;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import se.cygni.snake.websocket.event.api.type.ApiMessageType;
+import se.cygni.snake.eventapi.model.ActiveGame;
+import se.cygni.snake.eventapi.ApiMessage;
+import se.cygni.snake.eventapi.type.ApiMessageType;
 
 import java.util.List;
 

@@ -17,7 +17,7 @@ public class MapUtilTest {
     @Test
     public void testCanIMoveInDirectionNearEdge() throws Exception {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {5, 8, 7}),
+                new SnakeInfo("a", 3, "a", new int[] {5, 8, 7}, 0),
         };
         Map map = createMap(snakeInfos, new int[6], new int[3]);
 
@@ -32,7 +32,7 @@ public class MapUtilTest {
     @Test
     public void testCanIMoveInDirection() throws Exception {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}),
+                new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}, 0),
         };
         Map map = createMap(snakeInfos, new int[6], new int[3]);
 
@@ -47,7 +47,7 @@ public class MapUtilTest {
     @Test
     public void testIsTileAvailableForMovementTo() throws Exception {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}),
+                new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}, 0),
         };
         Map map = createMap(snakeInfos, new int[0], new int[]{0});
 
@@ -72,8 +72,8 @@ public class MapUtilTest {
     public void testGetSnakeSpread() throws Exception {
 
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),
-                new SnakeInfo("b", 8, "b", new int[] {3, 0})
+                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}, 0),
+                new SnakeInfo("b", 8, "b", new int[] {3, 0}, 0)
         };
 
         Map map = createMap(snakeInfos, new int[]{}, new int[]{});
@@ -102,8 +102,8 @@ public class MapUtilTest {
     @Test(expected = RuntimeException.class)
     public void testTranslateCoordinateWithNegativeX() {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),
-                new SnakeInfo("b", 8, "b", new int[] {3, 0})
+                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}, 0),
+                new SnakeInfo("b", 8, "b", new int[] {3, 0}, 0)
         };
 
         Map map = createMap(snakeInfos, new int[]{}, new int[]{});
@@ -159,8 +159,8 @@ public class MapUtilTest {
     public void testGetPlayerLength() throws Exception {
 
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),
-                new SnakeInfo("b", 8, "b", new int[] {3, 0})
+                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}, 0),
+                new SnakeInfo("b", 8, "b", new int[] {3, 0}, 0)
         };
 
         Map map = createMap(snakeInfos, new int[]{}, new int[]{});
@@ -173,8 +173,8 @@ public class MapUtilTest {
     @Test
     public void testGetMyPosition() {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),
-                new SnakeInfo("b", 8, "b", new int[] {3, 0})
+                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}, 0),
+                new SnakeInfo("b", 8, "b", new int[] {3, 0}, 0)
         };
 
         MapCoordinate snakePosition = new MapCoordinate(2,2);

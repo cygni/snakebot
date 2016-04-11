@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
+import se.cygni.game.transformation.DecrementTailProtection;
 import se.cygni.game.transformation.RemoveRandomWorldObject;
 import se.cygni.game.worldobject.Food;
 import se.cygni.game.worldobject.Obstacle;
@@ -108,6 +109,9 @@ public class GameEngine {
                     Set<IPlayer> livePlayers = game.getLivePlayers();
                     countDownLatch = new CountDownLatch(livePlayers.size());
                     registerMoveQueue = new ConcurrentLinkedQueue<>();
+
+                    DecrementTailProtection decrementTailProtection = new DecrementTailProtection();
+                    world = decrementTailProtection.transform(world);
 
                     Set<IPlayer> players = game.getPlayers();
                     MapUpdateEvent mapUpdateEvent = GameMessageConverter

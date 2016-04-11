@@ -10,19 +10,22 @@ public class SnakeInfo {
     final int points;
     final String id;
     final int[] positions;
+    final int tailProtectedForGameTicks;
 
     @JsonCreator
     public SnakeInfo(
             @JsonProperty("name") String name,
             @JsonProperty("points") int points,
             @JsonProperty("playerId")String playerId,
-            @JsonProperty("positions") int[] positions
+            @JsonProperty("positions") int[] positions,
+            @JsonProperty("tailProtectedForGameTicks") int tailProtectedForGameTicks
     )
     {
         this.name = name;
         this.points = points;
         this.id = playerId;
         this.positions = positions;
+        this.tailProtectedForGameTicks = tailProtectedForGameTicks;
     }
 
     public String getName() {
@@ -40,6 +43,10 @@ public class SnakeInfo {
 
     public String getId() {
         return id;
+    }
+
+    public int getTailProtectedForGameTicks() {
+        return tailProtectedForGameTicks;
     }
 
     @JsonIgnore

@@ -19,10 +19,17 @@ import se.cygni.snake.api.event.GameCreatedEvent;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
+import se.cygni.snake.eventapi.ApiMessage;
+import se.cygni.snake.eventapi.ApiMessageParser;
+import se.cygni.snake.eventapi.model.ActiveGame;
+import se.cygni.snake.eventapi.model.ActiveGamePlayer;
+import se.cygni.snake.eventapi.request.ListActiveGames;
+import se.cygni.snake.eventapi.request.SetGameFilter;
+import se.cygni.snake.eventapi.request.StartGame;
+import se.cygni.snake.eventapi.response.ActiveGamesList;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
 import se.cygni.snake.security.TokenService;
-import se.cygni.snake.websocket.event.api.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,14 +74,19 @@ public class EventSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message)
             throws Exception {
         log.debug(message.getPayload());
-        ApiMessage apiMessage = ApiMessageParser.decodeMessage(message.getPayload());
 
-        if (apiMessage instanceof ListActiveGames) {
-            sendListOfActiveGames();
-        } else if (apiMessage instanceof SetGameFilter) {
-            setActiveGameFilter((SetGameFilter)apiMessage);
-        } else if (apiMessage instanceof StartGame) {
-            startGame((StartGame)apiMessage);
+        try {
+            ApiMessage apiMessage = ApiMessageParser.decodeMessage(message.getPayload());
+
+            if (apiMessage instanceof ListActiveGames) {
+                sendListOfActiveGames();
+            } else if (apiMessage instanceof SetGameFilter) {
+                setActiveGameFilter((SetGameFilter) apiMessage);
+            } else if (apiMessage instanceof StartGame) {
+                startGame((StartGame) apiMessage);
+            }
+        } catch (Exception e) {
+            log.error("Failed to understand received message: {}", message.getPayload(), e);
         }
     }
 
@@ -127,7 +139,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
         List<Game> games = gameManager.listAllGames();
 
         List<ActiveGame> activeGames = games.stream().map(game -> {
-            List<ActiveGamePlayer> players = game.getPlayers().stream().map( player -> {
+            List<ActiveGamePlayer> players = game.getPlayers().stream().map(player -> {
                 return new ActiveGamePlayer(player.getName(), player.getPlayerId());
             }).collect(Collectors.toList());
 

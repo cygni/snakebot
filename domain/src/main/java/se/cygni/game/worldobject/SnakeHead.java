@@ -7,6 +7,7 @@ public class SnakeHead implements SnakePart {
     private final String playerId;
     private int points;
     private int position;
+    private int tailProtectedForGameTicks;
     private SnakePart nextSnakePart = null;
 
     public SnakeHead(String name, String playerId, int position) {
@@ -53,6 +54,20 @@ public class SnakeHead implements SnakePart {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int getTailProtectedForGameTicks() {
+        return tailProtectedForGameTicks;
+    }
+
+    public void setTailProtectedForGameTicks(int tailProtectedForGameTicks) {
+        this.tailProtectedForGameTicks = tailProtectedForGameTicks;
+    }
+
+    public void decrementTailProtection() {
+        if (tailProtectedForGameTicks > 0) {
+            tailProtectedForGameTicks--;
+        }
     }
 
     public int getLength() {
