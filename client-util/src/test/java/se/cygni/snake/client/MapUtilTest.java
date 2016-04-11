@@ -53,15 +53,19 @@ public class MapUtilTest {
 
         MapUtil mapUtil = new MapUtil(map, "a");
 
-        assertFalse(mapUtil.isTileAvailableForMovementTo(7));
-        assertFalse(mapUtil.isTileAvailableForMovementTo(4));
-        assertFalse(mapUtil.isTileAvailableForMovementTo(5));
-        assertFalse(mapUtil.isTileAvailableForMovementTo(8));
-        assertFalse(mapUtil.isTileAvailableForMovementTo(0));
-        assertTrue(mapUtil.isTileAvailableForMovementTo(1));
-        assertTrue(mapUtil.isTileAvailableForMovementTo(2));
-        assertTrue(mapUtil.isTileAvailableForMovementTo(3));
-        assertTrue(mapUtil.isTileAvailableForMovementTo(6));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(1,2)));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(1,1)));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(2,1)));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(2,2)));
+        assertFalse(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(-1,-1)));
+
+        // Obstacle at 0,0
+        assertFalse(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(0,0)));
+
+        assertTrue(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(0,1)));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(0,2)));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(1,0)));
+        assertTrue(mapUtil.isTileAvailableForMovementTo(new MapCoordinate(2,0)));
     }
 
     @Test
@@ -95,6 +99,20 @@ public class MapUtilTest {
         });
     }
 
+    @Test(expected = OutOfBoundsException.class)
+    public void testTranslateCoordinateWithNegativeX() {
+        SnakeInfo[] snakeInfos = new SnakeInfo[] {
+                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),
+                new SnakeInfo("b", 8, "b", new int[] {3, 0})
+        };
+
+        Map map = createMap(snakeInfos, new int[]{}, new int[]{});
+
+        MapUtil mapUtil = new MapUtil(map, "a");
+
+        TileContent tileAt = mapUtil.getTileAt(new MapCoordinate(-1, 0));
+    }
+
     @Test
     public void testListCoordinatesContainingObstacle() throws Exception {
         MapUtil mapUtil = new MapUtil(createMap(
@@ -120,53 +138,6 @@ public class MapUtilTest {
         Stream.of(foods).forEach(foodCoordinate -> {
             assertTrue(mapUtil.getTileAt(foodCoordinate) instanceof MapFood);
         });
-    }
-
-    @Test
-    public void testGetMyPosition() throws Exception {
-        SnakeInfo[] snakeInfos = new SnakeInfo[] {
-                new SnakeInfo("a", 3, "a", new int[] {7, 4, 5, 8}),
-        };
-        Map map = createMap(snakeInfos, new int[0], new int[0]);
-
-        MapUtil mapUtil = new MapUtil(map, "a");
-
-        assertEquals(new MapCoordinate(1,2), mapUtil.getMyPosition());
-    }
-
-    @Test
-    public void testTranslatePosition() throws Exception {
-        MapUtil mapUtil = new MapUtil(createMap(
-                new SnakeInfo[0], new int[0], new int[0]
-        ), "a");
-        MapCoordinate coordinate = mapUtil.translatePosition(5);
-        assertEquals(2, coordinate.x);
-        assertEquals(1, coordinate.y);
-    }
-
-    @Test
-    public void testTranslateCoordinate() throws Exception {
-        MapUtil mapUtil = new MapUtil(createMap(
-                new SnakeInfo[0], new int[0], new int[0]
-        ), "a");
-        int position = mapUtil.translateCoordinate(new MapCoordinate(0, 2));
-        assertEquals(6, position);
-    }
-
-    @Test
-    public void testTranslatePositions() throws Exception {
-        MapUtil mapUtil = new MapUtil(createMap(
-                new SnakeInfo[0], new int[0], new int[0]
-        ), "a");
-
-        int[] positions = new int[] {0,4,8};
-        MapCoordinate[] coordinates = mapUtil.translatePositions(positions);
-
-        assertArrayEquals(new MapCoordinate[] {
-                new MapCoordinate(0,0),
-                new MapCoordinate(1,1),
-                new MapCoordinate(2,2) },
-                coordinates);
     }
 
     @Test
@@ -197,6 +168,20 @@ public class MapUtilTest {
 
         assertEquals(4, mapUtil.getPlayerLength("a"));
         assertEquals(2, mapUtil.getPlayerLength("b"));
+    }
+
+    @Test
+    public void testGetMyPosition() {
+        SnakeInfo[] snakeInfos = new SnakeInfo[] {
+                new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),
+                new SnakeInfo("b", 8, "b", new int[] {3, 0})
+        };
+
+        MapCoordinate snakePosition = new MapCoordinate(2,2);
+
+        Map map = createMap(snakeInfos, new int[]{}, new int[]{});
+        MapUtil mapUtil = new MapUtil(map, "a");
+        assertEquals(snakePosition, mapUtil.getMyPosition());
     }
 
     /*

@@ -39,13 +39,20 @@ public class MapUtil {
     public boolean canIMoveInDirection(SnakeDirection direction) {
         try {
             MapCoordinate myPos = getMyPosition();
-            MapCoordinate myNewPos = myPos.translateBy(0,0);
+            MapCoordinate myNewPos = myPos.translateBy(0, 0);
 
             switch (direction) {
-                case DOWN : myNewPos = myPos.translateBy(0, 1); break;
-                case UP : myNewPos = myPos.translateBy(0, -1); break;
-                case LEFT : myNewPos = myPos.translateBy(-1, 0); break;
-                case RIGHT : myNewPos = myPos.translateBy(1, 0);
+                case DOWN:
+                    myNewPos = myPos.translateBy(0, 1);
+                    break;
+                case UP:
+                    myNewPos = myPos.translateBy(0, -1);
+                    break;
+                case LEFT:
+                    myNewPos = myPos.translateBy(-1, 0);
+                    break;
+                case RIGHT:
+                    myNewPos = myPos.translateBy(1, 0);
             }
 
             return isTileAvailableForMovementTo(myNewPos);
@@ -57,7 +64,7 @@ public class MapUtil {
     /**
      * Returns an array of MapCoordinate for the snake with the
      * supplied playerId.
-     *
+     * <p>
      * The first MapCoordinate always points to the MapSnakeHead and
      * the last to the snakes MapSnakeBody tail part.
      *
@@ -75,7 +82,6 @@ public class MapUtil {
     }
 
     /**
-     *
      * @return An array containing all MapCoordinates where there's Food
      */
     public MapCoordinate[] listCoordinatesContainingFood() {
@@ -83,17 +89,13 @@ public class MapUtil {
     }
 
     /**
-     *
      * @return An array containing all MapCoordinates where there's an Obstacle
      */
     public MapCoordinate[] listCoordinatesContainingObstacle() {
         return translatePositions(map.getObstaclePositions());
     }
 
-
-
     /**
-     *
      * @param coordinate
      * @return true if the TileContent at coordinate is Empty or contains Food
      */
@@ -106,11 +108,10 @@ public class MapUtil {
     }
 
     /**
-     *
-     * @param position
-     * @return true if the TileContent at coordinate is Empty or contains Food
+     * @param position map position
+     * @return true if the TileContent at map position is Empty or contains Food
      */
-    public boolean isTileAvailableForMovementTo(int position) {
+    private boolean isTileAvailableForMovementTo(int position) {
         if (isPositionOutOfBounds(position))
             return false;
 
@@ -118,35 +119,39 @@ public class MapUtil {
     }
 
     /**
-     *
-     * @return The MapCoordinate of the position for your MapSnakeHead
+     * @return The MapCoordinate of your snake's head.
      */
     public MapCoordinate getMyPosition() {
-
         return translatePosition(
                 snakeInfoMap.get(playerId).getPositions()[0]);
     }
 
+    /**
+     * @param coordinate map coordinate
+     * @return whether or not it is out of bounds
+     */
     public boolean isCoordinateOutOfBounds(MapCoordinate coordinate) {
-        if (coordinate.x < 0 || coordinate.y < 0) {
-            return true;
-        }
-
-        return coordinate.x >= map.getWidth() || coordinate.y >= map.getHeight();
-
-    }
-
-    public boolean isPositionOutOfBounds(int position) {
-        return position < 0 || position >= mapSize;
-
+        return coordinate.x < 0 || coordinate.x >= map.getWidth() || coordinate.y < 0 || coordinate.y >= map.getHeight();
     }
 
     /**
-     *
-     * @param position
+     * @param position map position
+     * @return whether or not it is out of bounds
+     */
+    private boolean isPositionOutOfBounds(int position) {
+        return position < 0 || position >= mapSize;
+    }
+
+    /**
+     * @param position map position
      * @return the TileContent at the specified position of the flattened map.
      */
-    public TileContent getTileAt(int position) {
+    private TileContent getTileAt(int position) {
+        if (isPositionOutOfBounds(position)) {
+            String errorMessage = String.format("Position [%s] is out of bounds", position);
+            throw new OutOfBoundsException(errorMessage);
+        }
+
         if (foods.get(position)) {
             return new MapFood();
         }
@@ -163,7 +168,6 @@ public class MapUtil {
     }
 
     /**
-     *
      * @param coordinate
      * @return the TileContent at the specified coordinate
      */
@@ -178,7 +182,7 @@ public class MapUtil {
      * @param position
      * @return
      */
-    public MapCoordinate translatePosition(int position) {
+    private MapCoordinate translatePosition(int position) {
         int y = position / map.getWidth();
         int x = position - y * map.getWidth();
         return new MapCoordinate(x, y);
@@ -191,11 +195,16 @@ public class MapUtil {
      * @param coordinate
      * @return
      */
-    public int translateCoordinate(MapCoordinate coordinate) {
+    private int translateCoordinate(MapCoordinate coordinate) {
+        if (isCoordinateOutOfBounds(coordinate)) {
+            String errorMessage = String.format("Coordinate [%s,%s] is out of bounds", coordinate.x, coordinate.y);
+            throw new OutOfBoundsException(errorMessage);
+        }
+
         return coordinate.x + coordinate.y * map.getWidth();
     }
 
-    public MapCoordinate[] translatePositions(int[] positions) {
+    private MapCoordinate[] translatePositions(int[] positions) {
         return Arrays.stream(positions)
                 .mapToObj(pos -> translatePosition(pos))
                 .toArray(MapCoordinate[]::new);
@@ -218,7 +227,7 @@ public class MapUtil {
             return new MapSnakeHead(snakeInfo.getName(), playerId);
         }
 
-        if (order == snakeInfo.getLength()-1) {
+        if (order == snakeInfo.getLength() - 1) {
             return new MapSnakeBody(true, playerId, order);
         }
         return new MapSnakeBody(false, playerId, order);
