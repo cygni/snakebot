@@ -99,7 +99,7 @@ public class MapUtilTest {
         });
     }
 
-    @Test(expected = OutOfBoundsException.class)
+    @Test(expected = RuntimeException.class)
     public void testTranslateCoordinateWithNegativeX() {
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
                 new SnakeInfo("a", 3, "a", new int[] {8, 7, 4, 1}),

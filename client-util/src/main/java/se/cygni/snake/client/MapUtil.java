@@ -149,7 +149,7 @@ public class MapUtil {
     private TileContent getTileAt(int position) {
         if (isPositionOutOfBounds(position)) {
             String errorMessage = String.format("Position [%s] is out of bounds", position);
-            throw new OutOfBoundsException(errorMessage);
+            throw new RuntimeException(errorMessage);
         }
 
         if (foods.get(position)) {
@@ -198,7 +198,7 @@ public class MapUtil {
     private int translateCoordinate(MapCoordinate coordinate) {
         if (isCoordinateOutOfBounds(coordinate)) {
             String errorMessage = String.format("Coordinate [%s,%s] is out of bounds", coordinate.x, coordinate.y);
-            throw new OutOfBoundsException(errorMessage);
+            throw new RuntimeException(errorMessage);
         }
 
         return coordinate.x + coordinate.y * map.getWidth();
