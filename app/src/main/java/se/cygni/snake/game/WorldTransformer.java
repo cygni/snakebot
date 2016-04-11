@@ -149,10 +149,7 @@ public class WorldTransformer {
 
                 // Special case when head hits tail and that feature is enabled
                 if (gameFeatures.headToTailConsumes &&
-                        tile.size() == 2 &&
-                        tile.listSnakeIdsPresent().size() > 1 && // Not ok to eat you own tail!
-                        tile.containsExactlyOneOfEachType(new Class[] {SnakeHead.class, SnakeBody.class}) &&
-                        tile.listContentsOfType(SnakeBody.class).get(0).isTail()) {
+                        isNibbleSitutaion(tile, snakeToWorldState)) {
 
                     SnakeBody snakeBodyTail = tile.listContentsOfType(SnakeBody.class).get(0);
                     SnakeHead head = tile.listContentsOfType(SnakeHead.class).get(0);
@@ -201,6 +198,22 @@ public class WorldTransformer {
         }
 
         return snakeToWorldState.values().stream().collect(Collectors.toList());
+    }
+
+    private boolean isNibbleSitutaion(TileMultipleContent tile, Map<String, WorldState> snakeToWorldState) {
+        if (tile.size() == 2 && // Nibble is only possible if there exists two objects on the same tile
+                tile.listSnakeIdsPresent().size() > 1 && // Not ok to eat you own tail!
+                tile.containsExactlyOneOfEachType(new Class[] {SnakeHead.class, SnakeBody.class}) && // One body and one head
+                tile.listContentsOfType(SnakeBody.class).get(0).isTail()) { // And the body is a tail
+
+            String tailPlayerId = tile.listContentsOfType(SnakeBody.class).get(0).getPlayerId();
+            WorldState ws = snakeToWorldState.get(tailPlayerId);
+
+            // Nibble is ok if this player is not currently protected
+            return ws.getSnakeHeadById(tailPlayerId).getTailProtectedForGameTicks() == 0;
+        }
+
+        return false;
     }
 
     /**
