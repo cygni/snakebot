@@ -1,5 +1,7 @@
 package se.cygni.game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -18,6 +20,8 @@ import se.cygni.snake.websocket.event.api.*;
 
 public class EventSocketClient {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocketClient.class);
+
     private String url = "ws://localhost:8080/events";
     private EventListener listener;
     private WebSocketSession webSocketSession;
@@ -28,7 +32,7 @@ public class EventSocketClient {
         this.listener = listener;
     }
 
-    public void setGameIdFilter(String...ids) {
+    public void setGameIdFilter(String... ids) {
         SetGameFilter setGameFilter = new SetGameFilter(ids);
         sendApiMesssage(setGameFilter);
     }
@@ -44,7 +48,7 @@ public class EventSocketClient {
             TextMessage textMessage = new TextMessage(msg);
             webSocketSession.sendMessage(textMessage);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error sending api message", e);
         }
     }
 
@@ -69,7 +73,7 @@ public class EventSocketClient {
                 String msgPayload = msgBuffer.toString();
                 msgBuffer = new StringBuilder();
 
-                listener.onMessage(message.getPayload().toString());
+                listener.onMessage(message.getPayload());
 
                 try {
                     GameMessage gameMessage = GameMessageParser.decodeMessage(msgPayload);
@@ -77,15 +81,15 @@ public class EventSocketClient {
                     if (gameMessage instanceof MapUpdateEvent) {
                         listener.onMapUpdate((MapUpdateEvent) gameMessage);
                     } else if (gameMessage instanceof SnakeDeadEvent) {
-                        listener.onSnakeDead((SnakeDeadEvent)gameMessage);
+                        listener.onSnakeDead((SnakeDeadEvent) gameMessage);
                     } else if (gameMessage instanceof GameEndedEvent) {
-                        listener.onGameEnded((GameEndedEvent)gameMessage);
+                        listener.onGameEnded((GameEndedEvent) gameMessage);
                     } else if (gameMessage instanceof GameStartingEvent) {
-                        listener.onGameStarting((GameStartingEvent)gameMessage);
+                        listener.onGameStarting((GameStartingEvent) gameMessage);
                     } else if (gameMessage instanceof PlayerRegistered) {
-                        listener.onPlayerRegistered((PlayerRegistered)gameMessage);
+                        listener.onPlayerRegistered((PlayerRegistered) gameMessage);
                     } else if (gameMessage instanceof InvalidPlayerName) {
-                        listener.onInvalidPlayerName((InvalidPlayerName)gameMessage);
+                        listener.onInvalidPlayerName((InvalidPlayerName) gameMessage);
                     }
                 } catch (Exception e) {
                 }
@@ -102,13 +106,13 @@ public class EventSocketClient {
 
             @Override
             public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-                System.out.println("transport error ");
+                LOGGER.info("transport error ");
                 exception.printStackTrace();
             }
 
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-                System.out.println("connection closed");
+                LOGGER.info("connection closed");
             }
 
             @Override
