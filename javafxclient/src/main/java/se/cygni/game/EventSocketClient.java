@@ -16,7 +16,11 @@ import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.response.PlayerRegistered;
-import se.cygni.snake.websocket.event.api.*;
+import se.cygni.snake.eventapi.ApiMessage;
+import se.cygni.snake.eventapi.ApiMessageParser;
+import se.cygni.snake.eventapi.request.SetGameFilter;
+import se.cygni.snake.eventapi.request.StartGame;
+import se.cygni.snake.eventapi.response.ActiveGamesList;
 
 public class EventSocketClient {
 
@@ -52,6 +56,44 @@ public class EventSocketClient {
         }
     }
 
+    private boolean tryToHandleGameMessage(String msg) {
+        try {
+            GameMessage gameMessage = GameMessageParser.decodeMessage(msg);
+
+            if (gameMessage instanceof MapUpdateEvent) {
+                listener.onMapUpdate((MapUpdateEvent) gameMessage);
+            } else if (gameMessage instanceof SnakeDeadEvent) {
+                listener.onSnakeDead((SnakeDeadEvent) gameMessage);
+            } else if (gameMessage instanceof GameEndedEvent) {
+                listener.onGameEnded((GameEndedEvent) gameMessage);
+            } else if (gameMessage instanceof GameStartingEvent) {
+                listener.onGameStarting((GameStartingEvent) gameMessage);
+            } else if (gameMessage instanceof PlayerRegistered) {
+                listener.onPlayerRegistered((PlayerRegistered) gameMessage);
+            } else if (gameMessage instanceof InvalidPlayerName) {
+                listener.onInvalidPlayerName((InvalidPlayerName) gameMessage);
+            }
+
+            return true;
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
+    private boolean tryToHandleApiMessage(String msg) {
+        try {
+            ApiMessage apiMessage = ApiMessageParser.decodeMessage(msg);
+
+            if (apiMessage instanceof ActiveGamesList) {
+                listener.onActiveGamesList((ActiveGamesList) apiMessage);
+            }
+
+            return true;
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
     public void connect() {
         WebSocketClient wsClient = new StandardWebSocketClient();
 
@@ -73,34 +115,10 @@ public class EventSocketClient {
                 String msgPayload = msgBuffer.toString();
                 msgBuffer = new StringBuilder();
 
-                listener.onMessage(message.getPayload());
+                listener.onMessage(msgPayload);
 
-                try {
-                    GameMessage gameMessage = GameMessageParser.decodeMessage(msgPayload);
-
-                    if (gameMessage instanceof MapUpdateEvent) {
-                        listener.onMapUpdate((MapUpdateEvent) gameMessage);
-                    } else if (gameMessage instanceof SnakeDeadEvent) {
-                        listener.onSnakeDead((SnakeDeadEvent) gameMessage);
-                    } else if (gameMessage instanceof GameEndedEvent) {
-                        listener.onGameEnded((GameEndedEvent) gameMessage);
-                    } else if (gameMessage instanceof GameStartingEvent) {
-                        listener.onGameStarting((GameStartingEvent) gameMessage);
-                    } else if (gameMessage instanceof PlayerRegistered) {
-                        listener.onPlayerRegistered((PlayerRegistered) gameMessage);
-                    } else if (gameMessage instanceof InvalidPlayerName) {
-                        listener.onInvalidPlayerName((InvalidPlayerName) gameMessage);
-                    }
-                } catch (Exception e) {
-                }
-
-                try {
-                    ApiMessage apiMessage = ApiMessageParser.decodeMessage(msgPayload);
-
-                    if (apiMessage instanceof ActiveGamesList) {
-                        listener.onActiveGamesList((ActiveGamesList) apiMessage);
-                    }
-                } catch (Exception e) {
+                if (!tryToHandleGameMessage(msgPayload)) {
+                    tryToHandleApiMessage(msgPayload);
                 }
             }
 

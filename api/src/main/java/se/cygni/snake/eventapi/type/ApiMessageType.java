@@ -1,4 +1,4 @@
-package se.cygni.snake.websocket.event.api.type;
+package se.cygni.snake.eventapi.type;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

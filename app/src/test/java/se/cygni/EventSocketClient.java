@@ -6,9 +6,9 @@ import org.springframework.web.socket.sockjs.client.RestTemplateXhrTransport;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.Transport;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
-import se.cygni.snake.websocket.event.api.ApiMessage;
-import se.cygni.snake.websocket.event.api.ApiMessageParser;
-import se.cygni.snake.websocket.event.api.ListActiveGames;
+import se.cygni.snake.eventapi.ApiMessage;
+import se.cygni.snake.eventapi.ApiMessageParser;
+import se.cygni.snake.eventapi.request.ListActiveGames;
 
 import java.util.ArrayList;
 import java.util.List;

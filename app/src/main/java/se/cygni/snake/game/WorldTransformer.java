@@ -162,7 +162,8 @@ public class WorldTransformer {
 
                     TailNibbled tailNibbled = new TailNibbled(
                             snakeBodyTail.getPlayerId(),
-                            snakeBodyTail.getPosition());
+                            snakeBodyTail.getPosition(),
+                            gameFeatures.getNoofRoundsTailProtectedAfterNibble());
                     tailWorldState = tailNibbled.transform(tailWorldState);
 
                     snakeToWorldState.put(snakeBodyTail.getPlayerId(), tailWorldState);
@@ -173,9 +174,6 @@ public class WorldTransformer {
                             game.getGameFeatures().getPointsPerNibble()
                     );
 
-                    // Protect nibbled player
-                    // Todo: Tailprotection not done.
-                    tailWorldState.getSnakeHeadById(snakeBodyTail.getPlayerId());
                     continue;
                 }
 
@@ -302,21 +300,33 @@ public class WorldTransformer {
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(oc.getPosition()),
                         worldTick);
+                game.getPlayer(playerId).addPoints(
+                        PointReason.SUICIDE,
+                        game.getGameFeatures().getPointsSuicide());
             } catch (WallCollision wc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithWall,
                         ws.translatePosition(wc.getPosition()),
                         worldTick);
+                game.getPlayer(playerId).addPoints(
+                        PointReason.SUICIDE,
+                        game.getGameFeatures().getPointsSuicide());
             } catch (SnakeCollision sc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithSelf,
                         ws.translatePosition(sc.getPosition()),
                         worldTick);
+                game.getPlayer(playerId).addPoints(
+                        PointReason.SUICIDE,
+                        game.getGameFeatures().getPointsSuicide());
             } catch (TransformationException oc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(0),
                         worldTick);
+                game.getPlayer(playerId).addPoints(
+                        PointReason.SUICIDE,
+                        game.getGameFeatures().getPointsSuicide());
             }
         }
 
@@ -369,6 +379,15 @@ public class WorldTransformer {
                 }
         );
         return tiles;
+    }
+
+    private boolean deathConsideredSuicide(DeathReason deathReason) {
+        if (deathReason == DeathReason.CollisionWithSelf ||
+                deathReason == DeathReason.CollisionWithWall ||
+                deathReason == DeathReason.CollisionWithObstacle) {
+            return true;
+        }
+        return false;
     }
 
     private void snakeDied(

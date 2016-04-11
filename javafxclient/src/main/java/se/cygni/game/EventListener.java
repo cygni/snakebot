@@ -6,7 +6,7 @@ import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.response.PlayerRegistered;
-import se.cygni.snake.websocket.event.api.ActiveGamesList;
+import se.cygni.snake.eventapi.response.ActiveGamesList;
 
 public interface EventListener {
 

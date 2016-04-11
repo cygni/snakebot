@@ -1,4 +1,4 @@
-package se.cygni.snake.websocket.event.api;
+package se.cygni.snake.eventapi.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

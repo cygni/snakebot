@@ -1,4 +1,4 @@
-package se.cygni.snake.websocket.event.api;
+package se.cygni.snake.eventapi;
 
 public class ApiMessage {
 
