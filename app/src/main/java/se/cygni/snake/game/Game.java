@@ -54,7 +54,7 @@ public class Game {
 
     @Subscribe
     public void startGame(StartGame startGame) {
-        if (gameFeatures.trainingGame) {
+        if (gameFeatures.isTrainingGame()) {
             log.debug("Starting game");
             startGame();
         }
@@ -77,9 +77,9 @@ public class Game {
 
         // If this is a training game changes to settings are allowed
         GameSettings requestedGameSettings = registerPlayer.getGameSettings();
-        if (gameFeatures.trainingGame && requestedGameSettings != null) {
+        if (gameFeatures.isTrainingGame() && requestedGameSettings != null) {
             gameFeatures = GameSettingsConverter.toGameFeatures(requestedGameSettings);
-            gameFeatures.trainingGame = true; // Just to be sure
+            gameFeatures.setTrainingGame(true); // Just to be sure
             gameEngine.reApplyGameFeatures(gameFeatures);
         }
 
@@ -178,10 +178,10 @@ public class Game {
     }
 
     private void initBotPlayers() {
-        if (!gameFeatures.trainingGame)
+        if (!gameFeatures.isTrainingGame())
             return;
 
-        for (int i = 0; i < gameFeatures.maxNoofPlayers - 1; i++) {
+        for (int i = 0; i < gameFeatures.getMaxNoofPlayers() - 1; i++) {
             RandomBot rbot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
             addPlayer(rbot);
         }

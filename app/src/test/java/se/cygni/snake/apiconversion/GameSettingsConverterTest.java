@@ -30,8 +30,8 @@ public class GameSettingsConverterTest {
 
         GameFeatures gf = GameSettingsConverter.toGameFeatures(gs);
 
-        assertEquals(25, gf.width);
-        assertEquals(50, gf.height);
-        assertEquals(3, gf.maxNoofPlayers);
+        assertEquals(25, gf.getWidth());
+        assertEquals(50, gf.getHeight());
+        assertEquals(3, gf.getMaxNoofPlayers());
     }
 }

@@ -28,12 +28,12 @@ public class GameEngineTest {
     //@Before
     public void setup() {
         GameFeatures gameFeatures = new GameFeatures();
-        gameFeatures.width = 15;
-        gameFeatures.height = 15;
-        gameFeatures.timeInMsPerTick = 1000;
-        gameFeatures.maxNoofPlayers = 25;
-        gameFeatures.spontaneousGrowthEveryNWorldTick = 2;
-        gameFeatures.trainingGame = true;
+        gameFeatures.setWidth(15);
+        gameFeatures.setHeight(15);
+        gameFeatures.setTimeInMsPerTick(1000);
+        gameFeatures.setMaxNoofPlayers(25);
+        gameFeatures.setSpontaneousGrowthEveryNWorldTick(2);
+        gameFeatures.setTrainingGame(true);
 
         GameManager gameManager = new GameManager(new EventBus());
         game = gameManager.createGame(gameFeatures);
