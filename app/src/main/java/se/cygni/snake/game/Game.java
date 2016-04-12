@@ -84,7 +84,7 @@ public class Game {
         }
 
         GameSettings gameSettings = GameSettingsConverter.toGameSettings(gameFeatures);
-        PlayerRegistered playerRegistered = new PlayerRegistered(gameId, player.getName(), gameSettings, GameMode.training);
+        PlayerRegistered playerRegistered = new PlayerRegistered(gameId, player.getName(), gameSettings, GameMode.TRAINING);
         MessageUtils.copyCommonAttributes(registerPlayer, playerRegistered);
 
         outgoingEventBus.post(playerRegistered);

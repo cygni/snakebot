@@ -10,46 +10,31 @@ import java.util.Set;
 public class GameMessageConverter {
 
     public static MapUpdateEvent onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
-
-        MapUpdateEvent mue = new MapUpdateEvent(
+        return new MapUpdateEvent(
                 gameTick,
                 gameId,
                 WorldStateConverter.convertWorldState(worldState, gameTick, players));
-
-        return mue;
     }
 
     public static SnakeDeadEvent onPlayerDied(DeathReason reason, String playerId, int x, int y, String gameId, long gameTick) {
-
-        SnakeDeadEvent sde = new SnakeDeadEvent(reason, playerId, x, y, gameId, gameTick);
-
-        return sde;
+        return new SnakeDeadEvent(reason, playerId, x, y, gameId, gameTick);
     }
 
     public static GameEndedEvent onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
-
-        GameEndedEvent gee = new GameEndedEvent(
+        return new GameEndedEvent(
                 playerWinnerId, gameId, gameTick,
-                WorldStateConverter.convertWorldState(worldState, gameTick, players)
-        );
-
-        return gee;
+                WorldStateConverter.convertWorldState(worldState, gameTick, players));
     }
 
     public static GameStartingEvent onGameStart(String gameId, int noofPlayers, int width, int height) {
-
-        GameStartingEvent gse = new GameStartingEvent(gameId, noofPlayers, width, height);
-
-        return gse;
+        return new GameStartingEvent(gameId, noofPlayers, width, height);
     }
 
     public static GameAbortedEvent onGameAborted(String gameId) {
-
         return new GameAbortedEvent(gameId);
     }
 
     public static GameChangedEvent onGameChanged(String gameId) {
-
         return new GameChangedEvent(gameId);
     }
 }

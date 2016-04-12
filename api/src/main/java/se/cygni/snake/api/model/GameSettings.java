@@ -2,10 +2,10 @@ package se.cygni.snake.api.model;
 
 public class GameSettings {
     // World width
-    private int width = 50;
+    private WorldSize width = WorldSize.MEDIUM;
 
     // World height
-    private int height = 50;
+    private WorldSize height = WorldSize.MEDIUM;
 
     // Maximum noof players in this game
     private int maxNoofPlayers = 5;
@@ -87,11 +87,11 @@ public class GameSettings {
     // snake.
     private int pointsSuicide = -10;
     
-    public int getWidth() {
+    public WorldSize getWidth() {
         return width;
     }
 
-    public int getHeight() {
+    public WorldSize getHeight() {
         return height;
     }
 
@@ -179,11 +179,11 @@ public class GameSettings {
         return pointsSuicide;
     }
 
-    public void setWidth(int width) {
+    public void setWidth(WorldSize width) {
         this.width = width;
     }
 
-    public void setHeight(int height) {
+    public void setHeight(WorldSize height) {
         this.height = height;
     }
 
@@ -301,8 +301,8 @@ public class GameSettings {
     }
 
     public static class GameSettingsBuilder {
-        private int width = 50;
-        private int height = 50;
+        private WorldSize width = WorldSize.MEDIUM;
+        private WorldSize height = WorldSize.MEDIUM;
         private int maxNoofPlayers = 5;
         private int startSnakeLength = 1;
         private int timeInMsPerTick = 250;
@@ -328,12 +328,12 @@ public class GameSettings {
         public GameSettingsBuilder() {
         }
 
-        public GameSettingsBuilder withWidth(int width) {
+        public GameSettingsBuilder withWidth(WorldSize width) {
             this.width = width;
             return this;
         }
 
-        public GameSettingsBuilder withHeight(int height) {
+        public GameSettingsBuilder withHeight(WorldSize height) {
             this.height = height;
             return this;
         }

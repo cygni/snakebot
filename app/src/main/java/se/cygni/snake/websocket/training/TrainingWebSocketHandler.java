@@ -26,7 +26,7 @@ import java.util.zip.Inflater;
 
 public class TrainingWebSocketHandler extends TextWebSocketHandler {
 
-    private static Logger log = LoggerFactory.getLogger(TrainingWebSocketHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingWebSocketHandler.class);
 
     private GameManager gameManager;
 
@@ -39,7 +39,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
     @Autowired
     public TrainingWebSocketHandler(GameManager gameManager) {
         this.gameManager = gameManager;
-        log.info("Started training web socket handler");
+        LOGGER.info("Started training web socket handler");
 
         // Create a playerId for this player
         playerId = UUID.randomUUID().toString();
@@ -51,21 +51,17 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         outgoingEventBus.register(this);
 
         incomingEventBus = game.getIncomingEventBus();
-
-
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-
-        log.debug("Opened new session in instance " + this);
+        LOGGER.debug("Opened new session in instance " + this);
         this.webSocketSession = session;
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message)
-            throws Exception {
-        log.debug(message.getPayload());
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        LOGGER.debug(message.getPayload());
 
         try {
             // Deserialize message
@@ -77,7 +73,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
             // Send to game
             incomingEventBus.post(gameMessage);
         } catch (Throwable e) {
-            log.error("Could not handle incoming text message: {}", e.getMessage());
+            LOGGER.error("Could not handle incoming text message: {}", e.getMessage());
 
             InvalidMessage invalidMessage = new InvalidMessage(
                     "Could not understand this message. Error:" + e.getMessage(),
@@ -86,7 +82,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
             invalidMessage.setReceivingPlayerId(playerId);
 
             try {
-                log.info("Sending InvalidMessage to client.");
+                LOGGER.info("Sending InvalidMessage to client.");
                 outgoingEventBus.post(invalidMessage);
             } catch (Throwable ee) {
                 ee.printStackTrace();
@@ -95,10 +91,8 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception)
-            throws Exception {
-
-        log.error("handleTransportError", exception);
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        LOGGER.error("handleTransportError", exception);
         session.close(CloseStatus.SERVER_ERROR);
         outgoingEventBus.unregister(this);
         game.playerLostConnection(playerId);
@@ -111,7 +105,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         outgoingEventBus.unregister(this);
         game.playerLostConnection(playerId);
         game.abort();
-        log.info("afterConnectionClosed {}", status);
+        LOGGER.info("afterConnectionClosed {}", status);
     }
 
     @Override
@@ -128,7 +122,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         }
         try {
             String msg = GameMessageParser.encodeMessage(message);
-            log.debug("Sending: {}", msg);
+            LOGGER.debug("Sending: {}", msg);
             webSocketSession.sendMessage(new TextMessage(msg));
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,8 +141,8 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         }
         outputStream.close();
         byte[] output = outputStream.toByteArray();
-        log.debug("Original: " + data.length / 1024 + " Kb");
-        log.debug("Compressed: " + output.length / 1024 + " Kb");
+        LOGGER.debug("Original: " + data.length / 1024 + " Kb");
+        LOGGER.debug("Compressed: " + output.length / 1024 + " Kb");
         return output;
     }
 
@@ -163,8 +157,8 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         }
         outputStream.close();
         byte[] output = outputStream.toByteArray();
-        log.debug("Original: " + data.length);
-        log.debug("Compressed: " + output.length);
+        LOGGER.debug("Original: " + data.length);
+        LOGGER.debug("Compressed: " + output.length);
         return output;
     }
 }
