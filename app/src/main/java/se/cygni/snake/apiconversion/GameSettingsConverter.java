@@ -7,20 +7,10 @@ import se.cygni.snake.game.GameFeatures;
 public class GameSettingsConverter {
 
     public static GameSettings toGameSettings(GameFeatures gameFeatures) {
-        GameSettings.GameSettingsBuilder builder = new GameSettings.GameSettingsBuilder();
-
-        return builder
-                .withMaxNoofPlayers(gameFeatures.maxNoofPlayers)
-                .withHeight(gameFeatures.height)
-                .withFoodEnabled(gameFeatures.foodEnabled)
-                .withWidth(gameFeatures.width)
-                .withObstaclesEnabled(gameFeatures.obstaclesEnabled)
-                .withEdgeWrapsAround(gameFeatures.edgeWrapsAround)
-                .withHeadToTailConsumes(gameFeatures.headToTailConsumes)
-                .withStartSnakeLength(gameFeatures.startSnakeLength)
-                .withTailConsumeGrows(gameFeatures.tailConsumeGrows)
-                .withTimeInMsPerTick(gameFeatures.timeInMsPerTick)
-                .build();
+        GameSettings gameSettings = new GameSettings();
+        gameFeatures.applyValidation();
+        BeanUtils.copyProperties(gameFeatures, gameSettings);
+        return gameSettings;
     }
 
     public static GameFeatures toGameFeatures(GameSettings gameSettings) {
