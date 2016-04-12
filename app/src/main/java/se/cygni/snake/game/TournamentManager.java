@@ -16,6 +16,7 @@ public class TournamentManager {
     private boolean tournamentStarted;
     private String tournamentId;
     private String tournamentName;
+    private GameFeatures gameFeatures;
 
     private Map<String, Game> games = new HashMap<>();
 
@@ -30,6 +31,7 @@ public class TournamentManager {
 
         tournamentId = null;
         tournamentName = null;
+        gameFeatures = null;
 
         games.values().forEach(game -> game.abort());
     }
@@ -43,7 +45,7 @@ public class TournamentManager {
         tournamentActive = true;
         tournamentId = UUID.randomUUID().toString();
         tournamentName = name;
-
+        gameFeatures = new GameFeatures();
         games = new HashMap<>();
     }
 
@@ -57,5 +59,21 @@ public class TournamentManager {
 
     public String getTournamentId() {
         return tournamentId;
+    }
+
+    public String getTournamentName() {
+        return tournamentName;
+    }
+
+    public void setGameFeatures(GameFeatures gameFeatures) {
+        this.gameFeatures = gameFeatures;
+    }
+
+    public GameFeatures getGameFeatures() {
+        return gameFeatures;
+    }
+
+    public void startGame(String gameId) {
+
     }
 }

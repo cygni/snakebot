@@ -10,7 +10,14 @@ public class GameSettingsConverterTest {
 
     @Test
     public void testToGameSettings() throws Exception {
+        GameFeatures gameFeatures = new GameFeatures();
+        gameFeatures.setTrainingGame(false);
+        gameFeatures.setPointsSuicide(-100);
 
+        GameSettings gameSettings = GameSettingsConverter.toGameSettings(gameFeatures);
+
+        assertEquals(false, gameSettings.isTrainingGame());
+        assertEquals(-100, gameSettings.getPointsSuicide());
     }
 
     @Test

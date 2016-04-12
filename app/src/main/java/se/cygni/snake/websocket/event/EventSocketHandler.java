@@ -3,6 +3,7 @@ package se.cygni.snake.websocket.event;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +22,15 @@ import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.eventapi.ApiMessage;
 import se.cygni.snake.eventapi.ApiMessageParser;
+import se.cygni.snake.eventapi.exception.Unauthorized;
 import se.cygni.snake.eventapi.model.ActiveGame;
 import se.cygni.snake.eventapi.model.ActiveGamePlayer;
-import se.cygni.snake.eventapi.request.ListActiveGames;
-import se.cygni.snake.eventapi.request.SetGameFilter;
-import se.cygni.snake.eventapi.request.StartGame;
+import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
+import se.cygni.snake.eventapi.response.TournamentCreated;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
+import se.cygni.snake.game.TournamentManager;
 import se.cygni.snake.security.TokenService;
 
 import java.io.IOException;
@@ -47,11 +49,20 @@ public class EventSocketHandler extends TextWebSocketHandler {
     private String[] filterGameIds = new String[0];
     private EventBus globalEventBus;
     private GameManager gameManager;
+    private TournamentManager tournamentManager;
+    private TokenService tokenService;
 
     @Autowired
-    public EventSocketHandler(EventBus globalEventBus, GameManager gameManager, TokenService tokenService) {
+    public EventSocketHandler(
+            EventBus globalEventBus,
+            GameManager gameManager,
+            TournamentManager tournamentManager,
+            TokenService tokenService) {
+
         this.globalEventBus = globalEventBus;
         this.gameManager = gameManager;
+        this.tournamentManager = tournamentManager;
+        this.tokenService = tokenService;
         log.info("EventSocketHandler started!");
     }
 
@@ -78,12 +89,50 @@ public class EventSocketHandler extends TextWebSocketHandler {
         try {
             ApiMessage apiMessage = ApiMessageParser.decodeMessage(message.getPayload());
 
+            if (!verifyTokenSendErrorIfUnauthorized(apiMessage)) {
+                return;
+            }
+
             if (apiMessage instanceof ListActiveGames) {
                 sendListOfActiveGames();
+
             } else if (apiMessage instanceof SetGameFilter) {
                 setActiveGameFilter((SetGameFilter) apiMessage);
+
             } else if (apiMessage instanceof StartGame) {
                 startGame((StartGame) apiMessage);
+
+            } else if (apiMessage instanceof KillTournament) {
+                // ToDo: Do we really need the current tournamentId?
+                tournamentManager.killTournament();
+
+            } else if (apiMessage instanceof CreateTournament) {
+                CreateTournament createTournament = (CreateTournament)apiMessage;
+
+                // ToDo: Handle case that a tournament is already started
+                tournamentManager.createTournament(createTournament.getTournamentName());
+                sendApiMessage(new TournamentCreated(
+                        tournamentManager.getTournamentId(),
+                        tournamentManager.getTournamentName(),
+                        GameSettingsConverter.toGameSettings(
+                                tournamentManager.getGameFeatures()
+                        )
+                ));
+
+            } else if (apiMessage instanceof UpdateTournamentSettings) {
+                UpdateTournamentSettings updateTournamentSettings = (UpdateTournamentSettings)apiMessage;
+
+                // ToDo: Handle case that a tournament is already started
+                tournamentManager.setGameFeatures(
+                        GameSettingsConverter.toGameFeatures(
+                                updateTournamentSettings.getGameSettings()
+                        )
+                );
+
+            } else if (apiMessage instanceof StartTournamentGame) {
+                StartTournamentGame startGame = (StartTournamentGame)apiMessage;
+
+                tournamentManager.startGame(startGame.getGameId());
             }
         } catch (Exception e) {
             log.error("Failed to understand received message: {}", message.getPayload(), e);
@@ -116,25 +165,20 @@ public class EventSocketHandler extends TextWebSocketHandler {
             sendListOfActiveGames();
         }
 
-        sendEvent(event.getGameMessage());
+        sendGameEvent(event.getGameMessage());
     }
 
-    private void sendEvent(GameMessage message) {
+    private void sendGameEvent(GameMessage message) {
         if (!session.isOpen())
             return;
 
-        try {
-            String gameId = org.apache.commons.beanutils.BeanUtils.getProperty(message, "gameId");
-            if (ArrayUtils.contains(filterGameIds, gameId)) {
-                session.sendMessage(new TextMessage(GameMessageParser.encodeMessage(message)));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        String gameId = extractGameId(message);
+        if (ArrayUtils.contains(filterGameIds, gameId)) {
+            sendGameMessage(message);
         }
     }
 
     private void sendListOfActiveGames() {
-//        List<Game> games = gameManager.listActiveGames();
         log.info("Seding updated list of games");
         List<Game> games = gameManager.listAllGames();
 
@@ -152,22 +196,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
         }).collect(Collectors.toList());
 
         ActiveGamesList gamesList = new ActiveGamesList(activeGames);
-        try {
-            if (session.isOpen()) {
-                session.sendMessage(new TextMessage(ApiMessageParser.encodeMessage(gamesList)));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//        ActiveGamesList gamesList = new ActiveGamesList(gameManager.listGameIds());
-//        try {
-//            if (session.isOpen()) {
-//                session.sendMessage(new TextMessage(ApiMessageParser.encodeMessage(gamesList)));
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        sendApiMessage(gamesList);
     }
 
     private void setActiveGameFilter(SetGameFilter gameFilter) {
@@ -181,6 +210,52 @@ public class EventSocketHandler extends TextWebSocketHandler {
             log.info("Starting game: {}", game.getGameId());
             log.info("Active remote players: {}", game.getLiveAndRemotePlayers().size());
             game.startGame();
+        }
+    }
+
+    private boolean verifyTokenSendErrorIfUnauthorized(ApiMessage apiMessage) {
+        try {
+            String token = BeanUtils.getProperty(apiMessage, "token");
+            if (!tokenService.isTokenValid(token)) {
+                String msg = String.format("Operation %s requires valid token. Specified token: %s is invalid",
+                        apiMessage.getClass().getSimpleName(),
+                        token);
+                Unauthorized unauthorized = new Unauthorized(msg);
+                sendApiMessage(unauthorized);
+                return false;
+            }
+        } catch (Exception e) {
+            // Happens if the ApiMessage doesn't have a token property
+            // in which case no authorization is needed.
+        }
+        return true;
+    }
+
+    private String extractGameId(GameMessage gameMessage) {
+        try {
+            return BeanUtils.getProperty(gameMessage, "gameId");
+        } catch (Exception e) {
+            return ":";
+        }
+    }
+
+    private void sendGameMessage(GameMessage gameMessage) {
+        try {
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(GameMessageParser.encodeMessage(gameMessage)));
+            }
+        } catch (IOException e) {
+            log.error("Failed to send GameMessage over eventsocket", e);
+        }
+    }
+
+    private void sendApiMessage(ApiMessage apiMessage) {
+        try {
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(ApiMessageParser.encodeMessage(apiMessage)));
+            }
+        } catch (IOException e) {
+            log.error("Failed to send GameMessage over eventsocket", e);
         }
     }
 }
