@@ -86,8 +86,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
         registerMove(mapUpdateEvent.getGameTick(), chosenDirection);
     }
 
-
-
     @Override
     public void onInvalidPlayerName(InvalidPlayerName invalidPlayerName) {
 
