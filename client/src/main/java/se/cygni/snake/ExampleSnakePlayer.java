@@ -11,6 +11,7 @@ import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
 import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.response.PlayerRegistered;
+import se.cygni.snake.api.util.GameSettingsUtils;
 import se.cygni.snake.client.AnsiPrinter;
 import se.cygni.snake.client.BaseSnakeClient;
 import se.cygni.snake.client.MapUtil;
@@ -127,12 +128,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     @Override
     public void onConnected() {
         log.info("Connected, registering for training...");
-        GameSettings gameSettings = new GameSettings.GameSettingsBuilder()
-                .withWidth(50)
-                .withHeight(50)
-                .withMaxNoofPlayers(5)
-                .build();
-
+        GameSettings gameSettings = GameSettingsUtils.trainingWorld();
         registerForGame(gameSettings);
     }
 
@@ -153,6 +149,6 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public GameMode getGameMode() {
-        return GameMode.training;
+        return GameMode.TRAINING;
     }
 }

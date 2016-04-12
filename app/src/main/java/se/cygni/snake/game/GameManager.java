@@ -36,9 +36,9 @@ public class GameManager {
 
     public Game createTrainingGame() {
         GameFeatures gameFeatures = new GameFeatures();
-        gameFeatures.trainingGame = true;
-        gameFeatures.height = 25;
-        gameFeatures.width = 25;
+        gameFeatures.setTrainingGame(true);
+        gameFeatures.setHeight(25);
+        gameFeatures.setWidth(25);
         Game game = new Game(gameFeatures, globalEventBus);
 
         registerGame(game);

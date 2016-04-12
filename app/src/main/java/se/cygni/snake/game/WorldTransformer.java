@@ -12,7 +12,10 @@ import se.cygni.game.exception.ObstacleCollision;
 import se.cygni.game.exception.SnakeCollision;
 import se.cygni.game.exception.TransformationException;
 import se.cygni.game.exception.WallCollision;
-import se.cygni.game.transformation.*;
+import se.cygni.game.transformation.KeepOnlyObjectsOfType;
+import se.cygni.game.transformation.KeepOnlySnakeWithId;
+import se.cygni.game.transformation.MoveSnake;
+import se.cygni.game.transformation.TailNibbled;
 import se.cygni.game.worldobject.*;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.model.DeathReason;
@@ -148,7 +151,7 @@ public class WorldTransformer {
             if (!tile.isValidCombinationOfContents()) {
 
                 // Special case when head hits tail and that feature is enabled
-                if (gameFeatures.headToTailConsumes &&
+                if (gameFeatures.isHeadToTailConsumes() &&
                         isNibbleSitutaion(tile, snakeToWorldState)) {
 
                     SnakeBody snakeBodyTail = tile.listContentsOfType(SnakeBody.class).get(0);

@@ -3,90 +3,90 @@ package se.cygni.snake.game;
 public class GameFeatures {
 
     // World width
-    public int width = 25;
+    private int width = 25;
 
     // World height
-    public int height = 25;
+    private int height = 25;
 
     // Maximum noof players in this game
-    public int maxNoofPlayers = 10;
+    private int maxNoofPlayers = 10;
 
     // The starting length of a snake
-    public int startSnakeLength = 1;
+    private int startSnakeLength = 1;
 
     // The time clients have to respond with a new move
-    public int timeInMsPerTick = 250;
+    private int timeInMsPerTick = 250;
 
     // Randomly place obstacles
-    public boolean obstaclesEnabled = true;
+    private boolean obstaclesEnabled = true;
 
     // Randomly place food
-    public boolean foodEnabled = true;
+    private boolean foodEnabled = true;
 
     // Traveling to the edge does not kill but moves to
     // corresponding edge on other side.
-    public boolean edgeWrapsAround = false;
+    private boolean edgeWrapsAround = false;
 
     // If a snake manages to nibble on the tail
     // of another snake it will consume that tail part.
     // I.e. the nibbling snake will grow one and
     // victim will loose one.
-    public boolean headToTailConsumes = true;
+    private boolean headToTailConsumes = true;
 
     // Only valid if headToTailConsumes is active.
     // When tailConsumeGrows is set to true the
     // consuming snake will grow when eating
     // another snake.
-    public boolean tailConsumeGrows = false;
+    private boolean tailConsumeGrows = false;
 
     // Likelihood (in percent) that a new food will be
     // added to the world
-    public int addFoodLikelihood = 15;
+    private int addFoodLikelihood = 15;
 
     // Likelihood (in percent) that a
     // food will be removed from the world
-    public int removeFoodLikelihood = 5;
+    private int removeFoodLikelihood = 5;
 
     // Likelihood (in percent) that a new obstacle will be
     // added to the world
-    public int addObstacleLikelihood = 10;
+    private int addObstacleLikelihood = 10;
 
     // Likelihood (in percent) that an
     // obstacle will be removed from the world
-    public int removeObstacleLikelihood = 5;
+    private int removeObstacleLikelihood = 5;
 
     // Snake grow every N world ticks.
     // 0 for disabled
-    public int spontaneousGrowthEveryNWorldTick = 3;
+    private int spontaneousGrowthEveryNWorldTick = 3;
 
     // Indicates that this is a training game,
     // Bots will be added to fill up remaining players.
-    public boolean trainingGame = false;
+    private boolean trainingGame = false;
 
     // Points given per length unit the Snake has
-    public int pointsPerLength = 1;
+    private int pointsPerLength = 1;
 
     // Points given per Food item consumed
-    public int pointsPerFood = 2;
+    private int pointsPerFood = 2;
 
     // Points given per caused death (i.e. another
     // snake collides with yours)
-    public int pointsPerCausedDeath = 5;
+    private int pointsPerCausedDeath = 5;
 
     // Points given when a snake nibbles the tail
     // of another snake
-    public int pointsPerNibble = 10;
+    private int pointsPerNibble = 10;
 
     // Points given to the last living snake (unless
     // the game has been stopped before this happens)
-    public int pointsLastSnakeLiving = 10;
+    private int pointsLastSnakeLiving = 10;
 
     // Number of rounds a tail is protected after nibble
-    public int noofRoundsTailProtectedAfterNibble = 3;
+    private int noofRoundsTailProtectedAfterNibble = 3;
 
     // If a snake kills itself by hitting a wall or another
     // snake.
-    public int pointsSuicide = -10;
+    private int pointsSuicide = -10;
 
     /**
      * Enforces limits on some values

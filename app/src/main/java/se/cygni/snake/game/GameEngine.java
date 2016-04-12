@@ -74,7 +74,7 @@ public class GameEngine {
     }
 
     private void initGame() {
-        world = new WorldState(gameFeatures.width, gameFeatures.height);
+        world = new WorldState(gameFeatures.getWidth(), gameFeatures.getHeight());
 
         // Place players
         game.getPlayers().stream().forEach( player -> {
@@ -127,7 +127,7 @@ public class GameEngine {
 
                     long tstart = System.currentTimeMillis();
                     try {
-                        countDownLatch.await(gameFeatures.timeInMsPerTick, TimeUnit.MILLISECONDS);
+                        countDownLatch.await(gameFeatures.getTimeInMsPerTick(), TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -145,11 +145,11 @@ public class GameEngine {
                     currentWorldTick++;
 
                     // Add random objects
-                    if (gameFeatures.foodEnabled) {
+                    if (gameFeatures.isFoodEnabled()) {
                         randomFood();
                     }
 
-                    if (gameFeatures.obstaclesEnabled) {
+                    if (gameFeatures.isObstaclesEnabled()) {
                         randomObstacle();
                     }
                 }
@@ -160,7 +160,7 @@ public class GameEngine {
                 for (IPlayer player : livingPlayers) {
                     player.addPoints(
                             PointReason.LAST_SNAKE_ALIVE,
-                            gameFeatures.pointsLastSnakeLiving);
+                            gameFeatures.getPointsLastSnakeLiving());
                 }
 
                 // Notify of GameEnded
@@ -190,13 +190,13 @@ public class GameEngine {
     }
 
     private void randomObstacle() {
-        if (gameFeatures.removeObstacleLikelihood > (Math.random()*100.0)) {
+        if (gameFeatures.getRemoveObstacleLikelihood() > (Math.random()*100.0)) {
             RemoveRandomWorldObject<Obstacle> removeTransform =
                     new RemoveRandomWorldObject<>(Obstacle.class);
             world = removeTransform.transform(world);
         }
 
-        if (gameFeatures.addObstacleLikelihood > (Math.random()*100.0)) {
+        if (gameFeatures.getAddObstacleLikelihood() > (Math.random()*100.0)) {
             AddWorldObjectAtRandomPosition addTransform =
                     new AddWorldObjectAtRandomPosition(new Obstacle());
             world = addTransform.transform(world);
@@ -205,13 +205,13 @@ public class GameEngine {
 
 
     private void randomFood() {
-        if (gameFeatures.removeFoodLikelihood > (Math.random()*100.0)) {
+        if (gameFeatures.getRemoveFoodLikelihood() > (Math.random()*100.0)) {
             RemoveRandomWorldObject<Food> removeTransform =
                     new RemoveRandomWorldObject<>(Food.class);
             world = removeTransform.transform(world);
         }
 
-        if (gameFeatures.addFoodLikelihood > (Math.random()*100.0)) {
+        if (gameFeatures.getAddFoodLikelihood() > (Math.random()*100.0)) {
             AddWorldObjectAtRandomPosition addTransform =
                     new AddWorldObjectAtRandomPosition(new Food());
             world = addTransform.transform(world);
@@ -219,8 +219,8 @@ public class GameEngine {
     }
 
     private boolean spontaneousGrowth() {
-        if (gameFeatures.spontaneousGrowthEveryNWorldTick > 0) {
-            return currentWorldTick % gameFeatures.spontaneousGrowthEveryNWorldTick == 0;
+        if (gameFeatures.getSpontaneousGrowthEveryNWorldTick() > 0) {
+            return currentWorldTick % gameFeatures.getSpontaneousGrowthEveryNWorldTick() == 0;
         }
         return false;
     }

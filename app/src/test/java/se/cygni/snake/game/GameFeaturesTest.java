@@ -9,38 +9,38 @@ public class GameFeaturesTest {
     public void testDivisibleBy25() throws Exception {
         GameFeatures gf = new GameFeatures();
 
-        gf.width = 74;
-        gf.height = 34;
+        gf.setWidth(74);
+        gf.setHeight(34);
 
         gf.applyValidation();
 
-        Assert.assertEquals(50, gf.width);
-        Assert.assertEquals(25, gf.height);
+        Assert.assertEquals(50, gf.getWidth());
+        Assert.assertEquals(25, gf.getHeight());
     }
 
     @Test
     public void testMinSize25() throws Exception {
         GameFeatures gf = new GameFeatures();
 
-        gf.width = 1;
-        gf.height = -4;
+        gf.setWidth(1);
+        gf.setHeight(-4);
 
         gf.applyValidation();
 
-        Assert.assertEquals(25, gf.width);
-        Assert.assertEquals(25, gf.height);
+        Assert.assertEquals(25, gf.getWidth());
+        Assert.assertEquals(25, gf.getHeight());
     }
 
     @Test
     public void testMaxSize100() throws Exception {
         GameFeatures gf = new GameFeatures();
 
-        gf.width = 100;
-        gf.height = 175;
+        gf.setWidth(100);
+        gf.setHeight(175);
 
         gf.applyValidation();
 
-        Assert.assertEquals(100, gf.width);
-        Assert.assertEquals(100, gf.height);
+        Assert.assertEquals(100, gf.getWidth());
+        Assert.assertEquals(100, gf.getHeight());
     }
 }
