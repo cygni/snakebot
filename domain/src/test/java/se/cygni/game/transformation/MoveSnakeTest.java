@@ -5,6 +5,7 @@ import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.exception.ObstacleCollision;
 import se.cygni.game.exception.SnakeCollision;
+import se.cygni.game.exception.TransformationException;
 import se.cygni.game.exception.WallCollision;
 import se.cygni.game.testutil.SnakeTestUtil;
 import se.cygni.game.worldobject.*;
@@ -27,7 +28,7 @@ public class MoveSnakeTest {
         ws = moveSnake.transform(ws);
 
         assertEquals(expectedEndPos, head.getPosition());
-        assertArrayEquals(new int[] { expectedEndPos }, ws.listPositionsWithContentOf(SnakeHead.class));
+        assertArrayEquals(new int[]{expectedEndPos}, ws.listPositionsWithContentOf(SnakeHead.class));
     }
 
     @Test
@@ -43,7 +44,7 @@ public class MoveSnakeTest {
         ws = moveSnake.transform(ws);
 
         assertEquals(expectedEndPos, head.getPosition());
-        assertArrayEquals(new int[] { expectedEndPos }, ws.listPositionsWithContentOf(SnakeHead.class));
+        assertArrayEquals(new int[]{expectedEndPos}, ws.listPositionsWithContentOf(SnakeHead.class));
     }
 
     @Test
@@ -59,7 +60,7 @@ public class MoveSnakeTest {
         ws = moveSnake.transform(ws);
 
         assertEquals(expectedEndPos, head.getPosition());
-        assertArrayEquals(new int[] { expectedEndPos }, ws.listPositionsWithContentOf(SnakeHead.class));
+        assertArrayEquals(new int[]{expectedEndPos}, ws.listPositionsWithContentOf(SnakeHead.class));
     }
 
     @Test
@@ -75,7 +76,7 @@ public class MoveSnakeTest {
         ws = moveSnake.transform(ws);
 
         assertEquals(expectedEndPos, head.getPosition());
-        assertArrayEquals(new int[] { expectedEndPos }, ws.listPositionsWithContentOf(SnakeHead.class));
+        assertArrayEquals(new int[]{expectedEndPos}, ws.listPositionsWithContentOf(SnakeHead.class));
     }
 
     @Test
@@ -86,7 +87,7 @@ public class MoveSnakeTest {
         int expectedEndPos = 16;
 
         SnakeHead head = new SnakeHead("test", "id", startPos);
-        SnakeBody body = new SnakeBody("id",25);
+        SnakeBody body = new SnakeBody("id", 25);
         head.setNextSnakePart(body);
 
 
@@ -157,15 +158,14 @@ public class MoveSnakeTest {
 
         assertEquals(expectedEndPos, head.getPosition());
 
-        assertArrayEquals(new int[] { expectedEndPos }, ws.listPositionsWithContentOf(SnakeHead.class));
-        assertArrayEquals(new int[] { startPos }, ws.listPositionsWithContentOf(SnakeBody.class));
-        assertArrayEquals(new int[] {}, ws.listFoodPositions());
+        assertArrayEquals(new int[]{expectedEndPos}, ws.listPositionsWithContentOf(SnakeHead.class));
+        assertArrayEquals(new int[]{startPos}, ws.listPositionsWithContentOf(SnakeBody.class));
+        assertArrayEquals(new int[]{}, ws.listFoodPositions());
 
     }
 
     @Test(expected = SnakeCollision.class)
     public void testNibbleOnSnakeHead() throws Exception {
-
         WorldState ws = new WorldState(10, 10);
 
         SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 12);
@@ -187,4 +187,29 @@ public class MoveSnakeTest {
         MoveSnake moveSnake = new MoveSnake(snakeHead2, Direction.UP, false);
         ws = moveSnake.transform(ws);
     }
+
+    @Test(expected = TransformationException.class)
+    public void testMoveSnakeIsNull() throws TransformationException {
+        WorldState ws = new WorldState(10, 10);
+
+        int startPos = 15;
+
+        SnakeHead head = null;
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.DOWN);
+        ws = moveSnake.transform(ws);
+    }
+
+    @Test(expected = TransformationException.class)
+    public void testMoveDirectionIsNull() throws TransformationException {
+        WorldState ws = new WorldState(10, 10);
+
+        int startPos = 15;
+
+        SnakeHead head = new SnakeHead("test", "id", startPos);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
+        MoveSnake moveSnake = new MoveSnake(head, null);
+        ws = moveSnake.transform(ws);
+    }
+
 }

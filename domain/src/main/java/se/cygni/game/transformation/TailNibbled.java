@@ -1,5 +1,6 @@
 package se.cygni.game.transformation;
 
+import org.apache.commons.lang3.StringUtils;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.exception.TransformationException;
@@ -23,6 +24,11 @@ public class TailNibbled implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) throws TransformationException {
+        if (StringUtils.isEmpty(snakeId)) {
+            String errorMessage = String.format("Can't nibble the tail of a snake with missing id: %s", snakeId);
+            throw new TransformationException(errorMessage);
+        }
+
         SnakeHead head = currentWorld.getSnakeHeadById(snakeId);
         int[] snakeSpread = currentWorld.getSnakeSpread(head);
 

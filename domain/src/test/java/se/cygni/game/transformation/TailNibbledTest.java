@@ -29,6 +29,14 @@ public class TailNibbledTest {
     }
 
     @Test(expected = TransformationException.class)
+    public void testTransformSnakeIdNull() throws TransformationException {
+        WorldState worldState = createWorldState();
+
+        TailNibbled tailNibbled = new TailNibbled(null, 3, 3);
+        WorldState updatedWorldState = tailNibbled.transform(worldState);
+    }
+
+    @Test(expected = TransformationException.class)
     public void testTransformWrongPosition() throws TransformationException {
         WorldState worldState = createWorldState();
 

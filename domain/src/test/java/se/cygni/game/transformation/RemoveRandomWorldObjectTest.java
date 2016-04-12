@@ -13,28 +13,33 @@ public class RemoveRandomWorldObjectTest {
 
     @Test
     public void testRemoveObstacle() throws Exception {
-
         WorldState ws = SnakeTestUtil.createWorld(Obstacle.class, 10, 10, 9, 12, 18);
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, new Food(), 10);
 
-        RemoveRandomWorldObject<Obstacle> removeTransformation = new RemoveRandomWorldObject<Obstacle>(Obstacle.class);
+        RemoveRandomWorldObject<Obstacle> removeTransformation = new RemoveRandomWorldObject<>(Obstacle.class);
 
         ws = removeTransformation.transform(ws);
 
-        assertArrayEquals(new int[] { 10 }, ws.listFoodPositions());
+        assertArrayEquals(new int[]{10}, ws.listFoodPositions());
         assertEquals(2, ws.listObstaclePositions().length);
     }
 
     @Test
     public void testNothingChangesIfObjectTypeDoesntExists() throws Exception {
-
         WorldState ws = SnakeTestUtil.createWorld(Obstacle.class, 10, 10, 9, 12, 18);
 
-        RemoveRandomWorldObject<Food> removeTransformation = new RemoveRandomWorldObject<Food>(Food.class);
+        RemoveRandomWorldObject<Food> removeTransformation = new RemoveRandomWorldObject<>(Food.class);
 
         ws = removeTransformation.transform(ws);
 
-        assertArrayEquals(new int[] { 9, 12, 18 }, ws.listObstaclePositions());
+        assertArrayEquals(new int[]{9, 12, 18}, ws.listObstaclePositions());
         assertEquals(0, ws.listFoodPositions().length);
+    }
+
+    @Test
+    public void testTransformWithNulls() throws Exception {
+        WorldState ws = SnakeTestUtil.createWorld(Obstacle.class, 10, 10, 9, 12, 18);
+        RemoveRandomWorldObject<Food> removeTransformation = new RemoveRandomWorldObject<>(null);
+        ws = removeTransformation.transform(ws);
     }
 }

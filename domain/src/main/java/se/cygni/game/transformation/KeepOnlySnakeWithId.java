@@ -18,6 +18,10 @@ public class KeepOnlySnakeWithId implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) throws TransformationException {
+        if (playerId == null) {
+            throw new TransformationException("Asked to remove all snakes except the one with id: null");
+        }
+
         Tile[] tiles = currentWorld.getTiles();
 
         IntStream.range(0, tiles.length).forEach(

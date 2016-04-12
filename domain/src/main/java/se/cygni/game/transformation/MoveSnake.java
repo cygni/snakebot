@@ -19,14 +19,10 @@ public class MoveSnake implements WorldTransformation {
     private boolean growthExecuted;
 
     public MoveSnake(SnakeHead snakeHead, Direction direction) {
-        this.snakeHead = snakeHead;
-        this.direction = direction;
+        this(snakeHead, direction, false);
     }
 
-    public MoveSnake(
-            SnakeHead snakeHead,
-            Direction direction,
-            boolean forceGrowth) {
+    public MoveSnake(SnakeHead snakeHead, Direction direction, boolean forceGrowth) {
         this.snakeHead = snakeHead;
         this.direction = direction;
         this.forceGrowth = forceGrowth;
@@ -34,10 +30,15 @@ public class MoveSnake implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) throws TransformationException {
+        if (snakeHead == null) {
+            throw new TransformationException("SnakeHead is null!!");
+        }
 
-        boolean grow = false;
+        if (direction == null) {
+            throw new TransformationException("Direction is null!");
+        }
+
         int snakeHeadPos = snakeHead.getPosition();
-
         int targetSnakePos = 0;
 
         // Snake tries to move out of bounds

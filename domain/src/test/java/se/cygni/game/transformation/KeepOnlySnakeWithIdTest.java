@@ -45,6 +45,19 @@ public class KeepOnlySnakeWithIdTest {
         }
     }
 
+    @Test(expected = TransformationException.class)
+    public void testTransformCheckingNullId() throws TransformationException {
+        Tile[] tiles = new WorldState(3, 3).getTiles();
+        tiles[2] = new Tile(new SnakeHead("a", "a", 2));
+        tiles[6] = new Tile(new SnakeHead("b", "b", 6));
+        tiles[8] = new Tile(new SnakeHead("b", "b", 6));
+
+        WorldState worldState = new WorldState(3, 3, tiles);
+
+        KeepOnlySnakeWithId keepOnlySnakeWithId = new KeepOnlySnakeWithId(null);
+        WorldState updatedWorldState = keepOnlySnakeWithId.transform(worldState);
+    }
+
     @Test
     public void testTransformFullSnakes() throws TransformationException {
         Tile[] tiles = new WorldState(6, 6).getTiles();
