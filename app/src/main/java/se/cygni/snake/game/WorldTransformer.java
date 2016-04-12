@@ -29,8 +29,7 @@ import java.util.stream.IntStream;
 
 public class WorldTransformer {
 
-    private static Logger log = LoggerFactory
-            .getLogger(WorldTransformer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorldTransformer.class);
 
     private final Game game;
     private int snakesDiedThisRound = 0;
@@ -61,7 +60,7 @@ public class WorldTransformer {
         // All Snakes died, return the world with static objects
         if (worldStates.size() == 0) {
             KeepOnlyObjectsOfType worldBaseLine = new KeepOnlyObjectsOfType(
-                    new Class[] {Empty.class, Food.class, Obstacle.class});
+                    new Class[]{Empty.class, Food.class, Obstacle.class});
             return worldBaseLine.transform(ws);
         }
 
@@ -76,7 +75,7 @@ public class WorldTransformer {
         // All Snakes died, return the world with static objects
         if (validWorldStates.size() == 0) {
             KeepOnlyObjectsOfType worldBaseLine = new KeepOnlyObjectsOfType(
-                    new Class[] {Empty.class, Food.class, Obstacle.class});
+                    new Class[]{Empty.class, Food.class, Obstacle.class});
             return worldBaseLine.transform(ws);
         }
 
@@ -91,7 +90,7 @@ public class WorldTransformer {
         int snakesAliveAtEnd = resultingWorld.listPositionsWithContentOf(SnakeHead.class).length;
 
         if (snakesAliveAtStart != snakesAliveAtEnd + snakesDiedThisRound) {
-            log.error("SnakeHead count doesn't match up. Start: {}, End: {}, Died: " + snakesDiedThisRound, snakesAliveAtStart, snakesAliveAtEnd);
+            LOGGER.error("SnakeHead count doesn't match up. Start: {}, End: {}, Died: " + snakesDiedThisRound, snakesAliveAtStart, snakesAliveAtEnd);
         }
         return resultingWorld;
     }
@@ -151,29 +150,8 @@ public class WorldTransformer {
             if (!tile.isValidCombinationOfContents()) {
 
                 // Special case when head hits tail and that feature is enabled
-                if (gameFeatures.isHeadToTailConsumes() &&
-                        isNibbleSitutaion(tile, snakeToWorldState)) {
-
-                    SnakeBody snakeBodyTail = tile.listContentsOfType(SnakeBody.class).get(0);
-                    SnakeHead head = tile.listContentsOfType(SnakeHead.class).get(0);
-
-                    // Need to remove tail from original world state!
-                    WorldState tailWorldState = snakeToWorldState.get(snakeBodyTail.getPlayerId());
-
-                    TailNibbled tailNibbled = new TailNibbled(
-                            snakeBodyTail.getPlayerId(),
-                            snakeBodyTail.getPosition(),
-                            gameFeatures.getNoofRoundsTailProtectedAfterNibble());
-                    tailWorldState = tailNibbled.transform(tailWorldState);
-
-                    snakeToWorldState.put(snakeBodyTail.getPlayerId(), tailWorldState);
-
-                    // Assign points
-                    game.getPlayer(head.getPlayerId()).addPoints(
-                            PointReason.NIBBLE,
-                            game.getGameFeatures().getPointsPerNibble()
-                    );
-
+                if (gameFeatures.isHeadToTailConsumes() && isNibbleSituation(tile, snakeToWorldState)) {
+                    handleTailNibbling(gameFeatures, snakeToWorldState, tile);
                     continue;
                 }
 
@@ -203,10 +181,36 @@ public class WorldTransformer {
         return snakeToWorldState.values().stream().collect(Collectors.toList());
     }
 
-    private boolean isNibbleSitutaion(TileMultipleContent tile, Map<String, WorldState> snakeToWorldState) {
+    private void handleTailNibbling(GameFeatures gameFeatures, Map<String, WorldState> snakeToWorldState, TileMultipleContent tileMultipleContent) {
+        try {
+            SnakeBody snakeBodyTail = tileMultipleContent.listContentsOfType(SnakeBody.class).get(0);
+            SnakeHead head = tileMultipleContent.listContentsOfType(SnakeHead.class).get(0);
+
+            // Need to remove tail from original world state!
+            WorldState tailWorldState = snakeToWorldState.get(snakeBodyTail.getPlayerId());
+
+            TailNibbled tailNibbled = new TailNibbled(
+                    snakeBodyTail.getPlayerId(),
+                    snakeBodyTail.getPosition(),
+                    gameFeatures.getNoofRoundsTailProtectedAfterNibble());
+
+            tailWorldState = tailNibbled.transform(tailWorldState);
+            snakeToWorldState.put(snakeBodyTail.getPlayerId(), tailWorldState);
+
+            // Assign points
+            game.getPlayer(head.getPlayerId()).addPoints(
+                    PointReason.NIBBLE,
+                    game.getGameFeatures().getPointsPerNibble()
+            );
+        } catch (TransformationException e) {
+            LOGGER.error("TailNibbled transformation failed.", e);
+        }
+    }
+
+    private boolean isNibbleSituation(TileMultipleContent tile, Map<String, WorldState> snakeToWorldState) {
         if (tile.size() == 2 && // Nibble is only possible if there exists two objects on the same tile
                 tile.listSnakeIdsPresent().size() > 1 && // Not ok to eat you own tail!
-                tile.containsExactlyOneOfEachType(new Class[] {SnakeHead.class, SnakeBody.class}) && // One body and one head
+                tile.containsExactlyOneOfEachType(new Class[]{SnakeHead.class, SnakeBody.class}) && // One body and one head
                 tile.listContentsOfType(SnakeBody.class).get(0).isTail()) { // And the body is a tail
 
             String tailPlayerId = tile.listContentsOfType(SnakeBody.class).get(0).getPlayerId();
@@ -231,9 +235,9 @@ public class WorldTransformer {
 
         // Find all tiles containing more than one snake part
         List<List<String>> list = Arrays.stream(tiles).filter(tile ->
-            tile.countInstancesOf(SnakeBody.class) +
-            tile.countInstancesOf(SnakeHead.class)
-                    > 1
+                tile.countInstancesOf(SnakeBody.class) +
+                        tile.countInstancesOf(SnakeHead.class)
+                        > 1
         ).map(mtile -> {
             return mtile.listSnakeIdsPresent();
         }).collect(Collectors.toList());
@@ -277,7 +281,7 @@ public class WorldTransformer {
         int[] headPositions = ws.listPositionsWithContentOf(SnakeHead.class);
         for (int headPosition : headPositions) {
 
-            SnakeHead snakeHead = ((SnakeHead)ws.getTile(headPosition).getContent());
+            SnakeHead snakeHead = ((SnakeHead) ws.getTile(headPosition).getContent());
             String playerId = snakeHead.getPlayerId();
 
             // First remove all other objects (just keep the current snake)
@@ -413,7 +417,7 @@ public class WorldTransformer {
             long worldTick) {
 
         snakesDiedThisRound++;
-        log.info(head.getPlayerId() + " died at: " + coordinate);
+        LOGGER.info(head.getPlayerId() + " died at: " + coordinate);
         game.getPlayer(head.getPlayerId()).dead();
 
         SnakeDeadEvent snakeDeadEvent = GameMessageConverter.onPlayerDied(
@@ -422,7 +426,7 @@ public class WorldTransformer {
                 coordinate.getX(), coordinate.getY(),
                 game.getGameId(), worldTick);
 
-        game.getPlayers().stream().forEach( player -> {
+        game.getPlayers().stream().forEach(player -> {
             player.onSnakeDead(snakeDeadEvent);
         });
 

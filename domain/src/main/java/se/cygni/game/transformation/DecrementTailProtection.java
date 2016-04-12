@@ -6,9 +6,6 @@ import se.cygni.game.worldobject.SnakeHead;
 
 public class DecrementTailProtection implements WorldTransformation {
 
-    public DecrementTailProtection() {
-    }
-
     @Override
     public WorldState transform(WorldState currentWorld) {
 

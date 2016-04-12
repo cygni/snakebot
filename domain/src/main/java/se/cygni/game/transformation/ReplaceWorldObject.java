@@ -19,7 +19,6 @@ public class ReplaceWorldObject implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) {
-
         Tile[] tiles = currentWorld.getTiles();
         tiles[position] = new Tile(worldObject);
 

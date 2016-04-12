@@ -19,7 +19,7 @@ public class TileMultipleContent {
 
     public TileMultipleContent(WorldObject content) {
         this();
-        if ( !(content instanceof Empty))
+        if (!(content instanceof Empty))
             contents.add(content);
     }
 
@@ -118,7 +118,7 @@ public class TileMultipleContent {
         return true;
     }
 
-    public <T extends WorldObject> boolean containsExactlyOneOfEachType(Class<T>...types) {
+    public <T extends WorldObject> boolean containsExactlyOneOfEachType(Class<T>... types) {
         if (types.length != contents.size())
             return false;
 
@@ -137,18 +137,17 @@ public class TileMultipleContent {
         return listContentsOfType(SnakeHead.class);
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends WorldObject> List<T> listContentsOfType(Class<T> type) {
         if (!hasContent()) {
             return new ArrayList<>();
         }
 
-        List<T> filtered = contents.stream().filter( worldObject ->
-                worldObject.getClass().equals(type)
-        ).map(typedObject -> {
-            return (T)typedObject;
-        }).collect(Collectors.toList());
-
-        return filtered;
+        return contents.stream()
+                .filter(worldObject -> worldObject.getClass().equals(type)).map(typedObject -> {
+                    return (T) typedObject;
+                })
+                .collect(Collectors.toList());
     }
 
     public <T extends WorldObject> int countInstancesOf(Class<T> type) {
@@ -183,7 +182,7 @@ public class TileMultipleContent {
     private <T extends WorldObject> T getFirstContentOfType(Class<T> type) {
         for (WorldObject wo : contents) {
             if (wo.getClass().equals(type)) {
-                return (T)wo;
+                return (T) wo;
             }
         }
 

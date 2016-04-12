@@ -2,6 +2,7 @@ package se.cygni.game.transformation;
 
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
+import se.cygni.game.exception.TransformationException;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.game.worldobject.SnakePart;
 
@@ -21,24 +22,22 @@ public class TailNibbled implements WorldTransformation {
     }
 
     @Override
-    public WorldState transform(WorldState currentWorld) {
-
+    public WorldState transform(WorldState currentWorld) throws TransformationException {
         SnakeHead head = currentWorld.getSnakeHeadById(snakeId);
         int[] snakeSpread = currentWorld.getSnakeSpread(head);
 
-        if (snakeSpread[snakeSpread.length-1] != position) {
-            throw new IllegalStateException("Supplied position was not the snakes tail");
+        if (snakeSpread[snakeSpread.length - 1] != position) {
+            throw new TransformationException("Supplied position was not the snakes tail");
         }
-
 
         Tile[] tiles = currentWorld.getTiles();
         tiles[position] = new Tile();
 
-        int previousPartPosition = snakeSpread[snakeSpread.length-2];
-        SnakePart previousPart = (SnakePart)tiles[previousPartPosition].getContent();
+        int previousPartPosition = snakeSpread[snakeSpread.length - 2];
+        SnakePart previousPart = (SnakePart) tiles[previousPartPosition].getContent();
         previousPart.setNextSnakePart(null);
 
-        head.setTailProtectedForGameTicks(protectedForTicks+1);
+        head.setTailProtectedForGameTicks(protectedForTicks + 1);
         return new WorldState(currentWorld.getWidth(), currentWorld.getHeight(), tiles);
     }
 }
