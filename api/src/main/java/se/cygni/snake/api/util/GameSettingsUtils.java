@@ -7,7 +7,7 @@ public class GameSettingsUtils {
 
     public static GameSettings trainingWorld() {
         return new GameSettings.GameSettingsBuilder()
-                .withMaxNoofPlayers(1)
+                .withMaxNoofPlayers(5)
                 .withWidth(WorldSize.SMALL)
                 .withHeight(WorldSize.SMALL)
                 .withFoodEnabled(true)

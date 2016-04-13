@@ -80,7 +80,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
 
     public void connect() {
         WebSocketClient wsClient = new StandardWebSocketClient();
-        String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString());
+        String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString().toLowerCase());
         log.info("Connecting to {}", uri);
         wsClient.doHandshake(this, uri);
     }
