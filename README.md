@@ -21,3 +21,7 @@ To generate Spring Boot self contained artifact:
 > ./gradlew clean bootRepackage
 ```
 
+If you change the client code/api and want to test locally, you need to publish your new snapshot locally before the code in the snake clients project can see your changes:
+```
+> ./gradlew publishToMavenLocal
+```
