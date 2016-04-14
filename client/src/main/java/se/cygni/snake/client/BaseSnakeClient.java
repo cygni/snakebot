@@ -1,5 +1,6 @@
 package se.cygni.snake.client;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.CloseStatus;
@@ -18,17 +19,19 @@ import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameSettings;
 import se.cygni.snake.api.model.SnakeDirection;
+import se.cygni.snake.api.request.ClientInfo;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.request.StartGame;
 import se.cygni.snake.api.response.PlayerRegistered;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 
 public abstract class BaseSnakeClient extends TextWebSocketHandler implements SnakeClient {
 
-    private static Logger log = LoggerFactory
-            .getLogger(BaseSnakeClient.class);
+    private static Logger log = LoggerFactory.getLogger(BaseSnakeClient.class);
 
     private WebSocketSession session;
 
@@ -55,6 +58,22 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         RegisterMove registerMove = new RegisterMove(gameTick, direction);
         registerMove.setReceivingPlayerId(playerId);
         sendMessage(registerMove);
+    }
+
+    public void sendClientInfo() {
+        String ipAddress = null;
+        try {
+            ipAddress = Inet4Address.getLocalHost().getHostAddress();
+        } catch (UnknownHostException e) {
+            ipAddress = "127.0.0.1";
+        }
+        String clientVersion = "0.0.10";
+
+        String language = String.format("Java %s", SystemUtils.JAVA_VERSION);
+        String os = String.format("%s %s", SystemUtils.OS_NAME, SystemUtils.OS_VERSION);
+
+        ClientInfo clientInfo = new ClientInfo(language, os, ipAddress, clientVersion);
+        sendMessage(clientInfo);
     }
 
     public boolean isPlaying() {
@@ -122,7 +141,6 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
 
         log.debug("Incoming message: {}", messageRaw);
         try {
-
             // Deserialize message
             GameMessage gameMessage = GameMessageParser.decodeMessage(messageRaw);
             log.debug(messageRaw);
@@ -130,6 +148,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (gameMessage instanceof PlayerRegistered) {
                 this.onPlayerRegistered((PlayerRegistered) gameMessage);
                 this.playerId = gameMessage.getReceivingPlayerId();
+                sendClientInfo();
             }
 
             if (gameMessage instanceof MapUpdateEvent)
@@ -151,7 +170,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             }
 
             if (gameMessage instanceof InvalidMessage) {
-                InvalidMessage invalidMessage = (InvalidMessage)gameMessage;
+                InvalidMessage invalidMessage = (InvalidMessage) gameMessage;
 
                 log.error("Server did not understand my last message");
                 log.error("Message sent: " + invalidMessage.getReceivedMessage());

@@ -10,6 +10,7 @@ import se.cygni.game.enums.Direction;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.request.ClientInfo;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.request.StartGame;
@@ -104,6 +105,11 @@ public class Game {
         );
     }
 
+    @Subscribe
+    public void clientInfo(ClientInfo clientInfo) {
+        LOGGER.info("Client Info: {}", clientInfo);
+    }
+
     public void startGame() {
         if (gameEngine.isGameRunning()) {
             return;
@@ -150,9 +156,9 @@ public class Game {
     }
 
     public Set<IPlayer> getLivePlayers() {
-        return getPlayers().stream().filter(player ->
-            player.isAlive()
-        ).collect(Collectors.toSet());
+        return getPlayers().stream()
+                .filter(IPlayer::isAlive)
+                .collect(Collectors.toSet());
     }
 
     public Set<IPlayer> getLiveAndRemotePlayers() {

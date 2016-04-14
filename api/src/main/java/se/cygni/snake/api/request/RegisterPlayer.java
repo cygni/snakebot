@@ -12,9 +12,7 @@ public class RegisterPlayer extends GameMessage {
     private final String playerName;
     private final GameSettings gameSettings;
 
-    public RegisterPlayer(
-            String playerName) {
-
+    public RegisterPlayer(String playerName) {
         this.playerName = playerName;
         this.gameSettings = null;
     }
@@ -23,7 +21,6 @@ public class RegisterPlayer extends GameMessage {
     public RegisterPlayer(
             @JsonProperty("playerName") String playerName,
             @JsonProperty("gameSettings") GameSettings gameSettings) {
-
         this.playerName = playerName;
         this.gameSettings = gameSettings;
     }

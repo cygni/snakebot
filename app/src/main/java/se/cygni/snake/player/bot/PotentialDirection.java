@@ -1,7 +1,5 @@
 package se.cygni.snake.player.bot;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import se.cygni.snake.api.model.*;
 
 /**
@@ -11,8 +9,6 @@ import se.cygni.snake.api.model.*;
 public class PotentialDirection implements Comparable<PotentialDirection> {
 
     public static SnakeDirection[] POSSIBLE_DIRECTIONS = {SnakeDirection.UP, SnakeDirection.DOWN, SnakeDirection.LEFT, SnakeDirection.RIGHT};
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PotentialDirection.class);
 
     static final int DEFAULT_KEEP_GOING_SCORE = 10;
     static final int DEFAULT_EMPTY_SCORE = 100;
@@ -77,7 +73,6 @@ public class PotentialDirection implements Comparable<PotentialDirection> {
                 break;
         }
         this.score += scoreToAdd;
-        LOGGER.info("D: {}, C: {}, S: {}, Score: {}", distanceFromSnake, tileContent.getContent(), scoreToAdd, this.toString());
     }
 
     private SnakeInfo findSnake(final Map gameMap, final String playerId) {
