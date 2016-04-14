@@ -20,17 +20,16 @@ import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
+import se.cygni.snake.player.bot.BotPlayer;
+import se.cygni.snake.player.bot.DumbBot;
 import se.cygni.snake.player.bot.RandomBot;
+import se.cygni.snake.player.bot.StayAliveBot;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Game {
-    private static Logger log = LoggerFactory
-            .getLogger(Game.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Game.class);
 
     private final EventBus incomingEventBus;
     private final EventBus outgoingEventBus;
@@ -39,6 +38,8 @@ public class Game {
     private GameFeatures gameFeatures;
     private final GameEngine gameEngine;
     private final EventBus globalEventBus;
+
+    private Random botSelector = new Random(System.currentTimeMillis());
 
     public Game(GameFeatures gameFeatures, EventBus globalEventBus) {
 
@@ -55,7 +56,7 @@ public class Game {
     @Subscribe
     public void startGame(StartGame startGame) {
         if (gameFeatures.isTrainingGame()) {
-            log.debug("Starting game");
+            LOGGER.debug("Starting game");
             startGame();
         }
     }
@@ -164,7 +165,7 @@ public class Game {
         try {
             getPlayer(playerId).dead();
         } catch (Exception e) {
-            log.warn("Player: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
+            LOGGER.warn("Player: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
         }
         if (getLiveAndRemotePlayers().size() == 0) {
             abort();
@@ -182,8 +183,24 @@ public class Game {
             return;
 
         for (int i = 0; i < gameFeatures.getMaxNoofPlayers() - 1; i++) {
-            RandomBot rbot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
-            addPlayer(rbot);
+            BotPlayer bot;
+
+            switch (Math.abs(botSelector.nextInt() % 3)) {
+                case 0:
+                    bot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 1:
+                    bot = new StayAliveBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 2:
+                    bot = new DumbBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                default:
+                    bot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+            }
+
+            addPlayer(bot);
         }
     }
 
