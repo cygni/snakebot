@@ -27,6 +27,7 @@ import se.cygni.snake.eventapi.model.ActiveGame;
 import se.cygni.snake.eventapi.model.ActiveGamePlayer;
 import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
+import se.cygni.snake.eventapi.response.InternalPong;
 import se.cygni.snake.eventapi.response.TournamentCreated;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
@@ -82,8 +83,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message)
-            throws Exception {
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         log.debug(message.getPayload());
 
         try {
@@ -107,20 +107,18 @@ public class EventSocketHandler extends TextWebSocketHandler {
                 tournamentManager.killTournament();
 
             } else if (apiMessage instanceof CreateTournament) {
-                CreateTournament createTournament = (CreateTournament)apiMessage;
+                CreateTournament createTournament = (CreateTournament) apiMessage;
 
                 // ToDo: Handle case that a tournament is already started
                 tournamentManager.createTournament(createTournament.getTournamentName());
                 sendApiMessage(new TournamentCreated(
                         tournamentManager.getTournamentId(),
                         tournamentManager.getTournamentName(),
-                        GameSettingsConverter.toGameSettings(
-                                tournamentManager.getGameFeatures()
-                        )
+                        GameSettingsConverter.toGameSettings(tournamentManager.getGameFeatures())
                 ));
 
             } else if (apiMessage instanceof UpdateTournamentSettings) {
-                UpdateTournamentSettings updateTournamentSettings = (UpdateTournamentSettings)apiMessage;
+                UpdateTournamentSettings updateTournamentSettings = (UpdateTournamentSettings) apiMessage;
 
                 // ToDo: Handle case that a tournament is already started
                 tournamentManager.setGameFeatures(
@@ -130,10 +128,14 @@ public class EventSocketHandler extends TextWebSocketHandler {
                 );
 
             } else if (apiMessage instanceof StartTournamentGame) {
-                StartTournamentGame startGame = (StartTournamentGame)apiMessage;
+                StartTournamentGame startGame = (StartTournamentGame) apiMessage;
 
                 tournamentManager.startGame(startGame.getGameId());
+
+            } else if (apiMessage instanceof InternalPing) {
+                sendApiMessage(new InternalPong());
             }
+
         } catch (Exception e) {
             log.error("Failed to understand received message: {}", message.getPayload(), e);
         }

@@ -21,6 +21,7 @@ import se.cygni.snake.eventapi.ApiMessageParser;
 import se.cygni.snake.eventapi.request.SetGameFilter;
 import se.cygni.snake.eventapi.request.StartGame;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
+import se.cygni.snake.eventapi.response.InternalPong;
 
 public class EventSocketClient {
 
@@ -28,7 +29,7 @@ public class EventSocketClient {
 
     private String url = "ws://localhost:8080/events";
     private EventListener listener;
-    private WebSocketSession webSocketSession;
+    private WebSocketSession apiSocketSession;
     private StringBuilder msgBuffer = new StringBuilder();
 
     public EventSocketClient(String url, EventListener listener) {
@@ -50,7 +51,7 @@ public class EventSocketClient {
         try {
             String msg = ApiMessageParser.encodeMessage(message);
             TextMessage textMessage = new TextMessage(msg);
-            webSocketSession.sendMessage(textMessage);
+            apiSocketSession.sendMessage(textMessage);
         } catch (Exception e) {
             LOGGER.error("Error sending api message", e);
         }
@@ -60,20 +61,29 @@ public class EventSocketClient {
         try {
             GameMessage gameMessage = GameMessageParser.decodeMessage(msg);
 
-            if (gameMessage instanceof MapUpdateEvent) {
-                listener.onMapUpdate((MapUpdateEvent) gameMessage);
-            } else if (gameMessage instanceof SnakeDeadEvent) {
-                listener.onSnakeDead((SnakeDeadEvent) gameMessage);
-            } else if (gameMessage instanceof GameEndedEvent) {
-                listener.onGameEnded((GameEndedEvent) gameMessage);
-            } else if (gameMessage instanceof GameStartingEvent) {
-                listener.onGameStarting((GameStartingEvent) gameMessage);
-            } else if (gameMessage instanceof PlayerRegistered) {
-                listener.onPlayerRegistered((PlayerRegistered) gameMessage);
-            } else if (gameMessage instanceof InvalidPlayerName) {
-                listener.onInvalidPlayerName((InvalidPlayerName) gameMessage);
+            switch (gameMessage.getSimpleType()) {
+                case "MapUpdateEvent":
+                    listener.onMapUpdate((MapUpdateEvent) gameMessage);
+                    break;
+                case "SnakeDeadEvent":
+                    listener.onSnakeDead((SnakeDeadEvent) gameMessage);
+                    break;
+                case "GameEndedEvent":
+                    listener.onGameEnded((GameEndedEvent) gameMessage);
+                    break;
+                case "GameStartingEvent":
+                    listener.onGameStarting((GameStartingEvent) gameMessage);
+                    break;
+                case "PlayerRegistered":
+                    listener.onPlayerRegistered((PlayerRegistered) gameMessage);
+                    break;
+                case "InvalidPlayerName":
+                    listener.onInvalidPlayerName((InvalidPlayerName) gameMessage);
+                    break;
+                case "PlayerPong":
+                    LOGGER.info("Received PONG for player {}!", gameMessage.getReceivingPlayerId());
+                    break;
             }
-
             return true;
         } catch (Exception e) {
         }
@@ -101,7 +111,8 @@ public class EventSocketClient {
             @Override
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
                 System.out.println("connected");
-                webSocketSession = session;
+                apiSocketSession = session;
+                sendHeartBeat();
             }
 
             @Override
@@ -116,6 +127,17 @@ public class EventSocketClient {
                 msgBuffer = new StringBuilder();
 
                 listener.onMessage(msgPayload);
+
+                try {
+                    ApiMessage apiMessage = ApiMessageParser.decodeMessage(msgPayload);
+                    if (apiMessage instanceof InternalPong) {
+                        LOGGER.info("Heartbeat received...");
+                        sendHeartBeat();
+                    }
+
+                } catch (Exception e) {
+
+                }
 
                 if (!tryToHandleGameMessage(msgPayload)) {
                     tryToHandleApiMessage(msgPayload);
@@ -140,4 +162,9 @@ public class EventSocketClient {
         }, url);
     }
 
+    private void sendHeartBeat() {
+        HeartbeatSender heartbeatSender = new HeartbeatSender(apiSocketSession);
+        Thread thread = new Thread(heartbeatSender);
+        thread.start();
+    }
 }

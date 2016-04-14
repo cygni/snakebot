@@ -68,7 +68,6 @@ public class ApiMessageParser {
 
     public static String encodeMessage(final ApiMessage message)
             throws IOException {
-
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, message);
         return out.toString();

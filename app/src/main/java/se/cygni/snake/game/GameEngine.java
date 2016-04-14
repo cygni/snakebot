@@ -121,8 +121,7 @@ public class GameEngine {
                         player.onWorldUpdate(mapUpdateEvent);
                     });
 
-                    InternalGameEvent gevent = new InternalGameEvent(
-                            System.currentTimeMillis(), mapUpdateEvent);
+                    InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis(), mapUpdateEvent);
                     globalEventBus.post(gevent);
 
                     long tstart = System.currentTimeMillis();

@@ -18,15 +18,13 @@ public class EchoWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message)
-            throws Exception {
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         logger.debug(message.getPayload());
         session.sendMessage(new TextMessage(message.getPayload()));
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception)
-            throws Exception {
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
         session.close(CloseStatus.SERVER_ERROR);
     }
 }

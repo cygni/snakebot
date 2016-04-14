@@ -31,16 +31,12 @@ public class GameMessageParser {
 
     // Init typeToClass map
     static {
-        final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(
-                true);
+        final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
         scanner.addIncludeFilter(new AnnotationTypeFilter(GameMessageType.class));
 
-        for (final BeanDefinition bd : scanner
-                .findCandidateComponents("se.cygni.snake.api")) {
+        for (final BeanDefinition bd : scanner.findCandidateComponents("se.cygni.snake.api")) {
             try {
-                typeToClass.put(bd.getBeanClassName(),
-                        (Class<? extends GameMessage>) Class.forName(bd
-                                .getBeanClassName()));
+                typeToClass.put(bd.getBeanClassName(), (Class<? extends GameMessage>) Class.forName(bd.getBeanClassName()));
             } catch (final ClassNotFoundException e) {
                 log.warn("Error in caching class in Type to Class map", e);
             }
@@ -53,50 +49,37 @@ public class GameMessageParser {
     private GameMessageParser() {
     }
 
-    public static GameMessage decodeMessage(final String msg)
-            throws IOException {
+    public static GameMessage decodeMessage(final String msg) throws IOException {
         try {
-            return mapper
-                    .readValue(msg,
-                            GameMessageParser.parseAndGetClassForMessage(msg));
+            return mapper.readValue(msg, GameMessageParser.parseAndGetClassForMessage(msg));
         } catch (final IllegalStateException e) {
             log.error(msg);
             throw e;
         }
     }
 
-    public static String encodeMessage(final GameMessage message)
-            throws IOException {
-
+    public static String encodeMessage(final GameMessage message) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, message);
         return out.toString();
     }
 
-    public static Class<? extends GameMessage> parseAndGetClassForMessage(
-            final String message) {
-
+    public static Class<? extends GameMessage> parseAndGetClassForMessage(final String message) {
         JsonParser parser = null;
         try {
             parser = factory.createParser(message);
             final JsonNode node = mapper.readTree(parser);
             final JsonNode typeNode = node.path(TYPE_IDENTIFIER);
 
-            if (typeNode == null
-                    || StringUtils.isEmpty(typeNode.asText()))
-            // Nothing found
-            {
-                throw new IllegalArgumentException("Could not find [" +
-                        TYPE_IDENTIFIER
-                        + "] in message: " + message);
+            if (typeNode == null || StringUtils.isEmpty(typeNode.asText())) { // Nothing found
+                throw new IllegalArgumentException("Could not find [" + TYPE_IDENTIFIER + "] in message: " + message);
             }
 
             return getClassForIdentifier(typeNode.asText());
 
         } catch (final Exception e) {
             // JSON exception
-            throw new IllegalArgumentException("Could not parse message: "
-                    + message, e);
+            throw new IllegalArgumentException("Could not parse message: " + message, e);
         } finally {
             if (parser != null) {
                 try {
@@ -108,9 +91,7 @@ public class GameMessageParser {
         }
     }
 
-    public static Class<? extends GameMessage> getClassForIdentifier(
-            final String identifier) {
-
+    public static Class<? extends GameMessage> getClassForIdentifier(final String identifier) {
         if (typeToClass.containsKey(identifier)) {
             return typeToClass.get(identifier);
         }

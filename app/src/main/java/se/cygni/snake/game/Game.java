@@ -10,9 +10,11 @@ import se.cygni.game.enums.Direction;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.request.PlayerPing;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.request.StartGame;
+import se.cygni.snake.api.response.PlayerPong;
 import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.apiconversion.DirectionConverter;
@@ -59,6 +61,13 @@ public class Game {
             LOGGER.debug("Starting game");
             startGame();
         }
+    }
+
+    @Subscribe
+    public void ping(final PlayerPing playerPing) {
+        PlayerPong playerPong = new PlayerPong();
+        playerPong.setReceivingPlayerId(playerPing.getReceivingPlayerId());
+        outgoingEventBus.post(playerPong);
     }
 
     @Subscribe
@@ -150,9 +159,9 @@ public class Game {
     }
 
     public Set<IPlayer> getLivePlayers() {
-        return getPlayers().stream().filter(player ->
-            player.isAlive()
-        ).collect(Collectors.toSet());
+        return getPlayers().stream()
+                .filter(IPlayer::isAlive)
+                .collect(Collectors.toSet());
     }
 
     public Set<IPlayer> getLiveAndRemotePlayers() {
