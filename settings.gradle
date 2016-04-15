@@ -1,5 +1,6 @@
 include ":api", ":domain", ":app", ":client", ":client-util"
 
+rootProject.name = 'Snake Server'
 
 if (!System.getenv()['JENKINS_HOME']) {
     include ":javafxclient"

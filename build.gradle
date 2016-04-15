@@ -19,6 +19,7 @@ allprojects {
 
     group = 'se.cygni.snakebot'
     version = '0.0.10-SNAPSHOT'
+    description = 'Game server for multi-player snake.'
 
     /* Enable this for compiler warnings
     gradle.projectsEvaluated {

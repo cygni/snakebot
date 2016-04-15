@@ -1,12 +1,12 @@
 package se.cygni.snake.websocket;
 
 import com.google.common.eventbus.EventBus;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.client.standard.WebSocketContainerFactoryBean;
-import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.PerConnectionWebSocketHandler;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 import se.cygni.snake.game.GameManager;
@@ -14,10 +14,7 @@ import se.cygni.snake.websocket.echo.EchoWebSocketHandler;
 import se.cygni.snake.websocket.event.EventSocketHandler;
 import se.cygni.snake.websocket.training.TrainingWebSocketHandler;
 
-
 @Configuration
-@EnableAutoConfiguration
-@EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
