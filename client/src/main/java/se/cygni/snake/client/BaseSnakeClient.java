@@ -25,13 +25,15 @@ import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.request.StartGame;
 import se.cygni.snake.api.response.PlayerRegistered;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
 public abstract class BaseSnakeClient extends TextWebSocketHandler implements SnakeClient {
 
-    private static Logger log = LoggerFactory.getLogger(BaseSnakeClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSnakeClient.class);
 
     private WebSocketSession session;
 
@@ -39,7 +41,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private boolean gameEnded = false;
 
     public void registerForGame(GameSettings gameSettings) {
-        log.info("Register for game...");
+        LOGGER.info("Register for game...");
         RegisterPlayer registerPlayer = new RegisterPlayer(
                 getName(),
                 gameSettings
@@ -48,7 +50,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public void startGame() {
-        log.info("Starting game...");
+        LOGGER.info("Starting game...");
         StartGame startGame = new StartGame();
         startGame.setReceivingPlayerId(playerId);
         sendMessage(startGame);
@@ -67,13 +69,32 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         } catch (UnknownHostException e) {
             ipAddress = "127.0.0.1";
         }
-        String clientVersion = "0.0.10";
+        String clientVersion = readVersionFromPropertiesFile();
 
         String language = String.format("Java %s", SystemUtils.JAVA_VERSION);
         String os = String.format("%s %s", SystemUtils.OS_NAME, SystemUtils.OS_VERSION);
 
         ClientInfo clientInfo = new ClientInfo(language, os, ipAddress, clientVersion);
         sendMessage(clientInfo);
+    }
+
+    private String readVersionFromPropertiesFile() {
+        String version = "Unknown";
+        try (BufferedReader bis = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream("client.properties")))) {
+            String line = null;
+            while ((line = bis.readLine()) != null) {
+                if (line.trim().length() > 0) {
+                    String[] split = line.split("=");
+                    if (split[0].equals("client.version")) {
+                        version = split[1];
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Failed to load properties file, could not determine client version");
+        }
+        return version;
     }
 
     public boolean isPlaying() {
@@ -85,12 +106,12 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     private void disconnect() {
-        log.info("Disconnecting from server");
+        LOGGER.info("Disconnecting from server");
         if (session != null) {
             try {
                 session.close();
             } catch (IOException e) {
-                log.warn("Failed to close websocket connection");
+                LOGGER.warn("Failed to close websocket connection");
             } finally {
                 session = null;
             }
@@ -100,28 +121,28 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     public void connect() {
         WebSocketClient wsClient = new StandardWebSocketClient();
         String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString().toLowerCase());
-        log.info("Connecting to {}", uri);
+        LOGGER.info("Connecting to {}", uri);
         wsClient.doHandshake(this, uri);
     }
 
     private void sendMessage(GameMessage message) {
 
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Sending: {}", GameMessageParser.encodeMessage(message));
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Sending: {}", GameMessageParser.encodeMessage(message));
             }
 
             session.sendMessage(new TextMessage(
                     GameMessageParser.encodeMessage(message)
             ));
         } catch (Exception e) {
-            log.error("Failed to send message over websocket", e);
+            LOGGER.error("Failed to send message over websocket", e);
         }
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        log.info("Connected to server");
+        LOGGER.info("Connected to server");
         this.session = session;
         this.onConnected();
     }
@@ -139,11 +160,11 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         String messageRaw = msgBuffer.toString();
         msgBuffer = new StringBuilder();
 
-        log.debug("Incoming message: {}", messageRaw);
+        LOGGER.debug("Incoming message: {}", messageRaw);
         try {
             // Deserialize message
             GameMessage gameMessage = GameMessageParser.decodeMessage(messageRaw);
-            log.debug(messageRaw);
+            LOGGER.debug(messageRaw);
 
             if (gameMessage instanceof PlayerRegistered) {
                 this.onPlayerRegistered((PlayerRegistered) gameMessage);
@@ -172,25 +193,25 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (gameMessage instanceof InvalidMessage) {
                 InvalidMessage invalidMessage = (InvalidMessage) gameMessage;
 
-                log.error("Server did not understand my last message");
-                log.error("Message sent: " + invalidMessage.getReceivedMessage());
-                log.error("Error message: " + invalidMessage.getErrorMessage());
+                LOGGER.error("Server did not understand my last message");
+                LOGGER.error("Message sent: " + invalidMessage.getReceivedMessage());
+                LOGGER.error("Error message: " + invalidMessage.getErrorMessage());
             }
         } catch (Exception e) {
-            log.error("Could not understand received message from server: {}", messageRaw, e);
+            LOGGER.error("Could not understand received message from server: {}", messageRaw, e);
         }
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        log.warn("Transport error", exception);
+        LOGGER.warn("Transport error", exception);
         disconnect();
         onSessionClosed();
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        log.warn("Server connection closed");
+        LOGGER.warn("Server connection closed");
         disconnect();
         onSessionClosed();
     }

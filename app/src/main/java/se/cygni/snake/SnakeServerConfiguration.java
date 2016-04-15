@@ -11,11 +11,11 @@ import org.springframework.context.annotation.Configuration;
 public class SnakeServerConfiguration {
 
     //TODO: Move some of the hard coded values scattered around the system to application.properties and read into this class.
-    
-    @Value("${info.build.version}")
-    private String serverVersion;
 
-    public String getServerVersion() {
-        return serverVersion;
+    @Value("${info.build.version}")
+    private String appVersion;
+
+    public String getAppVersion() {
+        return appVersion;
     }
 }
