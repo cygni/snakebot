@@ -7,10 +7,17 @@
         <pattern>%d{"ISO8601", UTC}  %p %t %c{0}.%M - %m%n</pattern>
     </appender>
 
-    <logger name="se" level="DEBUG"/>
-    
-    <root level="info">
+
+    <appender name="loggly-async" class="ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="loggly" />
+        <queueSize>2048</queueSize>
+        <neverBlock>true</neverBlock>
+    </appender>
+
+    <logger name="se" level="DEBUG"/>
+
+    <root level="info">
+        <appender-ref ref="loggly-async" />
     </root>
 
 </included>
