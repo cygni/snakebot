@@ -30,7 +30,7 @@ import se.cygni.snake.eventapi.response.ActiveGamesList;
 import se.cygni.snake.eventapi.response.TournamentCreated;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
-import se.cygni.snake.game.TournamentManager;
+import se.cygni.snake.tournament.TournamentManager;
 import se.cygni.snake.security.TokenService;
 
 import java.io.IOException;

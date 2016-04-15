@@ -48,43 +48,6 @@ public class RemotePlayer implements IPlayer {
         outgoingEventBus.post(gameStartingEvent);
     }
 
-    /*
-    @Override
-    public void onWorldUpdate(WorldState worldState, String gameId, long gameTick, Set<IPlayer> players) {
-
-        MapUpdateEvent mue = GameMessageConverter.onWorldUpdate(worldState, gameId, gameTick, players);
-        mue.setReceivingPlayerId(player.getPlayerId());
-
-        outgoingEventBus.post(mue);
-    }
-
-    @Override
-    public void onPlayerDied(DeathReason reason, String playerId, int x, int y, String gameId, long gameTick) {
-
-        SnakeDeadEvent sde = GameMessageConverter.onPlayerDied(reason, playerId, x, y, gameId, gameTick);
-        sde.setReceivingPlayerId(player.getPlayerId());
-
-        outgoingEventBus.post(sde);
-    }
-
-    @Override
-    public void onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
-
-        GameEndedEvent gee = GameMessageConverter.onGameEnded(playerWinnerId, gameId, gameTick, worldState, players);
-        gee.setReceivingPlayerId(player.getPlayerId());
-
-        outgoingEventBus.post(gee);
-    }
-
-    @Override
-    public void onGameStart(String gameId, int noofPlayers, int width, int height) {
-
-        GameStartingEvent gse = GameMessageConverter.onGameStart(gameId, noofPlayers, width, height);
-        gse.setReceivingPlayerId(player.getPlayerId());
-
-        outgoingEventBus.post(gse);
-    }
-*/
     @Override
     public boolean isAlive() {
         return alive;

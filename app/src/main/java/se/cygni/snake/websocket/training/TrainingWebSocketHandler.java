@@ -16,9 +16,13 @@ import se.cygni.snake.api.GameMessageParser;
 import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
+import se.cygni.snake.player.IPlayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -35,6 +39,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
     private final EventBus incomingEventBus;
     private final Game game;
     private final String playerId;
+    private Set<IPlayer> players = Collections.synchronizedSet(new HashSet<>());
 
     @Autowired
     public TrainingWebSocketHandler(GameManager gameManager) {

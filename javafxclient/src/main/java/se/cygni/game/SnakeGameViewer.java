@@ -57,8 +57,8 @@ public class SnakeGameViewer extends Application implements EventListener {
     @Override
     public void start(Stage primaryStage) {
 
-        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
-//        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
+//        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
+        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
 
         BorderPane root = new BorderPane();
 
