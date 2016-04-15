@@ -2,6 +2,12 @@ jar {
     baseName = 'snakebot-client'
 }
 
+processResources {
+    filesMatching("client.properties") {
+        expand(project.properties)
+    }
+}
+
 dependencies {
     compile project(':client-util')
     compile project(':api')
