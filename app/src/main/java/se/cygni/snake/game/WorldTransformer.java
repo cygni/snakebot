@@ -22,6 +22,7 @@ import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.apiconversion.GameMessageConverter;
 import se.cygni.snake.event.InternalGameEvent;
+import se.cygni.snake.player.IPlayer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -209,7 +210,7 @@ public class WorldTransformer {
 
     private boolean isNibbleSituation(TileMultipleContent tile, Map<String, WorldState> snakeToWorldState) {
         if (tile.size() == 2 && // Nibble is only possible if there exists two objects on the same tile
-                tile.listSnakeIdsPresent().size() > 1 && // Not ok to eat you own tail!
+                tile.listSnakeIdsPresent().size() > 1 && // Not ok to eat your own tail!
                 tile.containsExactlyOneOfEachType(new Class[]{SnakeHead.class, SnakeBody.class}) && // One body and one head
                 tile.listContentsOfType(SnakeBody.class).get(0).isTail()) { // And the body is a tail
 
@@ -417,8 +418,14 @@ public class WorldTransformer {
             long worldTick) {
 
         snakesDiedThisRound++;
-        LOGGER.info(head.getPlayerId() + " died at: " + coordinate);
-        game.getPlayer(head.getPlayerId()).dead();
+        IPlayer deadPlayer = game.getPlayer(head.getPlayerId());
+        LOGGER.info("Death occurred. GameId: {}, Player: {}, with id: {}, died at: {}",
+                game.getGameId(),
+                deadPlayer.getName(),
+                deadPlayer.getPlayerId(),
+                coordinate);
+
+        deadPlayer.dead();
 
         SnakeDeadEvent snakeDeadEvent = GameMessageConverter.onPlayerDied(
                 deathReason,

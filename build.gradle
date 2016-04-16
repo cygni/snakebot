@@ -46,7 +46,7 @@ subprojects {
     repositories {
         mavenCentral()
     }
-
+    ext['slf4j.version'] = '1.7.20'
     ext {
         slf4jVersion = '1.7.20'
         logbackVersion = '1.1.7'
