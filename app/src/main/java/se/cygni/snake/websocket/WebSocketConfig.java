@@ -12,6 +12,7 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 import se.cygni.snake.game.GameManager;
 import se.cygni.snake.websocket.echo.EchoWebSocketHandler;
 import se.cygni.snake.websocket.event.EventSocketHandler;
+import se.cygni.snake.websocket.tournament.TournamentWebSocketHandler;
 import se.cygni.snake.websocket.training.TrainingWebSocketHandler;
 
 @Configuration
@@ -23,6 +24,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(eventWebSocketHandler(), "/events").setAllowedOrigins("*").withSockJS();
         registry.addHandler(eventWebSocketHandler(), "/events-native").setAllowedOrigins("*");
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
+        registry.addHandler(snakeTournamentWebSocketHandler(), "/tournament");
     }
 
     @Bean
@@ -38,6 +40,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Bean
     public WebSocketHandler snakeTrainingWebSocketHandler() {
         return new PerConnectionWebSocketHandler(TrainingWebSocketHandler.class, true);
+    }
+
+    @Bean
+    public WebSocketHandler snakeTournamentWebSocketHandler() {
+        return new PerConnectionWebSocketHandler(TournamentWebSocketHandler.class, true);
     }
 
     @Bean

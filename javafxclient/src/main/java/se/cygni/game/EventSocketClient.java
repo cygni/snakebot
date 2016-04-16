@@ -115,6 +115,7 @@ public class EventSocketClient {
                 String msgPayload = msgBuffer.toString();
                 msgBuffer = new StringBuilder();
 
+                System.out.println("Received: " + msgPayload);
                 listener.onMessage(msgPayload);
 
                 if (!tryToHandleGameMessage(msgPayload)) {

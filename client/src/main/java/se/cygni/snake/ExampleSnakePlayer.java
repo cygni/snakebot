@@ -25,7 +25,13 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     private static Logger log = LoggerFactory
             .getLogger(ExampleSnakePlayer.class);
 
+    Random random = new Random();
+
     private AnsiPrinter ansiPrinter;
+    private String name = "#emil_" + random.nextInt(1000);
+    private String host = "localhost";
+    private int port = 8080;
+    private GameMode gameMode = GameMode.TOURNAMENT;
 
     public static void main(String[] args) {
 
@@ -134,21 +140,21 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public String getName() {
-        return "#emil";
+        return name;
     }
 
     @Override
     public String getServerHost() {
-        return "snake.cygni.se";
+        return host;
     }
 
     @Override
     public int getServerPort() {
-        return 80;
+        return port;
     }
 
     @Override
     public GameMode getGameMode() {
-        return GameMode.TRAINING;
+        return gameMode;
     }
 }

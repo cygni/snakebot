@@ -182,7 +182,7 @@ public class MapUtil {
      * @param position
      * @return
      */
-    private MapCoordinate translatePosition(int position) {
+    public MapCoordinate translatePosition(int position) {
         int y = position / map.getWidth();
         int x = position - y * map.getWidth();
         return new MapCoordinate(x, y);
