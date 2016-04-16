@@ -77,7 +77,7 @@ public class PotentialDirection implements Comparable<PotentialDirection> {
                 break;
         }
         this.score += scoreToAdd;
-        LOGGER.info("D: {}, C: {}, S: {}, Score: {}", distanceFromSnake, tileContent.getContent(), scoreToAdd, this.toString());
+        LOGGER.trace("D: {}, C: {}, S: {}, Score: {}", distanceFromSnake, tileContent.getContent(), scoreToAdd, this.toString());
     }
 
     private SnakeInfo findSnake(final Map gameMap, final String playerId) {

@@ -266,7 +266,7 @@ public class GameEngine {
             snakeDirections.put(playerId, direction);
             countDownLatch.countDown();
         } else {
-            log.info("Player with id {} too late in registering move", playerId);
+            log.info("Player: {} with id {} too late in registering move", game.getPlayerName(playerId), playerId);
         }
     }
 

@@ -55,7 +55,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        LOGGER.debug("Opened new session in instance " + this);
+        LOGGER.debug("After connection established, gameId: {}", game.getGameId());
         this.webSocketSession = session;
     }
 

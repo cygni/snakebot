@@ -56,7 +56,7 @@ public class Game {
     @Subscribe
     public void startGame(StartGame startGame) {
         if (gameFeatures.isTrainingGame()) {
-            LOGGER.debug("Starting game");
+            LOGGER.info("Starting game: {}", gameId);
             startGame();
         }
     }
@@ -129,6 +129,10 @@ public class Game {
         return players.stream().filter(player -> player.getPlayerId().equals(playerId)).findFirst().get();
     }
 
+    public String getPlayerName(String playerId) {
+        return getPlayer(playerId).getName();
+    }
+
     public EventBus getOutgoingEventBus() {
         return outgoingEventBus;
     }
@@ -163,9 +167,11 @@ public class Game {
 
     public void playerLostConnection(String playerId) {
         try {
-            getPlayer(playerId).dead();
+            IPlayer player = getPlayer(playerId);
+            player.dead();
+            LOGGER.info("Player: {} , playerId: {} lost connection and was therefore killed.", player.getName(), playerId);
         } catch (Exception e) {
-            LOGGER.warn("Player: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
+            LOGGER.warn("PlayerId: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
         }
         if (getLiveAndRemotePlayers().size() == 0) {
             abort();
