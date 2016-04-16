@@ -87,7 +87,7 @@ subprojects {
         repositories {
             maven {
                 // This is for jenkins local filesystem
-                url "/data/mavenrepo"
+                url "/var/mavenrepo"
             }
         }
     }
