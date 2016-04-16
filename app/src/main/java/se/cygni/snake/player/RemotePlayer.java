@@ -13,6 +13,7 @@ public class RemotePlayer implements IPlayer {
     private Player player;
     private EventBus outgoingEventBus;
     private boolean alive = true;
+    private boolean connected = true;
     private int accumulatedPoints = 0;
 
     public RemotePlayer(Player player, EventBus outgoingEventBus) {
@@ -56,6 +57,17 @@ public class RemotePlayer implements IPlayer {
     @Override
     public void dead() {
         alive = false;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return connected;
+    }
+
+    @Override
+    public void lostConnection() {
+        dead();
+        connected = false;
     }
 
     @Override

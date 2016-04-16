@@ -66,7 +66,7 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        LOGGER.debug(message.getPayload());
+        LOGGER.debug("Received: {}", message.getPayload());
 
         try {
             // Deserialize message

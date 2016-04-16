@@ -18,7 +18,7 @@ buildscript {
 allprojects {
 
     group = 'se.cygni.snakebot'
-    version = '0.0.9'
+    version = '0.1.0'
 
     /* Enable this for compiler warnings
     gradle.projectsEvaluated {
@@ -60,11 +60,26 @@ subprojects {
         guavaVersion = '19.0'
     }
 
+    task javadocJar (type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+    task sourceJar (type : Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
                 artifactId 'snakebot-' + project.name
                 from components.java
+                artifact (sourceJar) {
+                    classifier = 'sources'
+                }
+                artifact (javadocJar) {
+                    classifier = 'javadoc'
+                }
             }
         }
     }
@@ -72,7 +87,7 @@ subprojects {
         repositories {
             maven {
                 // This is for jenkins local filesystem
-                url "/var/mavenrepo"
+                url "/data/mavenrepo"
             }
         }
     }

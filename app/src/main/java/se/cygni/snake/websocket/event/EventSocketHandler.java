@@ -25,6 +25,7 @@ import se.cygni.snake.eventapi.ApiMessageParser;
 import se.cygni.snake.eventapi.exception.Unauthorized;
 import se.cygni.snake.eventapi.model.ActiveGame;
 import se.cygni.snake.eventapi.model.ActiveGamePlayer;
+import se.cygni.snake.eventapi.model.TournamentGamePlan;
 import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
 import se.cygni.snake.eventapi.response.TournamentCreated;
@@ -166,6 +167,11 @@ public class EventSocketHandler extends TextWebSocketHandler {
         }
 
         sendGameEvent(event.getGameMessage());
+    }
+
+    @Subscribe
+    public void onTournamentGamePlan(TournamentGamePlan tgp) {
+        sendApiMessage(tgp);
     }
 
     private void sendGameEvent(GameMessage message) {

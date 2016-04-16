@@ -16,7 +16,11 @@ public interface IPlayer {
 
     void onGameStart(GameStartingEvent gameStartingEvent);
 
+    void lostConnection();
+
     boolean isAlive();
+
+    boolean isConnected();
 
     void dead();
 

@@ -2,6 +2,8 @@ package se.cygni.snake.tournament;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.cygni.game.Player;
@@ -16,6 +18,7 @@ import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.apiconversion.DirectionConverter;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
+import se.cygni.snake.apiconversion.TournamentPlanConverter;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.game.GameManager;
@@ -26,17 +29,18 @@ import java.util.*;
 
 @Component
 public class TournamentManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TournamentManager.class);
 
     private GameManager gameManager;
     private final EventBus outgoingEventBus;
     private final EventBus incomingEventBus;
     private final EventBus globalEventBus;
 
-    private boolean tournamentActive;
+    private boolean tournamentActive = true;
     private boolean tournamentStarted;
     private String tournamentId;
     private String tournamentName;
-    private GameFeatures gameFeatures;
+    private GameFeatures gameFeatures = new GameFeatures();
     private TournamentPlan tournamentPlan;
     private Set<IPlayer> players = Collections.synchronizedSet(new HashSet<>());
 
@@ -86,6 +90,7 @@ public class TournamentManager {
 
     public void planTournament() {
         tournamentPlan = new TournamentPlan(gameFeatures, players);
+        publishTournamentPlan();
     }
 
     @Subscribe
@@ -103,6 +108,7 @@ public class TournamentManager {
         Player player = new Player(registerPlayer.getPlayerName());
         player.setPlayerId(playerId);
 
+        // ToDo: Player is unique on playerId, the code below won't work.
         if (players.contains(player)) {
             InvalidPlayerName playerNameTaken = new InvalidPlayerName(InvalidPlayerName.PlayerNameInvalidReason.Taken);
             MessageUtils.copyCommonAttributes(registerPlayer, playerNameTaken);
@@ -130,8 +136,39 @@ public class TournamentManager {
         // Send move to active game
     }
 
-    public void addPlayer(IPlayer player) {
+    private void addPlayer(IPlayer player) {
         players.add(player);
+
+        planTournament();
+    }
+
+    private void removePlayer(IPlayer player) {
+        players.remove(player);
+
+        planTournament();
+    }
+
+    public IPlayer getPlayer(String playerId) {
+        return players.stream().filter(player -> player.getPlayerId().equals(playerId)).findFirst().get();
+    }
+
+    public void playerLostConnection(String playerId) {
+
+        if (isTournamentStarted()) {
+            IPlayer player = getPlayer(playerId);
+            player.lostConnection();
+        } else {
+            removePlayer(getPlayer(playerId));
+        }
+    }
+
+    public void publishTournamentPlan() {
+        globalEventBus.post(
+                TournamentPlanConverter.getTournamentPlan(
+                        tournamentPlan,
+                        tournamentName,
+                        tournamentId
+                ));
     }
 
     public EventBus getOutgoingEventBus() {

@@ -66,6 +66,7 @@ public class Game {
         Player player = new Player(registerPlayer.getPlayerName());
         player.setPlayerId(registerPlayer.getReceivingPlayerId());
 
+        // ToDo: This is totally wrong...
         if (players.contains(player)) {
             InvalidPlayerName playerNameTaken = new InvalidPlayerName(InvalidPlayerName.PlayerNameInvalidReason.Taken);
             MessageUtils.copyCommonAttributes(registerPlayer, playerNameTaken);

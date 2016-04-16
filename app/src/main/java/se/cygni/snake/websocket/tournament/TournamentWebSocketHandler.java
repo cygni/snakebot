@@ -33,7 +33,7 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
     public TournamentWebSocketHandler(TournamentManager tournamentManager) {
         this.tournamentManager = tournamentManager;
 
-        LOGGER.info("Started training web socket handler");
+        LOGGER.info("Started tournament web socket handler");
 
         // Create a playerId for this player
         playerId = UUID.randomUUID().toString();
@@ -53,7 +53,7 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        LOGGER.debug("Opened new session in instance " + this);
+        LOGGER.debug("After connection established, tournamentId: {}", tournamentManager.getTournamentId());
         this.webSocketSession = session;
     }
 

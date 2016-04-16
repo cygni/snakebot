@@ -31,7 +31,7 @@ public class TournamentPlan {
         int maxPlayersPerGame = getMaxNoofPlayersPerGame(gameFeatures);
 
         int noofPlayersLeft = players.size();
-        boolean notSolved = true;
+        boolean notSolved = noofPlayersLeft > maxPlayersPerGame;
         int index = 0;
         while (notSolved) {
             TournamentLevel level = new TournamentLevel(index, noofPlayersLeft, maxPlayersPerGame);
