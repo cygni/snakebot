@@ -56,6 +56,16 @@ public abstract class BotPlayer implements IPlayer {
     }
 
     @Override
+    public void lostConnection() {
+
+    }
+
+    @Override
+    public boolean isConnected() {
+        return true;
+    }
+
+    @Override
     public String getName() {
         return this.getClass().getSimpleName();
     }

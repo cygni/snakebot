@@ -156,6 +156,14 @@ public class MapUtilTest {
     }
 
     @Test
+    public void testTranslateCoordinateLarge() throws Exception {
+        Map map = new Map(50, 50, 8, new SnakeInfo[0], new int[0], new int[0]);
+        MapUtil mapUtil = new MapUtil(map, "a");
+
+        System.out.println(mapUtil.translatePosition(637));
+        System.out.println(mapUtil.translatePosition(687));
+    }
+    @Test
     public void testGetPlayerLength() throws Exception {
 
         SnakeInfo[] snakeInfos = new SnakeInfo[] {
