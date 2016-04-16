@@ -18,7 +18,7 @@ buildscript {
 allprojects {
 
     group = 'se.cygni.snakebot'
-    version = '0.1.0'
+    version = '0.1.1'
 
     /* Enable this for compiler warnings
     gradle.projectsEvaluated {

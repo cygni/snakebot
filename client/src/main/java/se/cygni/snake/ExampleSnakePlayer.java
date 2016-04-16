@@ -29,9 +29,9 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     private AnsiPrinter ansiPrinter;
     private String name = "#emil_" + random.nextInt(1000);
-    private String host = "localhost";
-    private int port = 8080;
-    private GameMode gameMode = GameMode.TOURNAMENT;
+    private String host = "snake.cygni.se";
+    private int port = 80;
+    private GameMode gameMode = GameMode.TRAINING;
 
     public static void main(String[] args) {
 
