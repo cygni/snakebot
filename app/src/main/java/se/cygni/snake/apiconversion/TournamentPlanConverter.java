@@ -28,6 +28,10 @@ public class TournamentPlanConverter {
 
     public static List<ActiveGamePlayer> getPlayers(Set<IPlayer> players) {
         List<ActiveGamePlayer> activePlayers = new ArrayList<>();
+        if (players == null) {
+            return activePlayers;
+        }
+
         players.stream().forEach(player -> {
             activePlayers.add(new ActiveGamePlayer(player.getName(), player.getPlayerId()));
         });
@@ -38,6 +42,7 @@ public class TournamentPlanConverter {
         List<TournamentLevel> tlevels = new ArrayList<>();
         levels.stream().forEach(level -> {
             TournamentLevel tlevel = new TournamentLevel(level.getLevelIndex(), level.getExpectedNoofPlayers());
+            tlevel.setPlayers(getPlayers(level.getPlayers()));
             tlevel.setTournamentGames(getTournamentGames(level.getPlannedGames()));
             tlevels.add(tlevel);
         });
@@ -49,6 +54,11 @@ public class TournamentPlanConverter {
         plannedGames.stream().forEach(tgp -> {
             TournamentGame game = new TournamentGame();
             game.setExpectedNoofPlayers(tgp.getExpectedNoofPlayers());
+            game.setPlayers(getPlayers(tgp.getPlayers()));
+
+            if (tgp.getGame() != null) {
+                game.setGameId(tgp.getGame().getGameId());
+            }
             games.add(game);
         });
         return games;

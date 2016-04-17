@@ -1,13 +1,18 @@
 package se.cygni.snake.tournament;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.tournament.util.TournamentUtil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class TournamentLevel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TournamentLevel.class);
 
     private final int levelIndex;
     private final int expectedNoofPlayers;
@@ -22,6 +27,35 @@ public class TournamentLevel {
         planGames();
     }
 
+    public Set<IPlayer> getPlayersAdvancing() {
+        int diff = TournamentUtil.getNoofPlayersOut(maxNoofPlayersPerGame);
+        Set<IPlayer> playersAdvancing = new HashSet<>();
+
+        for (TournamentPlannedGame game : plannedGames) {
+            List<IPlayer> gameResult = game.getGame().getGameResult().getSortedResult();
+            int noofToAdvance;
+            if (gameResult.size() + diff <= 0) {
+                noofToAdvance = 1;
+            } else {
+                noofToAdvance = gameResult.size() + diff;
+            }
+            List<IPlayer> gameAdvancing = gameResult.subList(0, noofToAdvance);
+            LOGGER.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
+                    game.getGame().getPlayerManager().size(),
+                    gameResult.size(),
+                    gameAdvancing.size());
+
+            playersAdvancing.addAll(gameAdvancing);
+        }
+
+        for (IPlayer player : playersAdvancing) {
+            player.resetPoints();
+            player.revive();
+        }
+
+        return playersAdvancing;
+    }
+
     public int getLevelIndex() {
         return levelIndex;
     }
@@ -32,6 +66,10 @@ public class TournamentLevel {
 
     public void setPlayers(Set<IPlayer> players) {
         this.players = players;
+    }
+
+    public Set<IPlayer> getPlayers() {
+        return players;
     }
 
     public List<TournamentPlannedGame> getPlannedGames() {

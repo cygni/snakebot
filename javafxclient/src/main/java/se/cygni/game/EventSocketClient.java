@@ -15,7 +15,9 @@ import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
+import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.api.response.PlayerRegistered;
+import se.cygni.snake.client.HeartBeatSender;
 import se.cygni.snake.eventapi.ApiMessage;
 import se.cygni.snake.eventapi.ApiMessageParser;
 import se.cygni.snake.eventapi.request.SetGameFilter;
@@ -46,7 +48,7 @@ public class EventSocketClient {
         sendApiMesssage(startGame);
     }
 
-    private void sendApiMesssage(ApiMessage message) {
+    public void sendApiMesssage(ApiMessage message) {
         try {
             String msg = ApiMessageParser.encodeMessage(message);
             TextMessage textMessage = new TextMessage(msg);
@@ -72,6 +74,8 @@ public class EventSocketClient {
                 listener.onPlayerRegistered((PlayerRegistered) gameMessage);
             } else if (gameMessage instanceof InvalidPlayerName) {
                 listener.onInvalidPlayerName((InvalidPlayerName) gameMessage);
+            } else if (gameMessage instanceof HeartBeatResponse) {
+                sendHeartbeat();
             }
 
             return true;
@@ -94,6 +98,12 @@ public class EventSocketClient {
         return false;
     }
 
+    private void sendHeartbeat() {
+        HeartBeatSender heartbeatSender = new HeartBeatSender(webSocketSession, null);
+        Thread thread = new Thread(heartbeatSender);
+        thread.start();
+    }
+
     public void connect() {
         WebSocketClient wsClient = new StandardWebSocketClient();
 
@@ -102,6 +112,7 @@ public class EventSocketClient {
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
                 System.out.println("connected");
                 webSocketSession = session;
+                sendHeartbeat();
             }
 
             @Override

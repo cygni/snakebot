@@ -33,17 +33,17 @@ public class DumbBot extends BotPlayer {
     @Override
     public void onWorldUpdate(MapUpdateEvent mapUpdateEvent) {
         CompletableFuture cf = CompletableFuture.runAsync(() -> {
-            postNextMove(mapUpdateEvent.getMap(), mapUpdateEvent.getGameTick());
+            postNextMove(mapUpdateEvent.getGameId(), mapUpdateEvent.getMap(), mapUpdateEvent.getGameTick());
         });
     }
 
-    private void postNextMove(final Map map, final long gameTick) {
+    private void postNextMove(final String gameId, final Map map, final long gameTick) {
         MapUtil mapUtil = new MapUtil(map, getPlayerId());
 
         List<PotentialDirection> directions = createDirections(map, mapUtil);
         currentDirection = directions.get(0).getDirection();
 
-        RegisterMove registerMove = new RegisterMove(gameTick, currentDirection);
+        RegisterMove registerMove = new RegisterMove(gameId, gameTick, currentDirection);
         registerMove.setReceivingPlayerId(playerId);
         incomingEventbus.post(registerMove);
     }

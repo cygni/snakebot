@@ -23,8 +23,10 @@ public class TournamentPlanTest {
         gf.setWidth(25);
 
         Set<IPlayer> players = getPlayers(20);
+        PlayerManager playerManager = new PlayerManager();
+        playerManager.addAll(players);
 
-        TournamentPlan tp = new TournamentPlan(gf, players);
+        TournamentPlan tp = new TournamentPlan(gf, playerManager);
 
         List<TournamentLevel> levels = tp.getLevels();
         assertEquals(6, levels.size());
@@ -43,8 +45,10 @@ public class TournamentPlanTest {
         gf.setWidth(100);
 
         Set<IPlayer> players = getPlayers(30);
+        PlayerManager playerManager = new PlayerManager();
+        playerManager.addAll(players);
 
-        TournamentPlan tp = new TournamentPlan(gf, players);
+        TournamentPlan tp = new TournamentPlan(gf, playerManager);
 
         List<TournamentLevel> levels = tp.getLevels();
         assertEquals(2, levels.size());

@@ -23,6 +23,7 @@ import se.cygni.snake.api.request.ClientInfo;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.request.StartGame;
+import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.api.response.PlayerRegistered;
 
 import java.io.BufferedReader;
@@ -38,6 +39,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private WebSocketSession session;
 
     private String playerId;
+    private String lastGameId;
     private boolean gameEnded = false;
 
     public void registerForGame(GameSettings gameSettings) {
@@ -57,7 +59,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public void registerMove(long gameTick, SnakeDirection direction) {
-        RegisterMove registerMove = new RegisterMove(gameTick, direction);
+        RegisterMove registerMove = new RegisterMove(lastGameId, gameTick, direction);
         registerMove.setReceivingPlayerId(playerId);
         sendMessage(registerMove);
     }
@@ -98,7 +100,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public boolean isPlaying() {
-        return session != null && !gameEnded;
+        return session != null; // && !gameEnded;
     }
 
     public String getPlayerId() {
@@ -125,6 +127,12 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         wsClient.doHandshake(this, uri);
     }
 
+    private void sendHeartbeat() {
+        HeartBeatSender heartbeatSender = new HeartBeatSender(session, playerId);
+        Thread thread = new Thread(heartbeatSender);
+        thread.start();
+    }
+
     private void sendMessage(GameMessage message) {
 
         try {
@@ -145,6 +153,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         LOGGER.info("Connected to server");
         this.session = session;
         this.onConnected();
+        sendHeartbeat();
     }
 
     private StringBuilder msgBuffer = new StringBuilder();
@@ -172,9 +181,11 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
                 sendClientInfo();
             }
 
-            if (gameMessage instanceof MapUpdateEvent)
-                this.onMapUpdate((MapUpdateEvent) gameMessage);
-
+            if (gameMessage instanceof MapUpdateEvent) {
+                MapUpdateEvent mue = (MapUpdateEvent) gameMessage;
+                this.lastGameId = mue.getGameId();
+                this.onMapUpdate(mue);
+            }
             if (gameMessage instanceof GameStartingEvent)
                 this.onGameStarting((GameStartingEvent) gameMessage);
 
@@ -188,6 +199,10 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
 
             if (gameMessage instanceof InvalidPlayerName) {
                 this.onInvalidPlayerName((InvalidPlayerName) gameMessage);
+            }
+
+            if (gameMessage instanceof HeartBeatResponse) {
+                this.sendHeartbeat();
             }
 
             if (gameMessage instanceof InvalidMessage) {

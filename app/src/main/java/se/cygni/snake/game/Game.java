@@ -26,37 +26,43 @@ import se.cygni.snake.player.bot.DumbBot;
 import se.cygni.snake.player.bot.RandomBot;
 import se.cygni.snake.player.bot.StayAliveBot;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Random;
+import java.util.UUID;
 
 public class Game {
     private static final Logger LOGGER = LoggerFactory.getLogger(Game.class);
 
+    private final boolean trainingGame;
     private final EventBus incomingEventBus;
-    private final EventBus outgoingEventBus;
+    private EventBus outgoingEventBus;
     private final String gameId;
-    private Set<IPlayer> players = Collections.synchronizedSet(new HashSet<>());
+    PlayerManager playerManager = new PlayerManager();
     private GameFeatures gameFeatures;
     private final GameEngine gameEngine;
     private final EventBus globalEventBus;
 
     private Random botSelector = new Random(System.currentTimeMillis());
 
-    public Game(GameFeatures gameFeatures, EventBus globalEventBus) {
+    public Game(GameFeatures gameFeatures, EventBus globalEventBus, boolean trainingGame) {
 
         this.globalEventBus = globalEventBus;
         this.gameFeatures = gameFeatures;
-        gameEngine = new GameEngine(gameFeatures, this, globalEventBus);
+        this.trainingGame = trainingGame;
         gameId = UUID.randomUUID().toString();
+        gameEngine = new GameEngine(gameFeatures, playerManager, gameId, globalEventBus);
         incomingEventBus = new EventBus("game-" + gameId + "-incoming");
         incomingEventBus.register(this);
 
         outgoingEventBus = new EventBus("game-" + gameId + "-outgoing");
     }
 
+    public void setOutgoingEventBus(EventBus outgoingEventBus) {
+        this.outgoingEventBus = outgoingEventBus;
+    }
+
     @Subscribe
     public void startGame(StartGame startGame) {
-        if (gameFeatures.isTrainingGame()) {
+        if (trainingGame) {
             LOGGER.info("Starting game: {}", gameId);
             startGame();
         }
@@ -67,8 +73,7 @@ public class Game {
         Player player = new Player(registerPlayer.getPlayerName());
         player.setPlayerId(registerPlayer.getReceivingPlayerId());
 
-        // ToDo: This is totally wrong...
-        if (players.contains(player)) {
+        if (playerManager.containsPlayerWithName(player.getName())) {
             InvalidPlayerName playerNameTaken = new InvalidPlayerName(InvalidPlayerName.PlayerNameInvalidReason.Taken);
             MessageUtils.copyCommonAttributes(registerPlayer, playerNameTaken);
             outgoingEventBus.post(playerNameTaken);
@@ -80,9 +85,8 @@ public class Game {
 
         // If this is a training game changes to settings are allowed
         GameSettings requestedGameSettings = registerPlayer.getGameSettings();
-        if (gameFeatures.isTrainingGame() && requestedGameSettings != null) {
+        if (trainingGame && requestedGameSettings != null) {
             gameFeatures = GameSettingsConverter.toGameFeatures(requestedGameSettings);
-            gameFeatures.setTrainingGame(true); // Just to be sure
             gameEngine.reApplyGameFeatures(gameFeatures);
         }
 
@@ -99,6 +103,14 @@ public class Game {
         long gameTick = registerMove.getGameTick();
         String playerId = registerMove.getReceivingPlayerId();
         Direction direction = DirectionConverter.toDirection(registerMove.getDirection());
+
+        if (!gameId.equals(registerMove.getGameId())) {
+            LOGGER.warn("Player: {}, playerId: {}, tried to register move for wrong game. Aborting that move.",
+                    playerManager.getPlayerName(playerId),
+                    playerId);
+            return;
+        }
+
         gameEngine.registerMove(
                 gameTick,
                 playerId,
@@ -121,23 +133,12 @@ public class Game {
     }
 
     public void addPlayer(IPlayer player) {
-        players.add(player);
+        playerManager.add(player);
+        publishGameChanged();
     }
 
-    public Set<IPlayer> getPlayers() {
-        return players;
-    }
-
-    public int getNoofPlayers() {
-        return players.size();
-    }
-
-    public IPlayer getPlayer(String playerId) {
-        return players.stream().filter(player -> player.getPlayerId().equals(playerId)).findFirst().get();
-    }
-
-    public String getPlayerName(String playerId) {
-        return getPlayer(playerId).getName();
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 
     public EventBus getOutgoingEventBus() {
@@ -160,27 +161,15 @@ public class Game {
         return gameEngine;
     }
 
-    public Set<IPlayer> getLivePlayers() {
-        return getPlayers().stream()
-                .filter(IPlayer::isAlive)
-                .collect(Collectors.toSet());
-    }
-
-    public Set<IPlayer> getLiveAndRemotePlayers() {
-        return getPlayers().stream().filter(player ->
-                player.isAlive() && player instanceof RemotePlayer
-        ).collect(Collectors.toSet());
-    }
-
     public void playerLostConnection(String playerId) {
         try {
-            IPlayer player = getPlayer(playerId);
+            IPlayer player = playerManager.getPlayer(playerId);
             player.dead();
             LOGGER.info("Player: {} , playerId: {} lost connection and was therefore killed.", player.getName(), playerId);
         } catch (Exception e) {
             LOGGER.warn("PlayerId: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
         }
-        if (getLiveAndRemotePlayers().size() == 0) {
+        if (playerManager.getLiveAndRemotePlayers().size() == 0) {
             abort();
         } else {
             publishGameChanged();
@@ -191,8 +180,16 @@ public class Game {
         return globalEventBus;
     }
 
+    public boolean isEnded() {
+        return gameEngine.isGameComplete();
+    }
+
+    public GameResult getGameResult() {
+        return gameEngine.getGameResult();
+    }
+
     private void initBotPlayers() {
-        if (!gameFeatures.isTrainingGame())
+        if (!trainingGame)
             return;
 
         for (int i = 0; i < gameFeatures.getMaxNoofPlayers() - 1; i++) {
@@ -218,7 +215,7 @@ public class Game {
     }
 
     public void abort() {
-        players.clear();
+        playerManager.clear();
         gameEngine.abort();
 
         InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());

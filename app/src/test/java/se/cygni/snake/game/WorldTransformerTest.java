@@ -23,6 +23,7 @@ import static org.mockito.Mockito.*;
 public class WorldTransformerTest {
 
     Game game;
+    PlayerManager playerManager;
     EventBus globalEventBus;
     GameFeatures gameFeatures;
 
@@ -31,9 +32,11 @@ public class WorldTransformerTest {
         globalEventBus = new EventBus("globaleventbus");
         gameFeatures = new GameFeatures();
 
+        playerManager = mock(PlayerManager.class);
         game = mock(Game.class);
         when(game.getGlobalEventBus()).thenReturn(globalEventBus);
         when(game.getGameFeatures()).thenReturn(gameFeatures);
+        when(game.getPlayerManager()).thenReturn(playerManager);
     }
 
 
@@ -54,7 +57,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(52, transformedWorld.getSnakeHeadForBodyAt(52).getPosition());
@@ -75,7 +78,7 @@ public class WorldTransformerTest {
         SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -87,7 +90,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(52, transformedWorld.getSnakeHeadForBodyAt(52).getPosition());
@@ -106,7 +109,7 @@ public class WorldTransformerTest {
         SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -119,7 +122,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(52, transformedWorld.getSnakeHeadForBodyAt(52).getPosition());
@@ -141,7 +144,7 @@ public class WorldTransformerTest {
         SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -155,7 +158,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(52, transformedWorld.getSnakeHeadForBodyAt(52).getPosition());
@@ -182,8 +185,8 @@ public class WorldTransformerTest {
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
         RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(game.getPlayer("id2")).thenReturn(mockedPlayer2);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -196,7 +199,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(41, transformedWorld.getSnakeHeadForBodyAt(41).getPosition());
@@ -221,8 +224,8 @@ public class WorldTransformerTest {
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
         RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(game.getPlayer("id2")).thenReturn(mockedPlayer2);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -237,7 +240,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(22, transformedWorld.getSnakeHeadForBodyAt(22).getPosition());
@@ -262,8 +265,8 @@ public class WorldTransformerTest {
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
         RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(game.getPlayer("id2")).thenReturn(mockedPlayer2);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -278,7 +281,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(33, transformedWorld.getSnakeHeadForBodyAt(33).getPosition());
@@ -310,8 +313,8 @@ public class WorldTransformerTest {
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
         RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(game.getPlayer("id2")).thenReturn(mockedPlayer2);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -326,7 +329,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(22, transformedWorld.getSnakeHeadForBodyAt(22).getPosition());
@@ -350,8 +353,8 @@ public class WorldTransformerTest {
 
         RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
         RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(game.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(game.getPlayer("id2")).thenReturn(mockedPlayer2);
+        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -364,7 +367,7 @@ public class WorldTransformerTest {
             }
         };
 
-        WorldTransformer transformer = new WorldTransformer(game);
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(0, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);

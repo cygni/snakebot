@@ -18,6 +18,8 @@ import se.cygni.snake.api.event.GameAbortedEvent;
 import se.cygni.snake.api.event.GameChangedEvent;
 import se.cygni.snake.api.event.GameCreatedEvent;
 import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.api.request.HeartBeatRequest;
+import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.eventapi.ApiMessage;
@@ -82,16 +84,12 @@ public class EventSocketHandler extends TextWebSocketHandler {
         log.info("Removed session: {}", session.getId());
     }
 
-    @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message)
-            throws Exception {
-        log.debug(message.getPayload());
-
+    private boolean tryToHandleApiMessage(String message) {
         try {
-            ApiMessage apiMessage = ApiMessageParser.decodeMessage(message.getPayload());
+            ApiMessage apiMessage = ApiMessageParser.decodeMessage(message);
 
             if (!verifyTokenSendErrorIfUnauthorized(apiMessage)) {
-                return;
+                return true;
             }
 
             if (apiMessage instanceof ListActiveGames) {
@@ -130,13 +128,45 @@ public class EventSocketHandler extends TextWebSocketHandler {
                         )
                 );
 
+            } else if (apiMessage instanceof StartTournament) {
+
+                tournamentManager.startTournament();
+
             } else if (apiMessage instanceof StartTournamentGame) {
                 StartTournamentGame startGame = (StartTournamentGame)apiMessage;
 
-                tournamentManager.startGame(startGame.getGameId());
+                //tournamentManager.startGame(startGame.getGameId());
             }
         } catch (Exception e) {
-            log.error("Failed to understand received message: {}", message.getPayload(), e);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean tryToHandleGameMessage(String message) {
+        try {
+            GameMessage gameMessage = GameMessageParser.decodeMessage(message);
+            if (gameMessage instanceof HeartBeatRequest) {
+                sendHeartbeat();
+            } else {
+                log.info("Got GameMessage that I'm not prepared to handle: {}", message);
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void handleTextMessage(WebSocketSession session, TextMessage message)
+            throws Exception {
+        String msg = message.getPayload();
+        log.debug(msg);
+
+        if (!tryToHandleGameMessage(msg)) {
+            if (!tryToHandleApiMessage(msg)) {
+                log.error("Got message which I could not understand: {}", msg);
+            }
         }
     }
 
@@ -184,12 +214,17 @@ public class EventSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    private void sendHeartbeat() {
+        HeartBeatResponse heartBeatResponse = new HeartBeatResponse();
+        sendGameMessage(heartBeatResponse);
+    }
+
     private void sendListOfActiveGames() {
         log.info("Seding updated list of games");
         List<Game> games = gameManager.listAllGames();
 
         List<ActiveGame> activeGames = games.stream().map(game -> {
-            List<ActiveGamePlayer> players = game.getPlayers().stream().map(player -> {
+            List<ActiveGamePlayer> players = game.getPlayerManager().toSet().stream().map(player -> {
                 return new ActiveGamePlayer(player.getName(), player.getPlayerId());
             }).collect(Collectors.toList());
 
@@ -214,7 +249,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
         log.info(apiMessage.getGameId());
         if (game != null) {
             log.info("Starting game: {}", game.getGameId());
-            log.info("Active remote players: {}", game.getLiveAndRemotePlayers().size());
+            log.info("Active remote players: {}", game.getPlayerManager().getLiveAndRemotePlayers().size());
             game.startGame();
         }
     }

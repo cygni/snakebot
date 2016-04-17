@@ -14,6 +14,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
 import se.cygni.snake.api.exception.InvalidMessage;
+import se.cygni.snake.api.request.HeartBeatRequest;
+import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
 import se.cygni.snake.player.IPlayer;
@@ -64,6 +66,15 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
         this.webSocketSession = session;
     }
 
+    private void sendHeartbeat() {
+        HeartBeatResponse heartBeatResponse = new HeartBeatResponse();
+        try {
+            sendSnakeMessage(heartBeatResponse);
+        } catch (Exception e) {
+            LOGGER.error("Failed to send heartbeat response", e);
+        }
+    }
+
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         LOGGER.debug("Received: {}", message.getPayload());
@@ -74,6 +85,11 @@ public class TrainingWebSocketHandler extends TextWebSocketHandler {
 
             // Overwrite playerId to hinder any cheating
             gameMessage.setReceivingPlayerId(playerId);
+
+            if (gameMessage instanceof HeartBeatRequest) {
+                sendHeartbeat();
+                return;
+            }
 
             // Send to game
             incomingEventBus.post(gameMessage);

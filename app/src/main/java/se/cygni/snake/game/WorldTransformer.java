@@ -1,5 +1,6 @@
 package se.cygni.snake.game;
 
+import com.google.common.eventbus.EventBus;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +33,18 @@ public class WorldTransformer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorldTransformer.class);
 
-    private final Game game;
+//    private final Game game;
+    private final GameFeatures gameFeatures;
+    private final PlayerManager playerManager;
+    private final String gameId;
+    private final EventBus globalEventBus;
     private int snakesDiedThisRound = 0;
 
-    public WorldTransformer(Game game) {
-        this.game = game;
+    public WorldTransformer(GameFeatures gameFeatures, PlayerManager playerManager, String gameId, EventBus globalEventBus) {
+        this.gameFeatures = gameFeatures;
+        this.playerManager = playerManager;
+        this.gameId = gameId;
+        this.globalEventBus = globalEventBus;
     }
 
     public WorldState transform(
@@ -97,7 +105,7 @@ public class WorldTransformer {
     }
 
     private void syncPoints(WorldState ws) {
-        game.getPlayers().stream().forEach(player -> {
+        playerManager.toSet().stream().forEach(player -> {
             if (player.isAlive())
                 ws.getSnakeHeadById(player.getPlayerId()).setPoints(player.getTotalPoints());
         });
@@ -171,9 +179,9 @@ public class WorldTransformer {
                 // Assign points to SnakeParts still living
                 List<SnakeBody> survivors = tile.listContentsOfType(SnakeBody.class);
                 survivors.stream().forEach(snakeBody -> {
-                    game.getPlayer(snakeBody.getPlayerId()).addPoints(
+                    playerManager.getPlayer(snakeBody.getPlayerId()).addPoints(
                             PointReason.CAUSED_SNAKE_DEATH,
-                            game.getGameFeatures().getPointsPerCausedDeath()
+                            gameFeatures.getPointsPerCausedDeath()
                     );
                 });
             }
@@ -199,9 +207,9 @@ public class WorldTransformer {
             snakeToWorldState.put(snakeBodyTail.getPlayerId(), tailWorldState);
 
             // Assign points
-            game.getPlayer(head.getPlayerId()).addPoints(
+            playerManager.getPlayer(head.getPlayerId()).addPoints(
                     PointReason.NIBBLE,
-                    game.getGameFeatures().getPointsPerNibble()
+                    gameFeatures.getPointsPerNibble()
             );
         } catch (TransformationException e) {
             LOGGER.error("TailNibbled transformation failed.", e);
@@ -303,15 +311,15 @@ public class WorldTransformer {
 
                 // Assign points
                 if (moveSnake.isFoodConsumed()) {
-                    game.getPlayer(playerId).addPoints(
+                    playerManager.getPlayer(playerId).addPoints(
                             PointReason.FOOD,
-                            game.getGameFeatures().getPointsPerFood());
+                            gameFeatures.getPointsPerFood());
                 }
 
                 if (moveSnake.isGrowthExecuted()) {
-                    game.getPlayer(playerId).addPoints(
+                    playerManager.getPlayer(playerId).addPoints(
                             PointReason.GROWTH,
-                            game.getGameFeatures().getPointsPerLength());
+                            gameFeatures.getPointsPerLength());
                 }
 
                 worldStates.add(nws);
@@ -321,33 +329,33 @@ public class WorldTransformer {
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(oc.getPosition()),
                         worldTick);
-                game.getPlayer(playerId).addPoints(
+                playerManager.getPlayer(playerId).addPoints(
                         PointReason.SUICIDE,
-                        game.getGameFeatures().getPointsSuicide());
+                        gameFeatures.getPointsSuicide());
             } catch (WallCollision wc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithWall,
                         ws.translatePosition(wc.getPosition()),
                         worldTick);
-                game.getPlayer(playerId).addPoints(
+                playerManager.getPlayer(playerId).addPoints(
                         PointReason.SUICIDE,
-                        game.getGameFeatures().getPointsSuicide());
+                        gameFeatures.getPointsSuicide());
             } catch (SnakeCollision sc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithSelf,
                         ws.translatePosition(sc.getPosition()),
                         worldTick);
-                game.getPlayer(playerId).addPoints(
+                playerManager.getPlayer(playerId).addPoints(
                         PointReason.SUICIDE,
-                        game.getGameFeatures().getPointsSuicide());
+                        gameFeatures.getPointsSuicide());
             } catch (TransformationException oc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(0),
                         worldTick);
-                game.getPlayer(playerId).addPoints(
+                playerManager.getPlayer(playerId).addPoints(
                         PointReason.SUICIDE,
-                        game.getGameFeatures().getPointsSuicide());
+                        gameFeatures.getPointsSuicide());
             }
         }
 
@@ -418,9 +426,9 @@ public class WorldTransformer {
             long worldTick) {
 
         snakesDiedThisRound++;
-        IPlayer deadPlayer = game.getPlayer(head.getPlayerId());
+        IPlayer deadPlayer = playerManager.getPlayer(head.getPlayerId());
         LOGGER.info("Death occurred. GameId: {}, Player: {}, with id: {}, died at: {}",
-                game.getGameId(),
+                gameId,
                 deadPlayer.getName(),
                 deadPlayer.getPlayerId(),
                 coordinate);
@@ -431,15 +439,15 @@ public class WorldTransformer {
                 deathReason,
                 head.getPlayerId(),
                 coordinate.getX(), coordinate.getY(),
-                game.getGameId(), worldTick);
+                gameId, worldTick);
 
-        game.getPlayers().stream().forEach(player -> {
+        playerManager.toSet().stream().forEach(player -> {
             player.onSnakeDead(snakeDeadEvent);
         });
 
         InternalGameEvent gevent = new InternalGameEvent(
                 System.currentTimeMillis(),
                 snakeDeadEvent);
-        game.getGlobalEventBus().post(gevent);
+        globalEventBus.post(gevent);
     }
 }

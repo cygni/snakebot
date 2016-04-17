@@ -60,7 +60,6 @@ public class GameMessageParser {
                     .readValue(msg,
                             GameMessageParser.parseAndGetClassForMessage(msg));
         } catch (final IllegalStateException e) {
-            log.error(msg);
             throw e;
         }
     }

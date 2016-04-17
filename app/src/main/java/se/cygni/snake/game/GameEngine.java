@@ -40,23 +40,34 @@ public class GameEngine {
             .getLogger(GameEngine.class);
 
     private GameFeatures gameFeatures;
-    private final Game game;
+    //private final Game game;
     private WorldState world;
     private long currentWorldTick = 0;
     private java.util.Map<String, Direction> snakeDirections;
     private AtomicBoolean allowedToRun = new AtomicBoolean(false);
+    private AtomicBoolean gameComplete = new AtomicBoolean(false);
     private final EventBus globalEventBus;
     private final WorldTransformer worldTransformer;
+    private final PlayerManager playerManager;
+    private final String gameId;
 
     private CountDownLatch countDownLatch;
     private ConcurrentLinkedQueue<String> registerMoveQueue;
+    private GameResult gameResult;
 
+    public GameEngine(GameFeatures gameFeatures,
+                      PlayerManager playerManager,
+                      String gameId,
+                      EventBus globalEventBus) {
 
-    public GameEngine(GameFeatures gameFeatures, Game game, EventBus globalEventBus) {
         this.gameFeatures = gameFeatures;
-        this.game = game;
+        this.gameId = gameId;
+        this.playerManager = playerManager;
         this.globalEventBus = globalEventBus;
-        this.worldTransformer = new WorldTransformer(game);
+        this.worldTransformer = new WorldTransformer(
+                gameFeatures, playerManager, gameId, globalEventBus
+        );
+        this.gameResult = new GameResult();
     }
 
     public void reApplyGameFeatures(GameFeatures gameFeatures) {
@@ -77,18 +88,18 @@ public class GameEngine {
         world = new WorldState(gameFeatures.getWidth(), gameFeatures.getHeight());
 
         // Place players
-        game.getPlayers().stream().forEach( player -> {
+        playerManager.toSet().stream().forEach( player -> {
             SnakeHead snakeHead = new SnakeHead(player.getName(), player.getPlayerId(), 0);
             AddWorldObjectAtRandomPosition randomPosition = new AddWorldObjectAtRandomPosition(snakeHead);
             world = randomPosition.transform(world);
         });
 
         GameStartingEvent gameStartingEvent = new GameStartingEvent(
-                game.getGameId(),
-                game.getNoofPlayers(),
+                gameId,
+                playerManager.size(),
                 world.getWidth(), world.getHeight());
 
-        game.getPlayers().stream().forEach( player -> {
+        playerManager.toSet().stream().forEach( player -> {
             player.onGameStart(gameStartingEvent);
         });
 
@@ -106,16 +117,16 @@ public class GameEngine {
                 // Loop till winner is decided
                 while (isGameRunning()) {
 
-                    Set<IPlayer> livePlayers = game.getLivePlayers();
+                    Set<IPlayer> livePlayers = playerManager.getLivePlayers();
                     countDownLatch = new CountDownLatch(livePlayers.size());
                     registerMoveQueue = new ConcurrentLinkedQueue<>();
 
                     DecrementTailProtection decrementTailProtection = new DecrementTailProtection();
                     world = decrementTailProtection.transform(world);
 
-                    Set<IPlayer> players = game.getPlayers();
+                    Set<IPlayer> players = playerManager.toSet();
                     MapUpdateEvent mapUpdateEvent = GameMessageConverter
-                            .onWorldUpdate(world, game.getGameId(), currentWorldTick, players);
+                            .onWorldUpdate(world, gameId, currentWorldTick, players);
 
                     livePlayers.stream().forEach( player -> {
                         player.onWorldUpdate(mapUpdateEvent);
@@ -133,7 +144,7 @@ public class GameEngine {
                     }
 
                     long timeSpent = System.currentTimeMillis() - tstart;
-                    log.info("GameId: {}, tick: {}, time waiting: " + timeSpent + "ms", game.getGameId(), currentWorldTick);
+                    log.info("GameId: {}, tick: {}, time waiting: " + timeSpent + "ms", gameId, currentWorldTick);
 
                     try {
                         world = worldTransformer.transform(snakeDirections, gameFeatures, world, spontaneousGrowth(), currentWorldTick);
@@ -154,8 +165,9 @@ public class GameEngine {
                     }
                 }
 
+
                 // Game is Over, assign points to last man standing
-                Set<IPlayer> livingPlayers = game.getLivePlayers();
+                Set<IPlayer> livingPlayers = playerManager.getLivePlayers();
 
                 for (IPlayer player : livingPlayers) {
                     player.addPoints(
@@ -163,17 +175,26 @@ public class GameEngine {
                             gameFeatures.getPointsLastSnakeLiving());
                 }
 
+                // Create GameResult
+                Set<IPlayer> allPlayers = playerManager.toSet();
+                for (IPlayer player : allPlayers) {
+                    log.info("Adding player: {}, points: {}", player.getName(), player.getTotalPoints());
+                    gameResult.addResult(player.getTotalPoints(), player);
+                }
+
+                gameComplete.set(true);
+
                 // Notify of GameEnded
-                Set<IPlayer> players = game.getPlayers();
+                Set<IPlayer> players = playerManager.toSet();
                 GameEndedEvent gameEndedEvent = GameMessageConverter.onGameEnded(
-                        getLeaderPlayerId(),
-                        game.getGameId(),
+                        gameResult.getWinner().getPlayerId(),
+                        gameId,
                         currentWorldTick,
                         world,
                         players
                 );
 
-                game.getPlayers().stream().forEach( player -> {
+                players.stream().forEach( player -> {
                     player.onGameEnded(gameEndedEvent);
                 });
 
@@ -182,6 +203,8 @@ public class GameEngine {
                         gameEndedEvent);
                 globalEventBus.post(gevent);
                 globalEventBus.post(gevent.getGameMessage());
+
+                publishGameChanged();
             }
         };
 
@@ -228,26 +251,26 @@ public class GameEngine {
     private void initSnakeDirections() {
         snakeDirections = new HashMap<>();
 
-        game.getPlayers().stream().forEach( player -> {
+        playerManager.toSet().stream().forEach( player -> {
             snakeDirections.put(player.getPlayerId(), getRandomDirection());
         });
     }
 
     public boolean isGameRunning() {
         return (allowedToRun.get() &&
-                game.getLiveAndRemotePlayers().size() > 0 &&
+                playerManager.getLiveAndRemotePlayers().size() > 0 &&
                 noofLiveSnakesInWorld() > 1);
 
     }
 
     public int noofLiveSnakesInWorld() {
-        return (int) game.getPlayers().stream()
+        return (int) playerManager.toSet().stream()
                 .filter(player -> player.isAlive())
                 .count();
     }
 
     public String getLeaderPlayerId() {
-        IPlayer winner = game.getPlayers().stream()
+        IPlayer winner = playerManager.toSet().stream()
                 .max((player1, player2) -> {
                     return Integer.compare(
                             player1.getTotalPoints(),
@@ -266,7 +289,9 @@ public class GameEngine {
             snakeDirections.put(playerId, direction);
             countDownLatch.countDown();
         } else {
-            log.info("Player: {} with id {} too late in registering move", game.getPlayerName(playerId), playerId);
+            log.info("Player: {} with id {} sent move within wrong world tick. Current world tick: {}, player's world tick: {}",
+                    playerManager.getPlayerName(playerId), playerId,
+                    currentWorldTick, gameTick);
         }
     }
 
@@ -274,5 +299,19 @@ public class GameEngine {
         int max = Direction.values().length-1;
         Random r = new Random();
         return Direction.values()[r.nextInt(max)];
+    }
+
+    public boolean isGameComplete() {
+        return gameComplete.get();
+    }
+
+    public GameResult getGameResult() {
+        return gameResult;
+    }
+
+    public void publishGameChanged() {
+        InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis());
+        gevent.onGameChanged(gameId);
+        globalEventBus.post(gevent);
     }
 }

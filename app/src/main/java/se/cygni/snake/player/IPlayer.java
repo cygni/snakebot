@@ -22,7 +22,13 @@ public interface IPlayer {
 
     boolean isConnected();
 
+    boolean isInTournament();
+
+    void outOfTournament();
+
     void dead();
+
+    void revive();
 
     String getName();
 
@@ -30,5 +36,7 @@ public interface IPlayer {
 
     void addPoints(PointReason reason, int points);
 
-    int getTotalPoints();
+    void resetPoints();
+
+    int getTotalPoints();;
 }

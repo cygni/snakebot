@@ -1,25 +1,39 @@
 package se.cygni.snake.tournament;
 
 import se.cygni.snake.game.GameFeatures;
+import se.cygni.snake.game.PlayerManager;
 import se.cygni.snake.player.IPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import static se.cygni.snake.tournament.util.TournamentUtil.*;
+
+import static se.cygni.snake.tournament.util.TournamentUtil.getMaxNoofPlayersPerGame;
+import static se.cygni.snake.tournament.util.TournamentUtil.getNoofPlayersAdvancing;
 
 public class TournamentPlan {
 
     private List<TournamentLevel> levels = new ArrayList<>();
     private final GameFeatures gameFeatures;
-    private final Set<IPlayer> players;
+    private final PlayerManager playerManager;
 
 
-    public TournamentPlan(GameFeatures gameFeatures, Set<IPlayer> players) {
+    public TournamentPlan(
+            GameFeatures gameFeatures,
+            PlayerManager playerManager) {
+
         this.gameFeatures = gameFeatures;
-        this.players = players;
+        this.playerManager = playerManager;
 
         createPlan();
+    }
+
+    public TournamentLevel getLevelAt(int pos) {
+        if (pos < 0 || pos >= levels.size()) {
+            throw new RuntimeException("Idiot, you tried to get a level out of bounds.");
+        }
+
+        return levels.get(pos);
     }
 
     public List<TournamentLevel> getLevels() {
@@ -30,7 +44,7 @@ public class TournamentPlan {
 
         int maxPlayersPerGame = getMaxNoofPlayersPerGame(gameFeatures);
 
-        int noofPlayersLeft = players.size();
+        int noofPlayersLeft = playerManager.size();
         boolean notSolved = noofPlayersLeft > maxPlayersPerGame;
         int index = 0;
         while (notSolved) {
@@ -51,6 +65,6 @@ public class TournamentPlan {
     }
 
     public Set<IPlayer> getPlayers() {
-        return players;
+        return playerManager.toSet();
     }
 }
