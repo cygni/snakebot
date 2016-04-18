@@ -100,6 +100,9 @@ public class TournamentManager {
             for (IPlayer player : gameResult.getSortedResult()) {
                 LOGGER.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
             }
+
+            tournamentActive = false;
+            tournamentStarted = false;
             return;
         }
 

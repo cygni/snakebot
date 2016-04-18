@@ -1,17 +1,3 @@
-buildscript {
-    ext {
-        springBootVersion = '1.3.3.RELEASE'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
-}
-
-apply plugin: 'spring-boot'
-
 jar {
     baseName = 'snakebot-javafx-client'
 }
@@ -31,5 +17,4 @@ dependencies {
     compile("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     compile("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     compile("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    compile('eu.lestard:grid:0.2.0')
 }
