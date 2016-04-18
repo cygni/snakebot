@@ -72,7 +72,8 @@ public class TournamentManager {
 
         playerManager.clear();
         playersStillInTournament.clear();
-//        games.values().forEach(game -> game.abort());
+        games.values().forEach(game -> game.abort());
+        games.clear();
     }
 
     public void createTournament(String name) {
