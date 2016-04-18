@@ -12,10 +12,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
-import se.cygni.snake.api.event.GameEndedEvent;
-import se.cygni.snake.api.event.GameStartingEvent;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
@@ -45,6 +42,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private String playerId;
     private String lastGameId;
     private boolean gameEnded = false;
+    private boolean tournamentEnded = false;
 
     public void registerForGame(GameSettings gameSettings) {
         LOGGER.info("Register for game...");
@@ -104,7 +102,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         if (getGameMode() == GameMode.TRAINING) {
             return session != null && !gameEnded;
         } else {
-            return session != null;
+            return session != null && !tournamentEnded;
         }
     }
 
@@ -201,6 +199,11 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (gameMessage instanceof GameEndedEvent) {
                 this.onGameEnded((GameEndedEvent) gameMessage);
                 gameEnded = true;
+            }
+
+            if (gameMessage instanceof TournamentEndedEvent) {
+                this.onTournamentEnded((TournamentEndedEvent)gameMessage);
+                tournamentEnded = true;
             }
 
             if (gameMessage instanceof InvalidPlayerName) {

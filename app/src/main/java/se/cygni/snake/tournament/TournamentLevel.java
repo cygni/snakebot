@@ -34,12 +34,28 @@ public class TournamentLevel {
         for (TournamentPlannedGame game : plannedGames) {
             List<IPlayer> gameResult = game.getGame().getGameResult().getSortedResult();
             int noofToAdvance;
+
+            // At least one player should advance
             if (gameResult.size() + diff <= 0) {
                 noofToAdvance = 1;
             } else {
                 noofToAdvance = gameResult.size() + diff;
             }
-            List<IPlayer> gameAdvancing = gameResult.subList(0, noofToAdvance);
+
+            List<IPlayer> gameAdvancing = new ArrayList<>();
+            boolean addedEnough = false;
+            int added = 0;
+            int index = 0;
+            while (!addedEnough) {
+                IPlayer player = gameResult.get(index);
+                if (player.isConnected()) {
+                    gameAdvancing.add(player);
+                    added++;
+                }
+                index++;
+                addedEnough = added == noofToAdvance+1 || index >= gameResult.size();
+            }
+//            List<IPlayer> gameAdvancing = gameResult.subList(0, noofToAdvance);
             LOGGER.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
                     game.getGame().getPlayerManager().size(),
                     gameResult.size(),

@@ -29,13 +29,10 @@ public class TournamentPlanTest {
         TournamentPlan tp = new TournamentPlan(gf, playerManager);
 
         List<TournamentLevel> levels = tp.getLevels();
-        assertEquals(6, levels.size());
+        assertEquals(3, levels.size());
         assertEquals(20, levels.get(0).getExpectedNoofPlayers());
-        assertEquals(16, levels.get(1).getExpectedNoofPlayers());
-        assertEquals(12, levels.get(2).getExpectedNoofPlayers());
-        assertEquals(9, levels.get(3).getExpectedNoofPlayers());
-        assertEquals(7, levels.get(4).getExpectedNoofPlayers());
-        assertEquals(5, levels.get(5).getExpectedNoofPlayers());
+        assertEquals(8, levels.get(1).getExpectedNoofPlayers());
+        assertEquals(2, levels.get(2).getExpectedNoofPlayers());
     }
 
     @Test
@@ -53,7 +50,7 @@ public class TournamentPlanTest {
         List<TournamentLevel> levels = tp.getLevels();
         assertEquals(2, levels.size());
         assertEquals(30, levels.get(0).getExpectedNoofPlayers());
-        assertEquals(16, levels.get(1).getExpectedNoofPlayers());
+        assertEquals(12, levels.get(1).getExpectedNoofPlayers());
     }
 
     public static Set<IPlayer> getPlayers(int noof) {

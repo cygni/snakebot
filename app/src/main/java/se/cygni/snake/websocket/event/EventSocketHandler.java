@@ -14,10 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
-import se.cygni.snake.api.event.GameAbortedEvent;
-import se.cygni.snake.api.event.GameChangedEvent;
-import se.cygni.snake.api.event.GameCreatedEvent;
-import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.request.HeartBeatRequest;
 import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
@@ -189,6 +186,11 @@ public class EventSocketHandler extends TextWebSocketHandler {
                 gameMessage instanceof GameChangedEvent ||
                 gameMessage instanceof GameAbortedEvent) {
             sendListOfActiveGames();
+            return;
+        }
+
+        if (gameMessage instanceof TournamentEndedEvent) {
+            sendGameMessage(gameMessage);
             return;
         }
 

@@ -1,9 +1,6 @@
 package se.cygni.snake.client;
 
-import se.cygni.snake.api.event.GameEndedEvent;
-import se.cygni.snake.api.event.GameStartingEvent;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.response.PlayerRegistered;
@@ -16,22 +13,24 @@ public interface SnakeClient {
 
     void onGameEnded(GameEndedEvent gameEndedEvent);
 
-     void onGameStarting(GameStartingEvent gameStartingEvent);
+    void onGameStarting(GameStartingEvent gameStartingEvent);
 
-     void onPlayerRegistered(PlayerRegistered playerRegistered);
+    void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent);
 
-     void onInvalidPlayerName(InvalidPlayerName invalidPlayerName);
+    void onPlayerRegistered(PlayerRegistered playerRegistered);
 
-     String getServerHost();
+    void onInvalidPlayerName(InvalidPlayerName invalidPlayerName);
 
-     int getServerPort();
+    String getServerHost();
 
-     void onConnected();
+    int getServerPort();
 
-     void onSessionClosed();
+    void onConnected();
 
-     String getName();
+    void onSessionClosed();
 
-     GameMode getGameMode();
+    String getName();
+
+    GameMode getGameMode();
 
 }

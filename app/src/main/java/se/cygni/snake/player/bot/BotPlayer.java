@@ -1,10 +1,7 @@
 package se.cygni.snake.player.bot;
 
 import com.google.common.eventbus.EventBus;
-import se.cygni.snake.api.event.GameEndedEvent;
-import se.cygni.snake.api.event.GameStartingEvent;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.Map;
 import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.api.model.SnakeDirection;
@@ -37,6 +34,11 @@ public abstract class BotPlayer implements IPlayer {
 
     @Override
     public void onGameEnded(GameEndedEvent gameEndedEvent) {
+
+    }
+
+    @Override
+    public void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent) {
 
     }
 

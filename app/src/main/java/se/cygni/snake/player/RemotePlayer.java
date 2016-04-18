@@ -2,10 +2,7 @@ package se.cygni.snake.player;
 
 import com.google.common.eventbus.EventBus;
 import se.cygni.game.Player;
-import se.cygni.snake.api.event.GameEndedEvent;
-import se.cygni.snake.api.event.GameStartingEvent;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.PointReason;
 
 public class RemotePlayer implements IPlayer {
@@ -48,6 +45,13 @@ public class RemotePlayer implements IPlayer {
         GameStartingEvent gameStartingEvent = new GameStartingEvent(gse);
         gameStartingEvent.setReceivingPlayerId(player.getPlayerId());
         outgoingEventBus.post(gameStartingEvent);
+    }
+
+    @Override
+    public void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent) {
+        TournamentEndedEvent tee = new TournamentEndedEvent(tournamentEndedEvent);
+        tee.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(tee);
     }
 
     @Override

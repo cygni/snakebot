@@ -2,13 +2,11 @@ package se.cygni.snake;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.cygni.snake.api.event.GameEndedEvent;
-import se.cygni.snake.api.event.GameStartingEvent;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.event.SnakeDeadEvent;
+import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.model.PlayerPoints;
 import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.api.util.GameSettingsUtils;
@@ -103,6 +101,15 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
         log.info("A snake {} died by {}",
                 snakeDeadEvent.getPlayerId(),
                 snakeDeadEvent.getDeathReason() + " at tick: " + snakeDeadEvent.getGameTick());
+    }
+
+    @Override
+    public void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent) {
+        log.info("Tournament has ended, winner playerId: {}", tournamentEndedEvent.getPlayerWinnerId());
+        int c = 1;
+        for (PlayerPoints pp : tournamentEndedEvent.getGameResult()) {
+            log.info("{}. {} - {} points", c++, pp.getName(), pp.getPoints());
+        }
     }
 
     @Override

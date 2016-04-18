@@ -51,15 +51,15 @@ public class TournamentUtil {
 
     public static int getNoofPlayersOut(int maxPlayersPerGame) {
         if (maxPlayersPerGame <= PLAYERS_SMALL)
-            return -1;
+            return -3;
 
         if (maxPlayersPerGame <= PLAYERS_MEDIUM)
-            return -2;
-
-        if (maxPlayersPerGame <= PLAYERS_LARGE)
             return -4;
 
-        return -7;
+        if (maxPlayersPerGame <= PLAYERS_LARGE)
+            return -7;
+
+        return -9;
     }
 
     public static int getMaxNoofPlayersPerGame(GameFeatures gameFeatures) {

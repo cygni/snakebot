@@ -178,7 +178,6 @@ public class GameEngine {
                 // Create GameResult
                 Set<IPlayer> allPlayers = playerManager.toSet();
                 for (IPlayer player : allPlayers) {
-                    log.info("Adding player: {}, points: {}", player.getName(), player.getTotalPoints());
                     gameResult.addResult(player.getTotalPoints(), player);
                 }
 

@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.api.event.TournamentEndedEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.exception.NoActiveTournament;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.model.PlayerPoints;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.response.PlayerRegistered;
@@ -24,9 +26,7 @@ import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
 import se.cygni.snake.tournament.util.TournamentUtil;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 public class TournamentManager {
@@ -93,14 +93,41 @@ public class TournamentManager {
         LOGGER.info("Organizing players in Level. Current level: {}, noof levels: {}", currentLevel, tournamentPlan.getLevels().size());
         // Is tournament complete?
         if (currentLevel >= tournamentPlan.getLevels().size()) {
+
             LOGGER.info("We have a tournament result!");
-            assert tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().size() == 1;
+//            assert tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().size() == 1;
+
             TournamentPlannedGame lastGame = tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().get(0);
+
             GameResult gameResult = lastGame.getGame().getGameResult();
-            int c = 1;
-            for (IPlayer player : gameResult.getSortedResult()) {
-                LOGGER.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
+
+            List<PlayerPoints> playerPoints = new ArrayList<>();
+            String winnerPlayerId = null;
+            if (gameResult.getWinner() != null) {
+                winnerPlayerId = gameResult.getWinner().getPlayerId();
+                int c = 1;
+                for (IPlayer player : gameResult.getSortedResult()) {
+                    playerPoints.add(new PlayerPoints(player.getName(), player.getPlayerId(), player.getTotalPoints()));
+                    LOGGER.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
+                }
             }
+
+            TournamentEndedEvent tee = new TournamentEndedEvent(
+                    winnerPlayerId,
+                    lastGame.getGame().getGameId(),
+                    playerPoints,
+                    tournamentName,
+                    tournamentId);
+
+            playerManager.toSet().stream().forEach( player -> {
+                player.onTournamentEnded(tee);
+            });
+
+            InternalGameEvent gevent = new InternalGameEvent(
+                    System.currentTimeMillis(),
+                    tee);
+            globalEventBus.post(gevent);
+            globalEventBus.post(gevent.getGameMessage());
 
             tournamentActive = false;
             tournamentStarted = false;
@@ -124,6 +151,7 @@ public class TournamentManager {
             LOGGER.info("adding noof players to new game: {}", players.size());
             if (players.size() == 0) {
                 LOGGER.error("Hoa, got 0 players to add to game...");
+                continue;
             }
             tGame.setPlayers(players);
             playersInTournament.removeAll(players);
@@ -135,7 +163,6 @@ public class TournamentManager {
                 game.addPlayer(player);
             });
             games.put(game.getGameId(), game);
-            LOGGER.info("Starting gameId: {}", game.getGameId());
             //game.startGame();
         }
 
@@ -194,10 +221,12 @@ public class TournamentManager {
     public void onInternalGameEvent(InternalGameEvent internalGameEvent) {
         if (internalGameEvent.getGameMessage() instanceof GameEndedEvent) {
             GameEndedEvent gee = (GameEndedEvent)internalGameEvent.getGameMessage();
-            LOGGER.info("GameId: {} ended.", gee.getGameId());
-            if (areAllGamesInLevelComplete(currentLevel)) {
-                currentLevel++;
-                organizePlayersInLevel();
+            if (games.containsKey(gee.getGameId())) {
+                LOGGER.info("GameId: {} ended.", gee.getGameId());
+                if (areAllGamesInLevelComplete(currentLevel)) {
+                    currentLevel++;
+                    organizePlayersInLevel();
+                }
             }
         }
     }
