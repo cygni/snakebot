@@ -14,6 +14,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.GameMessageParser;
 import se.cygni.snake.api.exception.InvalidMessage;
+import se.cygni.snake.api.request.HeartBeatRequest;
+import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.tournament.TournamentManager;
 
 import java.io.IOException;
@@ -49,6 +51,7 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         super.afterConnectionClosed(session, status);
         outgoingEventBus.unregister(this);
+        tournamentManager.playerLostConnection(playerId);
     }
 
     @Override
@@ -57,10 +60,18 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
         this.webSocketSession = session;
     }
 
+    private void sendHeartbeat() {
+        HeartBeatResponse heartBeatResponse = new HeartBeatResponse();
+        try {
+            sendSnakeMessage(heartBeatResponse);
+        } catch (Exception e) {
+            LOGGER.error("Failed to send heartbeat response", e);
+        }
+    }
+
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message)
             throws Exception {
-        LOGGER.debug(message.getPayload());
 
         try {
             // Deserialize message
@@ -68,6 +79,13 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
 
             // Overwrite playerId to hinder any cheating
             gameMessage.setReceivingPlayerId(playerId);
+
+            if (gameMessage instanceof HeartBeatRequest) {
+                sendHeartbeat();
+                return;
+            }
+
+            LOGGER.debug(message.getPayload());
 
             // Send to game
             incomingEventBus.post(gameMessage);
@@ -100,7 +118,8 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
     public void sendSnakeMessage(GameMessage message) throws IOException {
 
         // Verify that this message is intended to this player (or null if for all players)
-        if (!StringUtils.isEmpty(message.getReceivingPlayerId()) && !playerId.equals(message.getReceivingPlayerId())) {
+        if (!StringUtils.isEmpty(message.getReceivingPlayerId()) &&
+                !playerId.equals(message.getReceivingPlayerId())) {
             return;
         }
         try {

@@ -29,9 +29,9 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     private AnsiPrinter ansiPrinter;
     private String name = "#emil_" + random.nextInt(1000);
-    private String host = "snake.cygni.se";
-    private int port = 80;
-    private GameMode gameMode = GameMode.TRAINING;
+    private String host = "localhost";
+    private int port = 8080;
+    private GameMode gameMode = GameMode.TOURNAMENT;
 
     public static void main(String[] args) {
 
@@ -64,7 +64,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
-        ansiPrinter.printMap(mapUpdateEvent);
+        //ansiPrinter.printMap(mapUpdateEvent);
 
         // MapUtil contains lot's of useful methods for querying the map!
         MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), getPlayerId());
@@ -107,14 +107,15 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onGameEnded(GameEndedEvent gameEndedEvent) {
-        log.info("GameEnded at tick: {}, winner: {}",
+        log.info("GameEnded gameId: {}, at tick: {}, winner: {}",
+                gameEndedEvent.getGameId(),
                 gameEndedEvent.getGameTick(),
                 gameEndedEvent.getPlayerWinnerId());
     }
 
     @Override
     public void onGameStarting(GameStartingEvent gameStartingEvent) {
-        log.debug("GameStartingEvent: " + gameStartingEvent);
+        log.info("GameStartingEvent, gameId: {} ", gameStartingEvent.getGameId());
     }
 
     @Override
@@ -133,7 +134,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onConnected() {
-        log.info("Connected, registering for training...");
+        log.info("Connected, registering for {}...", gameMode);
         GameSettings gameSettings = GameSettingsUtils.trainingWorld();
         registerForGame(gameSettings);
     }

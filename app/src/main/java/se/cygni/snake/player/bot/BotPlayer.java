@@ -56,7 +56,22 @@ public abstract class BotPlayer implements IPlayer {
     }
 
     @Override
+    public void revive() {
+        alive = true;
+    }
+
+    @Override
     public void lostConnection() {
+
+    }
+
+    @Override
+    public boolean isInTournament() {
+        return false;
+    }
+
+    @Override
+    public void outOfTournament() {
 
     }
 
@@ -78,6 +93,11 @@ public abstract class BotPlayer implements IPlayer {
     @Override
     public void addPoints(PointReason reason, int points) {
         accumulatedPoints += points;
+    }
+
+    @Override
+    public void resetPoints() {
+        accumulatedPoints = 0;
     }
 
     @Override

@@ -23,11 +23,11 @@ public class RandomBot extends BotPlayer {
     @Override
     public void onWorldUpdate(MapUpdateEvent mapUpdateEvent) {
         CompletableFuture cf = CompletableFuture.runAsync(() -> {
-            postNextMove(mapUpdateEvent.getMap(), mapUpdateEvent.getGameTick());
+            postNextMove(mapUpdateEvent.getGameId(), mapUpdateEvent.getMap(), mapUpdateEvent.getGameTick());
         });
     }
 
-    private void postNextMove(Map map, long gameTick) {
+    private void postNextMove(String gameId, Map map, long gameTick) {
 
         MapUtil mapUtil = new MapUtil(map, playerId);
 
@@ -37,7 +37,7 @@ public class RandomBot extends BotPlayer {
             rndDirection = getRandomDirection(validDirections);
         }
 
-        RegisterMove registerMove = new RegisterMove(gameTick, rndDirection);
+        RegisterMove registerMove = new RegisterMove(gameId, gameTick, rndDirection);
         registerMove.setReceivingPlayerId(playerId);
         incomingEventbus.post(registerMove);
     }

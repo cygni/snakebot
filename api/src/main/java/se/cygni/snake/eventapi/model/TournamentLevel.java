@@ -6,6 +6,7 @@ public class TournamentLevel {
 
     private final int level;
     private final int expectedNoofPlayers;
+    private List<ActiveGamePlayer> players;
     private List<TournamentGame> tournamentGames;
 
     public TournamentLevel(int level, int expectedNoofPlayers) {
@@ -27,5 +28,13 @@ public class TournamentLevel {
 
     public void setTournamentGames(List<TournamentGame> tournamentGames) {
         this.tournamentGames = tournamentGames;
+    }
+
+    public List<ActiveGamePlayer> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<ActiveGamePlayer> players) {
+        this.players = players;
     }
 }

@@ -38,14 +38,14 @@ public class GameManager {
         gameFeatures.setTrainingGame(true);
         gameFeatures.setHeight(25);
         gameFeatures.setWidth(25);
-        Game game = new Game(gameFeatures, globalEventBus);
+        Game game = new Game(gameFeatures, globalEventBus, true);
 
         registerGame(game);
         return game;
     }
 
     public Game createGame(GameFeatures gameFeatures) {
-        Game game = new Game(gameFeatures, globalEventBus);
+        Game game = new Game(gameFeatures, globalEventBus, false);
         registerGame(game);
 
         return game;
@@ -66,7 +66,7 @@ public class GameManager {
                 .keySet()
                 .stream()
                 .filter(id -> {
-                    return getGame(id).getLiveAndRemotePlayers().size() > 0;
+                    return getGame(id).getPlayerManager().getLiveAndRemotePlayers().size() > 0;
                 }).map(id -> {
                     return getGame(id);
                 }).collect(Collectors.toList());
@@ -78,7 +78,7 @@ public class GameManager {
                 .keySet()
                 .stream()
                 .filter(id -> {
-                    return getGame(id).getLiveAndRemotePlayers().size() > 0;
+                    return getGame(id).getPlayerManager().getLiveAndRemotePlayers().size() > 0;
                 })
                 .toArray(size -> new String[size]);
     }

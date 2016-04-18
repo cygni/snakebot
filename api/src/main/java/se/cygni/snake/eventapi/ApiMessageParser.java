@@ -61,7 +61,6 @@ public class ApiMessageParser {
                     .readValue(msg,
                             ApiMessageParser.parseAndGetClassForMessage(msg));
         } catch (final IllegalStateException e) {
-            log.error(msg);
             throw e;
         }
     }

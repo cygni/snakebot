@@ -1,6 +1,9 @@
 package se.cygni.snake.tournament.util;
 
 import se.cygni.snake.game.GameFeatures;
+import se.cygni.snake.player.IPlayer;
+
+import java.util.*;
 
 public class TournamentUtil {
 
@@ -8,6 +11,18 @@ public class TournamentUtil {
     private static int PLAYERS_MEDIUM = 8;
     private static int PLAYERS_LARGE = 13;
     private static int PLAYERS_XLARGE = 17;
+
+
+    public static Set<IPlayer> getRandomPlayers(Set<IPlayer> players, int noofPlayers) {
+        Set<IPlayer> randomPlayers = new HashSet<>();
+        List<IPlayer> startPlayers = new ArrayList<>(players);
+        Collections.shuffle(startPlayers);
+        int acutalNoofPlayers = Math.min(noofPlayers, startPlayers.size());
+        for (int i = 0; i < acutalNoofPlayers; i++) {
+            randomPlayers.add(startPlayers.get(i));
+        }
+        return randomPlayers;
+    }
 
     public static int getNoofPlayersAdvancing(int noofPlayers, int maxPlayersPerGame) {
         int noofGames = getNoofGamesForPlayers(noofPlayers, maxPlayersPerGame);

@@ -61,7 +61,7 @@ public class GameFeatures {
 
     // Indicates that this is a training game,
     // Bots will be added to fill up remaining players.
-    private boolean trainingGame = false;
+    private boolean trainingGame = true;
 
     // Points given per length unit the Snake has
     private int pointsPerLength = 1;

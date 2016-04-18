@@ -14,6 +14,7 @@ public class RemotePlayer implements IPlayer {
     private EventBus outgoingEventBus;
     private boolean alive = true;
     private boolean connected = true;
+    private boolean inTournament = true;
     private int accumulatedPoints = 0;
 
     public RemotePlayer(Player player, EventBus outgoingEventBus) {
@@ -60,8 +61,23 @@ public class RemotePlayer implements IPlayer {
     }
 
     @Override
+    public void revive() {
+        alive = true;
+    }
+
+    @Override
     public boolean isConnected() {
         return connected;
+    }
+
+    @Override
+    public boolean isInTournament() {
+        return inTournament;
+    }
+
+    @Override
+    public void outOfTournament() {
+        inTournament = false;
     }
 
     @Override
@@ -83,6 +99,11 @@ public class RemotePlayer implements IPlayer {
     @Override
     public void addPoints(PointReason reason, int points) {
         accumulatedPoints += points;
+    }
+
+    @Override
+    public void resetPoints() {
+        accumulatedPoints = 0;
     }
 
     @Override
