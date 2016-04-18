@@ -3,6 +3,7 @@ package se.cygni.snake.client;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -27,6 +28,8 @@ import se.cygni.snake.api.request.StartGame;
 import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.api.response.PlayerRegistered;
 
+import javax.websocket.OnError;
+import javax.websocket.Session;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,10 +48,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
 
     public void registerForGame(GameSettings gameSettings) {
         LOGGER.info("Register for game...");
-        RegisterPlayer registerPlayer = new RegisterPlayer(
-                getName(),
-                gameSettings
-        );
+        RegisterPlayer registerPlayer = new RegisterPlayer(getName(), gameSettings);
         sendMessage(registerPlayer);
     }
 
@@ -125,11 +125,12 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         }
     }
 
-    public void connect() {
-        WebSocketClient wsClient = new StandardWebSocketClient();
+    public ListenableFuture<WebSocketSession> connect() {
         String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString().toLowerCase());
         LOGGER.info("Connecting to {}", uri);
-        wsClient.doHandshake(this, uri);
+
+        WebSocketClient wsClient = new StandardWebSocketClient();
+        return wsClient.doHandshake(this, uri);
     }
 
     private void sendHeartbeat() {
@@ -222,7 +223,10 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         }
     }
 
-
+    @OnError
+    public void onError(Throwable exception, Session session) {
+        LOGGER.error("Websocket error", exception);
+    }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
