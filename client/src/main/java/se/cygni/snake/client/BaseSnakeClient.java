@@ -17,6 +17,7 @@ import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.event.SnakeDeadEvent;
 import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
+import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
 import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.request.ClientInfo;
@@ -100,7 +101,11 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public boolean isPlaying() {
-        return session != null; // && !gameEnded;
+        if (getGameMode() == GameMode.TRAINING) {
+            return session != null && !gameEnded;
+        } else {
+            return session != null;
+        }
     }
 
     public String getPlayerId() {
@@ -216,6 +221,8 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             LOGGER.error("Could not understand received message from server: {}", messageRaw, e);
         }
     }
+
+
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
