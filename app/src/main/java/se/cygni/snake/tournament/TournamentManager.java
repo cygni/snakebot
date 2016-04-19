@@ -88,49 +88,55 @@ public class TournamentManager {
         gameFeatures = new GameFeatures();
     }
 
+    private boolean isTournamentComplete() {
+        return currentLevel >= tournamentPlan.getLevels().size();
+    }
+
+    private void completeTournament() {
+        LOGGER.info("We have a tournament result!");
+
+        TournamentPlannedGame lastGame = tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().get(0);
+        GameResult gameResult = lastGame.getGame().getGameResult();
+
+        List<PlayerPoints> playerPoints = new ArrayList<>();
+        String winnerPlayerId = null;
+        if (gameResult.getWinner() != null) {
+            winnerPlayerId = gameResult.getWinner().getPlayerId();
+            int c = 1;
+            for (IPlayer player : gameResult.getSortedResult()) {
+                playerPoints.add(new PlayerPoints(player.getName(), player.getPlayerId(), player.getTotalPoints()));
+                LOGGER.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
+            }
+        }
+
+        TournamentEndedEvent tee = new TournamentEndedEvent(
+                winnerPlayerId,
+                lastGame.getGame().getGameId(),
+                playerPoints,
+                tournamentName,
+                tournamentId);
+
+        playerManager.toSet().stream().forEach( player -> {
+            player.onTournamentEnded(tee);
+        });
+
+        InternalGameEvent gevent = new InternalGameEvent(
+                System.currentTimeMillis(),
+                tee);
+        globalEventBus.post(gevent);
+        globalEventBus.post(gevent.getGameMessage());
+
+        tournamentActive = false;
+        tournamentStarted = false;
+
+        killTournament();
+    }
+
     private void organizePlayersInLevel() {
 
         LOGGER.info("Organizing players in Level. Current level: {}, noof levels: {}", currentLevel, tournamentPlan.getLevels().size());
-        // Is tournament complete?
-        if (currentLevel >= tournamentPlan.getLevels().size()) {
-
-            LOGGER.info("We have a tournament result!");
-//            assert tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().size() == 1;
-
-            TournamentPlannedGame lastGame = tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().get(0);
-
-            GameResult gameResult = lastGame.getGame().getGameResult();
-
-            List<PlayerPoints> playerPoints = new ArrayList<>();
-            String winnerPlayerId = null;
-            if (gameResult.getWinner() != null) {
-                winnerPlayerId = gameResult.getWinner().getPlayerId();
-                int c = 1;
-                for (IPlayer player : gameResult.getSortedResult()) {
-                    playerPoints.add(new PlayerPoints(player.getName(), player.getPlayerId(), player.getTotalPoints()));
-                    LOGGER.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
-                }
-            }
-
-            TournamentEndedEvent tee = new TournamentEndedEvent(
-                    winnerPlayerId,
-                    lastGame.getGame().getGameId(),
-                    playerPoints,
-                    tournamentName,
-                    tournamentId);
-
-            playerManager.toSet().stream().forEach( player -> {
-                player.onTournamentEnded(tee);
-            });
-
-            InternalGameEvent gevent = new InternalGameEvent(
-                    System.currentTimeMillis(),
-                    tee);
-            globalEventBus.post(gevent);
-            globalEventBus.post(gevent.getGameMessage());
-
-            tournamentActive = false;
-            tournamentStarted = false;
+        if (isTournamentComplete()) {
+            completeTournament();
             return;
         }
 
@@ -163,7 +169,6 @@ public class TournamentManager {
                 game.addPlayer(player);
             });
             games.put(game.getGameId(), game);
-            //game.startGame();
         }
 
         publishTournamentPlan();
@@ -261,6 +266,8 @@ public class TournamentManager {
     }
 
     public void startTournament() {
+
+        // ToDo: Not thread safe
         tournamentStarted = true;
 
         playersStillInTournament.clear();

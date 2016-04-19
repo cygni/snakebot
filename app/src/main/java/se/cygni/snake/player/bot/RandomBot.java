@@ -1,6 +1,7 @@
 package se.cygni.snake.player.bot;
 
 import com.google.common.eventbus.EventBus;
+import se.cygni.game.random.XORShiftRandom;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.model.Map;
 import se.cygni.snake.api.model.SnakeDirection;
@@ -9,12 +10,12 @@ import se.cygni.snake.client.MapUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 public class RandomBot extends BotPlayer {
 
     private SnakeDirection myLastDirection;
+    private XORShiftRandom random = new XORShiftRandom();
 
     public RandomBot(String playerId, EventBus incomingEventbus) {
         super(playerId, incomingEventbus);
@@ -36,6 +37,7 @@ public class RandomBot extends BotPlayer {
         if (validDirections.size() > 0) {
             rndDirection = getRandomDirection(validDirections);
         }
+        myLastDirection = rndDirection;
 
         RegisterMove registerMove = new RegisterMove(gameId, gameTick, rndDirection);
         registerMove.setReceivingPlayerId(playerId);
@@ -56,11 +58,9 @@ public class RandomBot extends BotPlayer {
 
     private SnakeDirection getRandomDirection(List<SnakeDirection> directions) {
 
-        Random r = new Random();
-
         // Let's prefer the last direction if it is available
         if (directions.contains(myLastDirection)) {
-            if (r.nextDouble() < 0.5) {
+            if (random.nextDouble() < 0.5) {
                 return myLastDirection;
             }
         }
@@ -69,13 +69,12 @@ public class RandomBot extends BotPlayer {
         if (max == 0)
             return directions.get(0);
 
-        return directions.get(r.nextInt(max));
+        return directions.get(random.nextInt(max));
     }
 
     private SnakeDirection getRandomDirection() {
         int max = SnakeDirection.values().length-1;
 
-        Random r = new Random();
-        return SnakeDirection.values()[r.nextInt(max)];
+        return SnakeDirection.values()[random.nextInt(max)];
     }
 }

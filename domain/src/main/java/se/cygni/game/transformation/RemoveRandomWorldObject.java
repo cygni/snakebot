@@ -1,13 +1,10 @@
 package se.cygni.game.transformation;
 
-import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.random.RandomGeneratorFactory;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
+import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.worldobject.Empty;
 import se.cygni.game.worldobject.WorldObject;
-
-import java.util.Random;
 
 /**
  * Adds a Food object at random free Tile
@@ -15,7 +12,7 @@ import java.util.Random;
 public class RemoveRandomWorldObject<T extends WorldObject> implements WorldTransformation {
 
     private final Class<T> worldObjectType;
-    private RandomGenerator randomGenerator = RandomGeneratorFactory.createRandomGenerator(new Random());
+    private XORShiftRandom random = new XORShiftRandom();
 
     public RemoveRandomWorldObject(Class<T> worldObjectType) {
         this.worldObjectType = worldObjectType;
@@ -28,7 +25,7 @@ public class RemoveRandomWorldObject<T extends WorldObject> implements WorldTran
         if (positionsWithContentOfType.length == 0)
             return currentWorld;
 
-        int randomPosition = positionsWithContentOfType[randomGenerator.nextInt(positionsWithContentOfType.length)];
+        int randomPosition = positionsWithContentOfType[random.nextInt(positionsWithContentOfType.length)];
 
         Tile[] tiles = currentWorld.getTiles();
         tiles[randomPosition] = new Tile(new Empty());

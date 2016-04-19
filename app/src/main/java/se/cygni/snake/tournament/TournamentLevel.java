@@ -55,7 +55,6 @@ public class TournamentLevel {
                 index++;
                 addedEnough = added == noofToAdvance+1 || index >= gameResult.size();
             }
-//            List<IPlayer> gameAdvancing = gameResult.subList(0, noofToAdvance);
             LOGGER.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
                     game.getGame().getPlayerManager().size(),
                     gameResult.size(),

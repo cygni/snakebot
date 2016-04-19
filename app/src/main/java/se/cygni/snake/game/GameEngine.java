@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
+import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
 import se.cygni.game.transformation.DecrementTailProtection;
 import se.cygni.game.transformation.RemoveRandomWorldObject;
@@ -19,10 +20,7 @@ import se.cygni.snake.apiconversion.GameMessageConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
 
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,11 +38,10 @@ public class GameEngine {
             .getLogger(GameEngine.class);
 
     private GameFeatures gameFeatures;
-    //private final Game game;
     private WorldState world;
     private long currentWorldTick = 0;
     private java.util.Map<String, Direction> snakeDirections;
-    private AtomicBoolean allowedToRun = new AtomicBoolean(false);
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
     private AtomicBoolean gameComplete = new AtomicBoolean(false);
     private final EventBus globalEventBus;
     private final WorldTransformer worldTransformer;
@@ -52,7 +49,8 @@ public class GameEngine {
     private final String gameId;
 
     private CountDownLatch countDownLatch;
-    private ConcurrentLinkedQueue<String> registerMoveQueue;
+    private Set<String> registeredMovesByPlayers = Collections.synchronizedSet(new HashSet<>());
+    private XORShiftRandom random = new XORShiftRandom();
     private GameResult gameResult;
 
     public GameEngine(GameFeatures gameFeatures,
@@ -75,13 +73,12 @@ public class GameEngine {
     }
 
     public void startGame() {
-        allowedToRun.set(true);
         initGame();
         gameLoop();
     }
 
     public void abort() {
-        allowedToRun.set(false);
+        isRunning.set(false);
     }
 
     private void initGame() {
@@ -114,12 +111,15 @@ public class GameEngine {
         Runnable r = new Runnable() {
             @Override
             public void run() {
+                // Set internal state to running
+                isRunning.set(true);
+
                 // Loop till winner is decided
                 while (isGameRunning()) {
 
                     Set<IPlayer> livePlayers = playerManager.getLivePlayers();
                     countDownLatch = new CountDownLatch(livePlayers.size());
-                    registerMoveQueue = new ConcurrentLinkedQueue<>();
+                    registeredMovesByPlayers.clear();
 
                     DecrementTailProtection decrementTailProtection = new DecrementTailProtection();
                     world = decrementTailProtection.transform(world);
@@ -165,6 +165,8 @@ public class GameEngine {
                     }
                 }
 
+                // Set internal state to not running
+                isRunning.set(false);
 
                 // Game is Over, assign points to last man standing
                 Set<IPlayer> livingPlayers = playerManager.getLivePlayers();
@@ -212,32 +214,40 @@ public class GameEngine {
     }
 
     private void randomObstacle() {
-        if (gameFeatures.getRemoveObstacleLikelihood() > (Math.random()*100.0)) {
+        if (shouldExecute(gameFeatures.getRemoveObstacleLikelihood())) {
             RemoveRandomWorldObject<Obstacle> removeTransform =
                     new RemoveRandomWorldObject<>(Obstacle.class);
             world = removeTransform.transform(world);
         }
 
-        if (gameFeatures.getAddObstacleLikelihood() > (Math.random()*100.0)) {
+        if (shouldExecute(gameFeatures.getAddObstacleLikelihood())) {
             AddWorldObjectAtRandomPosition addTransform =
                     new AddWorldObjectAtRandomPosition(new Obstacle());
             world = addTransform.transform(world);
         }
     }
 
-
     private void randomFood() {
-        if (gameFeatures.getRemoveFoodLikelihood() > (Math.random()*100.0)) {
+        if (shouldExecute(gameFeatures.getRemoveFoodLikelihood())) {
             RemoveRandomWorldObject<Food> removeTransform =
                     new RemoveRandomWorldObject<>(Food.class);
             world = removeTransform.transform(world);
         }
 
-        if (gameFeatures.getAddFoodLikelihood() > (Math.random()*100.0)) {
+        if (shouldExecute(gameFeatures.getAddFoodLikelihood())) {
             AddWorldObjectAtRandomPosition addTransform =
                     new AddWorldObjectAtRandomPosition(new Food());
             world = addTransform.transform(world);
         }
+    }
+
+    /**
+     *
+     * @param likelihood
+     * @return true if a random double * 100 is smaller than likelihood
+     */
+    private boolean shouldExecute(int likelihood) {
+        return likelihood > random.nextDouble()*100;
     }
 
     private boolean spontaneousGrowth() {
@@ -256,10 +266,9 @@ public class GameEngine {
     }
 
     public boolean isGameRunning() {
-        return (allowedToRun.get() &&
+        return (isRunning.get() &&
                 playerManager.getLiveAndRemotePlayers().size() > 0 &&
                 noofLiveSnakesInWorld() > 1);
-
     }
 
     public int noofLiveSnakesInWorld() {
@@ -268,36 +277,35 @@ public class GameEngine {
                 .count();
     }
 
-    public String getLeaderPlayerId() {
-        IPlayer winner = playerManager.toSet().stream()
-                .max((player1, player2) -> {
-                    return Integer.compare(
-                            player1.getTotalPoints(),
-                            player2.getTotalPoints());
-                })
-                .get();
-
-        return winner.getPlayerId();
-    }
-
     public void registerMove(long gameTick, String playerId, Direction direction) {
-        // Todo: Possible sync problem here if a players registers move before game has actually started countDownLatch may be null.
-        // Todo: Must handle misbehaving clients that may send more than one registerMove per world tick!
-        if (gameTick == currentWorldTick) {
-            registerMoveQueue.add(playerId);
-            snakeDirections.put(playerId, direction);
-            countDownLatch.countDown();
-        } else {
-            log.info("Player: {} with id {} sent move within wrong world tick. Current world tick: {}, player's world tick: {}",
+        if (!isGameRunning()) {
+            return;
+        }
+
+        // Move is for wrong gameTick
+        if (gameTick != currentWorldTick) {
+            log.warn("Player: {} with id {} sent move within wrong world tick. Current world tick: {}, player's world tick: {}",
                     playerManager.getPlayerName(playerId), playerId,
                     currentWorldTick, gameTick);
+            return;
         }
+
+        // Player has already registered a move
+        if (registeredMovesByPlayers.contains(playerId)) {
+            log.warn("Player: {} with id {} sent more than one move. Current world tick: {}, player's world tick: {}",
+                    playerManager.getPlayerName(playerId), playerId,
+                    currentWorldTick, gameTick);
+            return;
+        }
+
+        registeredMovesByPlayers.add(playerId);
+        snakeDirections.put(playerId, direction);
+        countDownLatch.countDown();
     }
 
     private Direction getRandomDirection() {
         int max = Direction.values().length-1;
-        Random r = new Random();
-        return Direction.values()[r.nextInt(max)];
+        return Direction.values()[random.nextInt(max)];
     }
 
     public boolean isGameComplete() {

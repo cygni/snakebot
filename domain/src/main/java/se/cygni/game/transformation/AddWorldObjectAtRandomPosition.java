@@ -1,14 +1,11 @@
 package se.cygni.game.transformation;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.random.RandomGenerator;
-import org.apache.commons.math3.random.RandomGeneratorFactory;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
+import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.game.worldobject.WorldObject;
-
-import java.util.Random;
 
 /**
  * Adds a WorldObject at random free Tile
@@ -16,7 +13,7 @@ import java.util.Random;
 public class AddWorldObjectAtRandomPosition implements WorldTransformation {
 
     private final WorldObject worldObject;
-    private RandomGenerator randomGenerator = RandomGeneratorFactory.createRandomGenerator(new Random());
+    private XORShiftRandom random = new XORShiftRandom();
 
     public AddWorldObjectAtRandomPosition(WorldObject worldObject) {
         this.worldObject = worldObject;
@@ -37,7 +34,7 @@ public class AddWorldObjectAtRandomPosition implements WorldTransformation {
             return currentWorld;
         }
 
-        int randomPosition = validPositions[randomGenerator.nextInt(validPositions.length)];
+        int randomPosition = validPositions[random.nextInt(validPositions.length)];
 
         Tile[] tiles = currentWorld.getTiles();
         tiles[randomPosition] = new Tile(worldObject);
