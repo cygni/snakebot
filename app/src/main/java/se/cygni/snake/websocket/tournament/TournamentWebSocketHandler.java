@@ -1,35 +1,17 @@
 package se.cygni.snake.websocket.tournament;
 
 
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
-import se.cygni.snake.api.GameMessage;
-import se.cygni.snake.api.GameMessageParser;
-import se.cygni.snake.api.exception.InvalidMessage;
-import se.cygni.snake.api.request.HeartBeatRequest;
-import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.tournament.TournamentManager;
+import se.cygni.snake.websocket.BaseGameSocketHandler;
 
-import java.io.IOException;
-import java.util.UUID;
-
-public class TournamentWebSocketHandler extends TextWebSocketHandler {
+public class TournamentWebSocketHandler extends BaseGameSocketHandler {
 
     private static Logger LOGGER = LoggerFactory.getLogger(TournamentWebSocketHandler.class);
 
-    private final EventBus outgoingEventBus;
-    private final EventBus incomingEventBus;
     private TournamentManager tournamentManager;
-    private final String playerId;
-    private WebSocketSession webSocketSession;
 
     @Autowired
     public TournamentWebSocketHandler(TournamentManager tournamentManager) {
@@ -37,97 +19,13 @@ public class TournamentWebSocketHandler extends TextWebSocketHandler {
 
         LOGGER.info("Started tournament web socket handler");
 
-        // Create a playerId for this player
-        playerId = UUID.randomUUID().toString();
-
         // Get an eventbus and register this handler
-        outgoingEventBus = tournamentManager.getOutgoingEventBus();
-        outgoingEventBus.register(this);
-
-        incomingEventBus = tournamentManager.getIncomingEventBus();
+        this.setOutgoingEventBus(tournamentManager.getOutgoingEventBus());
+        this.setIncomingEventBus(tournamentManager.getIncomingEventBus());
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        super.afterConnectionClosed(session, status);
-        outgoingEventBus.unregister(this);
-        tournamentManager.playerLostConnection(playerId);
-    }
-
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        LOGGER.debug("After connection established, tournamentId: {}", tournamentManager.getTournamentId());
-        this.webSocketSession = session;
-    }
-
-    private void sendHeartbeat() {
-        HeartBeatResponse heartBeatResponse = new HeartBeatResponse();
-        try {
-            sendSnakeMessage(heartBeatResponse);
-        } catch (Exception e) {
-            LOGGER.error("Failed to send heartbeat response", e);
-        }
-    }
-
-    @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message)
-            throws Exception {
-
-        try {
-            // Deserialize message
-            GameMessage gameMessage = GameMessageParser.decodeMessage(message.getPayload());
-
-            // Overwrite playerId to hinder any cheating
-            gameMessage.setReceivingPlayerId(playerId);
-
-            if (gameMessage instanceof HeartBeatRequest) {
-                sendHeartbeat();
-                return;
-            }
-
-            LOGGER.debug(message.getPayload());
-
-            // Send to game
-            incomingEventBus.post(gameMessage);
-        } catch (Throwable e) {
-            LOGGER.error("Could not handle incoming text message: {}", e.getMessage());
-
-            InvalidMessage invalidMessage = new InvalidMessage(
-                    "Could not understand this message. Error:" + e.getMessage(),
-                    message.getPayload()
-            );
-            invalidMessage.setReceivingPlayerId(playerId);
-
-            try {
-                LOGGER.info("Sending InvalidMessage to client.");
-                outgoingEventBus.post(invalidMessage);
-            } catch (Throwable ee) {
-                ee.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception)
-            throws Exception {
-        session.close(CloseStatus.SERVER_ERROR);
-        outgoingEventBus.unregister(this);
-    }
-
-    @Subscribe
-    public void sendSnakeMessage(GameMessage message) throws IOException {
-
-        // Verify that this message is intended to this player (or null if for all players)
-        if (!StringUtils.isEmpty(message.getReceivingPlayerId()) &&
-                !playerId.equals(message.getReceivingPlayerId())) {
-            return;
-        }
-        try {
-            String msg = GameMessageParser.encodeMessage(message);
-            LOGGER.debug("Sending: {}", msg);
-            webSocketSession.sendMessage(new TextMessage(msg));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void playerLostConnection() {
+        tournamentManager.playerLostConnection(getPlayerId());
     }
 }
