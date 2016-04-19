@@ -105,7 +105,13 @@ public class EventSocketHandler extends TextWebSocketHandler {
             } else if (apiMessage instanceof CreateTournament) {
                 CreateTournament createTournament = (CreateTournament)apiMessage;
 
+
+
                 // ToDo: Handle case that a tournament is already started
+
+                if(tournamentManager.isTournamentActive()) {
+                    tournamentManager.killTournament();
+                }
                 tournamentManager.createTournament(createTournament.getTournamentName());
                 sendApiMessage(new TournamentCreated(
                         tournamentManager.getTournamentId(),
