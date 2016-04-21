@@ -4,7 +4,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.random.XORShiftRandom;
-import se.cygni.game.worldobject.SnakeHead;
+import se.cygni.game.worldobject.SnakePart;
 import se.cygni.game.worldobject.WorldObject;
 
 /**
@@ -39,9 +39,9 @@ public class AddWorldObjectAtRandomPosition implements WorldTransformation {
         Tile[] tiles = currentWorld.getTiles();
         tiles[randomPosition] = new Tile(worldObject);
 
-        if (worldObject instanceof SnakeHead) {
-            SnakeHead snakeHead = (SnakeHead)worldObject;
-            snakeHead.setPosition(randomPosition);
+        if (worldObject instanceof SnakePart) {
+            SnakePart snakePart = (SnakePart)worldObject;
+            snakePart.setPosition(randomPosition);
         }
 
         return new WorldState(currentWorld.getWidth(), currentWorld.getHeight(), tiles);

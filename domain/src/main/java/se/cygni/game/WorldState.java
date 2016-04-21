@@ -31,7 +31,7 @@ public class WorldState {
     public WorldState(WorldState worldState) {
         this.width = worldState.getWidth();
         this.height = worldState.getHeight();
-        this.tiles = ArrayUtils.clone(worldState.getTiles());
+        this.tiles = worldState.getTiles();
     }
 
     public int getWidth() {
@@ -207,6 +207,7 @@ public class WorldState {
             !ArrayUtils.contains(snakeAdjacentPositions, pos)
         ).toArray();
     }
+
     /**
      * @return a copy of the tiles
      */
