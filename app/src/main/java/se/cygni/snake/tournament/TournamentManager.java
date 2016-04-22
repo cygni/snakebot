@@ -283,7 +283,7 @@ public class TournamentManager {
         }
 
         if (isTournamentStarted()) {
-            player.lostConnection();
+            player.lostConnection(-1);
         } else {
             removePlayer(player);
         }

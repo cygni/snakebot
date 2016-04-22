@@ -3,7 +3,7 @@ package se.cygni.snake.player;
 import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.PointReason;
 
-public interface IPlayer {
+public interface IPlayer extends Comparable<IPlayer> {
 
     void onWorldUpdate(MapUpdateEvent mapUpdateEvent);
 
@@ -15,9 +15,11 @@ public interface IPlayer {
 
     void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent);
 
-    void lostConnection();
+    void lostConnection(long gameTick);
 
     boolean isAlive();
+
+    long getDiedAtTick();
 
     boolean isConnected();
 
@@ -25,7 +27,7 @@ public interface IPlayer {
 
     void outOfTournament();
 
-    void dead();
+    void dead(long gameTick);
 
     void revive();
 
@@ -35,7 +37,9 @@ public interface IPlayer {
 
     void addPoints(PointReason reason, int points);
 
-    void resetPoints();
+    void reset();
 
-    int getTotalPoints();;
+    int getTotalPoints();
+
+    int getPointsBy(PointReason reason);
 }

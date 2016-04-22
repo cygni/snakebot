@@ -3,14 +3,13 @@ package se.cygni.snake.player.bot;
 import com.google.common.eventbus.EventBus;
 import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.Map;
-import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.model.TileContent;
 import se.cygni.snake.client.MapCoordinate;
 import se.cygni.snake.client.MapUtil;
-import se.cygni.snake.player.IPlayer;
+import se.cygni.snake.player.BasePlayer;
 
-public abstract class BotPlayer implements IPlayer {
+public abstract class BotPlayer extends BasePlayer {
 
     private boolean alive = true;
     protected final String playerId;
@@ -48,41 +47,6 @@ public abstract class BotPlayer implements IPlayer {
     }
 
     @Override
-    public boolean isAlive() {
-        return alive;
-    }
-
-    @Override
-    public void dead() {
-        alive = false;
-    }
-
-    @Override
-    public void revive() {
-        alive = true;
-    }
-
-    @Override
-    public void lostConnection() {
-
-    }
-
-    @Override
-    public boolean isInTournament() {
-        return false;
-    }
-
-    @Override
-    public void outOfTournament() {
-
-    }
-
-    @Override
-    public boolean isConnected() {
-        return true;
-    }
-
-    @Override
     public String getName() {
         return this.getClass().getSimpleName();
     }
@@ -90,21 +54,6 @@ public abstract class BotPlayer implements IPlayer {
     @Override
     public String getPlayerId() {
         return playerId;
-    }
-
-    @Override
-    public void addPoints(PointReason reason, int points) {
-        accumulatedPoints += points;
-    }
-
-    @Override
-    public void resetPoints() {
-        accumulatedPoints = 0;
-    }
-
-    @Override
-    public int getTotalPoints() {
-        return accumulatedPoints;
     }
 
     /**

@@ -20,12 +20,7 @@ public class GameResult {
 
     public void addResult(int score, IPlayer player) {
         result.add(new PlayerScore(score, player));
-        Collections.sort(result, new Comparator<PlayerScore>() {
-            @Override
-            public int compare(PlayerScore o1, PlayerScore o2) {
-                return Integer.compare(o2.getScore(), o1.getScore()); // Note reversed order!
-            }
-        });
+        Collections.sort(result, (o1, o2) -> o1.getPlayer().compareTo(o1.getPlayer()));
 
         if (score > highestScore) {
             highestScore = score;
