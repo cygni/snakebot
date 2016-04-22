@@ -321,4 +321,8 @@ public class GameEngine {
         gevent.onGameChanged(gameId);
         globalEventBus.post(gevent);
     }
+
+    public long getCurrentWorldTick() {
+        return currentWorldTick;
+    }
 }

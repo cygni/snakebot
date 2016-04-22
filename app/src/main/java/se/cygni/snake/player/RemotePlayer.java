@@ -3,18 +3,14 @@ package se.cygni.snake.player;
 import com.google.common.eventbus.EventBus;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.*;
-import se.cygni.snake.api.model.PointReason;
 
-public class RemotePlayer implements IPlayer {
+public class RemotePlayer extends BasePlayer {
 
     private Player player;
     private EventBus outgoingEventBus;
-    private boolean alive = true;
-    private boolean connected = true;
-    private boolean inTournament = true;
-    private int accumulatedPoints = 0;
 
     public RemotePlayer(Player player, EventBus outgoingEventBus) {
+        super();
         this.player = player;
         this.outgoingEventBus = outgoingEventBus;
     }
@@ -54,41 +50,6 @@ public class RemotePlayer implements IPlayer {
         outgoingEventBus.post(tee);
     }
 
-    @Override
-    public boolean isAlive() {
-        return alive;
-    }
-
-    @Override
-    public void dead() {
-        alive = false;
-    }
-
-    @Override
-    public void revive() {
-        alive = true;
-    }
-
-    @Override
-    public boolean isConnected() {
-        return connected;
-    }
-
-    @Override
-    public boolean isInTournament() {
-        return inTournament;
-    }
-
-    @Override
-    public void outOfTournament() {
-        inTournament = false;
-    }
-
-    @Override
-    public void lostConnection() {
-        dead();
-        connected = false;
-    }
 
     @Override
     public String getName() {
@@ -98,21 +59,6 @@ public class RemotePlayer implements IPlayer {
     @Override
     public String getPlayerId() {
         return player.getPlayerId();
-    }
-
-    @Override
-    public void addPoints(PointReason reason, int points) {
-        accumulatedPoints += points;
-    }
-
-    @Override
-    public void resetPoints() {
-        accumulatedPoints = 0;
-    }
-
-    @Override
-    public int getTotalPoints() {
-        return accumulatedPoints;
     }
 
     @Override

@@ -19,18 +19,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-//        registry.addHandler(echoWebSocketHandler(), "/echo").withSockJS();
         registry.addHandler(eventWebSocketHandler(), "/events").setAllowedOrigins("*").withSockJS();
         registry.addHandler(eventWebSocketHandler(), "/events-native").setAllowedOrigins("*");
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
         registry.addHandler(snakeTournamentWebSocketHandler(), "/tournament");
     }
-
-//    @Bean
-//    public WebSocketHandler echoWebSocketHandler() {
-//        return new EchoWebSocketHandler();
-//    }
-
+    
     @Bean
     public WebSocketHandler eventWebSocketHandler() {
         return new PerConnectionWebSocketHandler(EventSocketHandler.class, true);

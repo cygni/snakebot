@@ -97,7 +97,7 @@ public class WorldTransformerTest {
         assertArrayEquals(new int[] {52, 42}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(52)));
 
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
-        verify(mockedPlayer1).dead();
+        verify(mockedPlayer1).dead(5);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class WorldTransformerTest {
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead();
+        verify(mockedPlayer1).dead(5);
     }
 
     @Test
@@ -209,7 +209,7 @@ public class WorldTransformerTest {
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead();
+        verify(mockedPlayer1).dead(5);
         verify(mockedPlayer2).addPoints(PointReason.CAUSED_SNAKE_DEATH, gameFeatures.getPointsPerCausedDeath());
     }
 
@@ -250,8 +250,8 @@ public class WorldTransformerTest {
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead();
-        verify(mockedPlayer2).dead();
+        verify(mockedPlayer1).dead(5);
+        verify(mockedPlayer2).dead(5);
     }
 
     @Test
@@ -339,8 +339,8 @@ public class WorldTransformerTest {
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead();
-        verify(mockedPlayer2).dead();
+        verify(mockedPlayer1).dead(5);
+        verify(mockedPlayer2).dead(5);
     }
 
     @Test
@@ -373,7 +373,7 @@ public class WorldTransformerTest {
         assertEquals(0, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead();
-        verify(mockedPlayer2).dead();
+        verify(mockedPlayer1).dead(5);
+        verify(mockedPlayer2).dead(5);
     }
 }

@@ -164,7 +164,7 @@ public class Game {
     public void playerLostConnection(String playerId) {
         try {
             IPlayer player = playerManager.getPlayer(playerId);
-            player.dead();
+            player.dead(gameEngine.getCurrentWorldTick());
             LOGGER.info("Player: {} , playerId: {} lost connection and was therefore killed.", player.getName(), playerId);
         } catch (Exception e) {
             LOGGER.warn("PlayerId: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);

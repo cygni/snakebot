@@ -433,7 +433,7 @@ public class WorldTransformer {
                 deadPlayer.getPlayerId(),
                 coordinate);
 
-        deadPlayer.dead();
+        deadPlayer.dead(worldTick);
 
         SnakeDeadEvent snakeDeadEvent = GameMessageConverter.onPlayerDied(
                 deathReason,

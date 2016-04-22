@@ -64,7 +64,7 @@ public class TournamentLevel {
         }
 
         for (IPlayer player : playersAdvancing) {
-            player.resetPoints();
+            player.reset();
             player.revive();
         }
 
