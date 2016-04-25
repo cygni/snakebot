@@ -37,7 +37,7 @@ public class TournamentManager {
     private final EventBus incomingEventBus;
     private final EventBus globalEventBus;
 
-    private boolean tournamentActive = true;
+    private boolean tournamentActive = false;
     private boolean tournamentStarted = false;
     private String tournamentId;
     private String tournamentName;
