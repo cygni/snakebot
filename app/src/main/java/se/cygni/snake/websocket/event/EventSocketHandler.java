@@ -27,6 +27,7 @@ import se.cygni.snake.eventapi.model.ActiveGamePlayer;
 import se.cygni.snake.eventapi.model.TournamentGamePlan;
 import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
+import se.cygni.snake.eventapi.response.NoActiveTournamentEvent;
 import se.cygni.snake.eventapi.response.TournamentCreated;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
@@ -98,18 +99,32 @@ public class EventSocketHandler extends TextWebSocketHandler {
             } else if (apiMessage instanceof StartGame) {
                 startGame((StartGame) apiMessage);
 
+
+            } else if (apiMessage instanceof GetActiveTournament) {
+                if(tournamentManager.isTournamentActive()) {
+
+                    sendApiMessage(new TournamentCreated(
+                            tournamentManager.getTournamentId(),
+                            tournamentManager.getTournamentName(),
+                            GameSettingsConverter.toGameSettings(
+                                    tournamentManager.getGameFeatures()
+                            )
+                    ));
+                    tournamentManager.publishTournamentPlan();
+                }else {
+                    sendApiMessage(new NoActiveTournamentEvent());
+                }
             } else if (apiMessage instanceof KillTournament) {
                 // ToDo: Do we really need the current tournamentId?
                 tournamentManager.killTournament();
 
             } else if (apiMessage instanceof CreateTournament) {
-                CreateTournament createTournament = (CreateTournament)apiMessage;
-
+                CreateTournament createTournament = (CreateTournament) apiMessage;
 
 
                 // ToDo: Handle case that a tournament is already started
 
-                if(tournamentManager.isTournamentActive()) {
+                if (tournamentManager.isTournamentActive()) {
                     tournamentManager.killTournament();
                 }
                 tournamentManager.createTournament(createTournament.getTournamentName());
@@ -122,7 +137,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
                 ));
 
             } else if (apiMessage instanceof UpdateTournamentSettings) {
-                UpdateTournamentSettings updateTournamentSettings = (UpdateTournamentSettings)apiMessage;
+                UpdateTournamentSettings updateTournamentSettings = (UpdateTournamentSettings) apiMessage;
 
                 // ToDo: Handle case that a tournament is already started
                 tournamentManager.setGameFeatures(
@@ -136,9 +151,9 @@ public class EventSocketHandler extends TextWebSocketHandler {
                 tournamentManager.startTournament();
 
             } else if (apiMessage instanceof StartTournamentGame) {
-                StartTournamentGame startGame = (StartTournamentGame)apiMessage;
+                StartTournamentGame startGame = (StartTournamentGame) apiMessage;
 
-                //tournamentManager.startGame(startGame.getGameId());
+//                tournamentManager.startGame(startGame.getGameId());
             }
         } catch (Exception e) {
             return false;
