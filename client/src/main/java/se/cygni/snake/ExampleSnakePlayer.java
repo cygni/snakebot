@@ -29,7 +29,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     private String name = "#emil_" + random.nextInt(1000);
     private String host = "localhost";
     private int port = 8080;
-    private GameMode gameMode = GameMode.TOURNAMENT;
+    private GameMode gameMode = GameMode.TRAINING;
 
     public static void main(String[] args) {
 
@@ -131,7 +131,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-//        startGame();
+        startGame();
     }
 
     @Override
