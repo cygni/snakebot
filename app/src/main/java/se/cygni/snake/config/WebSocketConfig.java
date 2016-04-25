@@ -1,4 +1,4 @@
-package se.cygni.snake.websocket;
+package se.cygni.snake.config;
 
 import com.google.common.eventbus.EventBus;
 import org.springframework.context.annotation.Bean;
@@ -39,17 +39,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public WebSocketHandler snakeTournamentWebSocketHandler() {
         return new PerConnectionWebSocketHandler(TournamentWebSocketHandler.class, true);
     }
-
-    @Bean
-    public GameManager gameManager() {
-        return new GameManager(globalEventBus());
-    }
-
-    @Bean
-    public EventBus globalEventBus() {
-        return new EventBus("globalEventBus");
-    }
-
     @Bean
     public ServletServerContainerFactoryBean createServletServerContainerFactoryBean() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
