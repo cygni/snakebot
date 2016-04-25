@@ -31,7 +31,11 @@ public class TournamentUtil {
         int playersOut = getNoofPlayersOut(maxPlayersPerGame);
         int sum = 0;
         for (int i = 0; i < playersPerGame.length; i++) {
-            playersPerGame[i] += playersOut;
+            if (playersPerGame[i] + playersOut <= 0) {
+                playersPerGame[i] = 1;
+            } else {
+                playersPerGame[i] += playersOut;
+            }
             sum += playersPerGame[i];
         }
         return sum;

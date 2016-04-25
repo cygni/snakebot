@@ -109,8 +109,6 @@ public class TournamentManager {
             }
         }
 
-//        playerPoints.sort((PlayerPoints p1, PlayerPoints p2) -> Integer.compare(p1.getPoints(), p2.getPoints()));
-
         TournamentEndedEvent tee = new TournamentEndedEvent(
                 winnerPlayerId,
                 lastGame.getGame().getGameId(),
