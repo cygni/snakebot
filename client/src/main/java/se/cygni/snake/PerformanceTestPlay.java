@@ -12,7 +12,7 @@ public class PerformanceTestPlay {
 
             List<ExampleSnakePlayer> players = new ArrayList<>();
 
-            int noofPlayers = 20;
+            int noofPlayers = 10;
             for (int i = 0; i < noofPlayers; i++) {
                 ExampleSnakePlayer player = new ExampleSnakePlayer();
                 player.connect();

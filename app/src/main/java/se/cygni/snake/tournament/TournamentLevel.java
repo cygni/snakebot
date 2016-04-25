@@ -53,7 +53,7 @@ public class TournamentLevel {
                     added++;
                 }
                 index++;
-                addedEnough = added == noofToAdvance+1 || index >= gameResult.size();
+                addedEnough = added == noofToAdvance || index >= gameResult.size();
             }
             LOGGER.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
                     game.getGame().getPlayerManager().size(),

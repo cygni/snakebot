@@ -29,7 +29,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     private String name = "#emil_" + random.nextInt(1000);
     private String host = "localhost";
     private int port = 8080;
-    private GameMode gameMode = GameMode.TRAINING;
+    private GameMode gameMode = GameMode.TOURNAMENT;
 
     public static void main(String[] args) {
 
