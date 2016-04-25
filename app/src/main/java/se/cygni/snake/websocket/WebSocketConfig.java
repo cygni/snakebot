@@ -24,7 +24,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
         registry.addHandler(snakeTournamentWebSocketHandler(), "/tournament");
     }
-    
+
     @Bean
     public WebSocketHandler eventWebSocketHandler() {
         return new PerConnectionWebSocketHandler(EventSocketHandler.class, true);
