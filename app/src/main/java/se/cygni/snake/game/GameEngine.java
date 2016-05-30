@@ -88,8 +88,9 @@ public class GameEngine {
 
         // Place players
         List<SnakeHead> snakeHeads = playerManager.toSet().stream().map(player -> new SnakeHead(player.getName(), player.getPlayerId(), 0)).collect(Collectors.toList());
-        AddWorldObjectsInCircle circleFormation = new AddWorldObjectsInCircle(snakeHeads, 0.9d);
-        world = circleFormation.transform(world);
+        Collections.shuffle(snakeHeads, new XORShiftRandom());
+        AddWorldObjectsInCircle snakeHeadsInCircleFormation = new AddWorldObjectsInCircle(snakeHeads, 0.9d);
+        world = snakeHeadsInCircleFormation.transform(world);
         GameStartingEvent gameStartingEvent = new GameStartingEvent(
                 gameId,
                 playerManager.size(),

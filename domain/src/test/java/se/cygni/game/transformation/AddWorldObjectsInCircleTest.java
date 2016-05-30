@@ -11,18 +11,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 
-/**
- * Created by tordid on 2016-05-30.
- */
 public class AddWorldObjectsInCircleTest {
 
-    static int qq= 0;
+    static int stuffCounter = 0;
     private static Collection<WorldObject> stuff(int number){
         Collection<WorldObject> ret = new ArrayList<>();
         for(int i = 0; i < number; ++i){
-            ret.add(new SnakeHead(qq+"troll"+i, qq+"TROLL"+ i,0));
+            ret.add(new SnakeHead(stuffCounter+"troll"+i, stuffCounter+"TROLL"+ i,0));
         }
         assert ret.size() == number;
+        stuffCounter++;
         return ret;
     }
 

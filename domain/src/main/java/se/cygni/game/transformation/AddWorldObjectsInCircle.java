@@ -6,7 +6,6 @@ import se.cygni.game.WorldState;
 import se.cygni.game.worldobject.SnakePart;
 import se.cygni.game.worldobject.WorldObject;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,18 +31,15 @@ public class AddWorldObjectsInCircle implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) {
-
         if (worldObjects.isEmpty()) {
             return currentWorld;
         }
 
         int[] emptyArray = currentWorld.listEmptyPositions();
 
-
         if (emptyArray.length < worldObjects.size()) {
             throw new NoRoomInWorldException();
         }
-
         List<Integer> emptyPositions = IntStream.of(emptyArray).boxed().collect(Collectors.toList());
         Tile[] tiles = currentWorld.getTiles();
 
@@ -58,13 +54,14 @@ public class AddWorldObjectsInCircle implements WorldTransformation {
         for (WorldObject wo : worldObjects) {
             double sin = Math.sin(rotated);
             double cos = Math.cos(rotated);
-            int widthScaled = (int) Math.floor(centerWidth + (sin * width * scaleFactor/2));
-            int heightScaled = (int) Math.floor(centerHeight + (cos * height * scaleFactor/2));
+            int widthScaled = (int) Math.floor(centerWidth + (sin * width * scaleFactor / 2));
+            int heightScaled = (int) Math.floor(centerHeight + (cos * height * scaleFactor / 2));
             Integer tileNo = currentWorld.translateCoordinate(new Coordinate(widthScaled, heightScaled));
 
-            while(!emptyPositions.contains(tileNo)){
-                tileNo = (tileNo+1)%(width * height);
+            while (!emptyPositions.contains(tileNo)) {
+                tileNo = (tileNo + 1) % (width * height);
             }
+
             emptyPositions.remove(tileNo);
             if (wo instanceof SnakePart) {
                 SnakePart snakePart = (SnakePart) wo;
@@ -75,7 +72,4 @@ public class AddWorldObjectsInCircle implements WorldTransformation {
         }
         return new WorldState(width, height, tiles);
     }
-
-
-
 }
