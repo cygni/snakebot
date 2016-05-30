@@ -6,7 +6,11 @@ import se.cygni.game.WorldState;
 import se.cygni.game.worldobject.SnakePart;
 import se.cygni.game.worldobject.WorldObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Adds a set of WorldObject randomly in a centerd circle formation on empty cells. If cells are taken next cell index is used.
@@ -32,53 +36,46 @@ public class AddWorldObjectsInCircle implements WorldTransformation {
         if (worldObjects.isEmpty()) {
             return currentWorld;
         }
-        int[] emptyPositions = currentWorld.listEmptyPositions();
-        if (emptyPositions.length < worldObjects.size()) {
+
+        int[] emptyArray = currentWorld.listEmptyPositions();
+
+
+        if (emptyArray.length < worldObjects.size()) {
             throw new NoRoomInWorldException();
         }
+
+        List<Integer> emptyPositions = IntStream.of(emptyArray).boxed().collect(Collectors.toList());
+        Tile[] tiles = currentWorld.getTiles();
 
         int width = currentWorld.getWidth();
         int height = currentWorld.getHeight();
 
         double rotation = (2 * Math.PI) / worldObjects.size();
-
         double centerWidth = ((double) width) / 2;
         double centerHeight = ((double) height) / 2;
-
         double rotated = 0;
-        for (WorldObject wo : worldObjects) {
 
+        for (WorldObject wo : worldObjects) {
             double sin = Math.sin(rotated);
             double cos = Math.cos(rotated);
             int widthScaled = (int) Math.floor(centerWidth + (sin * width * scaleFactor/2));
             int heightScaled = (int) Math.floor(centerHeight + (cos * height * scaleFactor/2));
+            Integer tileNo = currentWorld.translateCoordinate(new Coordinate(widthScaled, heightScaled));
 
-            int tileNo = currentWorld.translateCoordinate(new Coordinate(widthScaled, heightScaled));
-            currentWorld = setNextFreeTile(currentWorld, wo, tileNo);
-
+            while(!emptyPositions.contains(tileNo)){
+                tileNo = (tileNo+1)%(width * height);
+            }
+            emptyPositions.remove(tileNo);
+            if (wo instanceof SnakePart) {
+                SnakePart snakePart = (SnakePart) wo;
+                snakePart.setPosition(tileNo);
+            }
+            tiles[tileNo] = new Tile(wo);
             rotated += rotation;
         }
-
-        return currentWorld;
+        return new WorldState(width, height, tiles);
     }
 
-    static WorldState setNextFreeTile(WorldState ws, WorldObject worldObject, int index){
-        boolean tileEmpty = ws.isTileEmpty(index);
-
-        int width = ws.getWidth();
-        int height = ws.getHeight();
-        if (tileEmpty){
-            if (worldObject instanceof SnakePart) {
-                SnakePart snakePart = (SnakePart) worldObject;
-                snakePart.setPosition(index);
-            }
-            Tile[] tiles = ws.getTiles();
-            tiles[index] = new Tile(worldObject);
-            return new WorldState(width, height, tiles);
-        } else {
-            return setNextFreeTile(ws, worldObject, index+1%(width * height));
-        }
-    }
 
 
 }
