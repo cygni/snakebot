@@ -7,6 +7,7 @@ import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
+import se.cygni.game.transformation.AddWorldObjectsInCircle;
 import se.cygni.game.transformation.DecrementTailProtection;
 import se.cygni.game.transformation.RemoveRandomWorldObject;
 import se.cygni.game.worldobject.Food;
@@ -24,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * GameEngine is responsible for:
@@ -85,12 +87,10 @@ public class GameEngine {
         world = new WorldState(gameFeatures.getWidth(), gameFeatures.getHeight());
 
         // Place players
-        playerManager.toSet().stream().forEach( player -> {
-            SnakeHead snakeHead = new SnakeHead(player.getName(), player.getPlayerId(), 0);
-            AddWorldObjectAtRandomPosition randomPosition = new AddWorldObjectAtRandomPosition(snakeHead);
-            world = randomPosition.transform(world);
-        });
-
+        List<SnakeHead> snakeHeads = playerManager.toSet().stream().map(player -> new SnakeHead(player.getName(), player.getPlayerId(), 0)).collect(Collectors.toList());
+        Collections.shuffle(snakeHeads, new XORShiftRandom());
+        AddWorldObjectsInCircle snakeHeadsInCircleFormation = new AddWorldObjectsInCircle(snakeHeads, 0.9d);
+        world = snakeHeadsInCircleFormation.transform(world);
         GameStartingEvent gameStartingEvent = new GameStartingEvent(
                 gameId,
                 playerManager.size(),
