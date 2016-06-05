@@ -88,6 +88,13 @@ public class GameFeatures {
     // snake.
     private int pointsSuicide = -10;
 
+    // The starting count for obstacles
+    private int startObstacles = 0;
+
+    // The starting count for food
+    private int startFood = 0;
+
+
     /**
      * Enforces limits on some values
      */
@@ -108,6 +115,8 @@ public class GameFeatures {
         startSnakeLength = startSnakeLength > 10 ? 10 : startSnakeLength;
         maxNoofPlayers = maxNoofPlayers > 20 ? 20 : maxNoofPlayers;
         spontaneousGrowthEveryNWorldTick = spontaneousGrowthEveryNWorldTick < 2 ? 2 : spontaneousGrowthEveryNWorldTick;
+        startObstacles = Math.max(0, startObstacles);
+        startFood = Math.max(0, startFood);
     }
 
     public int getWidth() {
@@ -292,5 +301,21 @@ public class GameFeatures {
 
     public void setPointsSuicide(int pointsSuicide) {
         this.pointsSuicide = pointsSuicide;
+    }
+
+    public int getStartObstacles() {
+        return startObstacles;
+    }
+
+    public void setStartObstacles(int startObstacles) {
+        this.startObstacles = startObstacles;
+    }
+
+    public int getStartFood() {
+        return startFood;
+    }
+
+    public void setStartFood(int startFood) {
+        this.startFood = startFood;
     }
 }

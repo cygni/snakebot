@@ -86,7 +86,13 @@ public class GameSettings {
     // If a snake kills itself by hitting a wall or another
     // snake.
     private int pointsSuicide = -10;
-    
+
+    // The starting count for obstacles
+    private int startObstacles = 0;
+
+    // The starting count for food
+    private int startFood = 0;
+
     public WorldSize getWidth() {
         return width;
     }
@@ -300,6 +306,22 @@ public class GameSettings {
                 '}';
     }
 
+    public int getStartObstacles() {
+        return startObstacles;
+    }
+
+    public void setStartObstacles(int startObstacles) {
+        this.startObstacles = startObstacles;
+    }
+
+    public int getStartFood() {
+        return startFood;
+    }
+
+    public void setStartFood(int startFood) {
+        this.startFood = startFood;
+    }
+
     public static class GameSettingsBuilder {
         private WorldSize width = WorldSize.MEDIUM;
         private WorldSize height = WorldSize.MEDIUM;
@@ -324,6 +346,8 @@ public class GameSettings {
         private int pointsLastSnakeLiving = 10;
         private int noofRoundsTailProtectedAfterNibble = 3;
         private int pointsSuicide = -10;
+        private int startObstacles = 0;
+        private int startFood = 0;
 
         public GameSettingsBuilder() {
         }
@@ -443,6 +467,16 @@ public class GameSettings {
             return this;
         }
 
+        public GameSettingsBuilder withStartObstacles(int startObstacles) {
+            this.startObstacles = startObstacles;
+            return this;
+        }
+
+        public GameSettingsBuilder withStartFood(int startFood) {
+            this.startFood = startFood;
+            return this;
+        }
+
         public GameSettings build() {
             GameSettings gameSettings = new GameSettings();
             gameSettings.setWidth(width);
@@ -468,6 +502,8 @@ public class GameSettings {
             gameSettings.setPointsLastSnakeLiving(pointsLastSnakeLiving);
             gameSettings.setNoofRoundsTailProtectedAfterNibble(noofRoundsTailProtectedAfterNibble);
             gameSettings.setPointsSuicide(pointsSuicide);
+            gameSettings.setStartObstacles(startObstacles);
+            gameSettings.setStartFood(startFood);
             return gameSettings;
         }
     }
