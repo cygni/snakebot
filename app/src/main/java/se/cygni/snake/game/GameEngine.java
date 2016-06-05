@@ -7,6 +7,7 @@ import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
+import se.cygni.game.transformation.AddWorldObjectAtRandomPositionInGrid;
 import se.cygni.game.transformation.AddWorldObjectsInCircle;
 import se.cygni.game.transformation.DecrementTailProtection;
 import se.cygni.game.transformation.RemoveRandomWorldObject;
@@ -55,6 +56,7 @@ public class GameEngine {
     private XORShiftRandom random = new XORShiftRandom();
     private GameResult gameResult;
 
+
     public GameEngine(GameFeatures gameFeatures,
                       PlayerManager playerManager,
                       String gameId,
@@ -83,6 +85,8 @@ public class GameEngine {
         isRunning.set(false);
     }
 
+
+
     private void initGame() {
         world = new WorldState(gameFeatures.getWidth(), gameFeatures.getHeight());
 
@@ -100,10 +104,46 @@ public class GameEngine {
             player.onGameStart(gameStartingEvent);
         });
 
+        Collections.nCopies(gameFeatures.getStartFood(), "").stream()
+                .map(operand -> new Food())
+                .forEach(worldObject -> world = new AddWorldObjectAtRandomPosition(worldObject).transform(world));
+        AddWorldObjectAtRandomPositionInGrid.GridFilter mazeFilter = AddWorldObjectAtRandomPositionInGrid.fromStringMap(
+                " #       #     #         " +
+                        " # ### # ### # # ##### # " +
+                        " # #   #     # # #   # # " +
+                        " # # ### ####### # # # # " +
+                        " # #   # #   #   # #   # " +
+                        " # ### ### # # ### ##### " +
+                        " #   #     # # # #   #   " +
+                        " ##### ##### # # ### # ##" +
+                        "     # #   #   #   # #   " +
+                        "#### ### # ### # # # ### " +
+                        "     #   #   #   # # # # " +
+                        " ##### ##### # ##### # # " +
+                        " #     #   # # #   # #   " +
+                        " # ##### ### ### # # # ##" +
+                        "   #     #   #   #   #   " +
+                        "###### ### ### ######### " +
+                        "     #   # #   #       # " +
+                        " # # ### # ### ### ### # " +
+                        " # # #   #   #   # #   # " +
+                        "## # # ##### ### # # ### " +
+                        "   #   #   # #   # #   # " +
+                        " # ##### # # # ### ### # " +
+                        " # #   # #   #   #   # # " +
+                        " ### # # ####### ### # # " +
+                        "     #           #   #   "
+                , 25);
+
+        AddWorldObjectAtRandomPositionInGrid addObstacles = new AddWorldObjectAtRandomPositionInGrid(random, () -> new Obstacle(), mazeFilter.invert());
+        world = addObstacles.gridInsert(world, gameFeatures.getStartObstacles());
+
         InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis(),
                 gameStartingEvent);
         globalEventBus.post(gevent);
     }
+
+
 
     private void gameLoop() {
         initSnakeDirections();
