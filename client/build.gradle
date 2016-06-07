@@ -13,7 +13,7 @@ dependencies {
     compile project(':api')
     compile("org.apache.commons:commons-math3:$commonsMathVersion")
     compile("org.apache.commons:commons-lang3:$commonsLangVersion")
-    compile("commons-collections:commons-collections:$commonsCollectionsVersion")
+    compile("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
     compile("ch.qos.logback:logback-classic:$logbackVersion")
     compile("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
     compile("org.slf4j:slf4j-api:$slf4jVersion")

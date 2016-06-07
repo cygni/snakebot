@@ -2,23 +2,23 @@
 
     <contextName>Snake-bot-server</contextName>
 
-    <appender name="loggly" class="ch.qos.logback.ext.loggly.LogglyAppender">
-        <endpointUrl>http://logs-01.loggly.com/inputs/d515be25-6588-4bff-a95b-01ecc84167f6/tag/logback</endpointUrl>
-        <pattern>%d{"ISO8601", UTC}  %p %t %c{0}.%M - %m%n</pattern>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder
+            by default -->
+        <encoder>
+            <pattern>%green(%date{HH:mm:ss.SSS}) %highlight(%-5level) %boldYellow(%logger{0}) - %highlight(%msg) %cyan([%t]) %n</pattern>
+        </encoder>
     </appender>
 
-
-    <appender name="loggly-async" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="loggly" />
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT" />
         <queueSize>2048</queueSize>
         <neverBlock>true</neverBlock>
     </appender>
 
     <logger name="se" level="DEBUG"/>
 
-    <root level="info">
-        <appender-ref ref="loggly-async" />
+    <root level="INFO">
+        <appender-ref ref="ASYNC" />
     </root>
-
 </included>
-

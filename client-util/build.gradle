@@ -4,5 +4,5 @@ jar {
 
 dependencies {
     compile project(':api')
-    compile("commons-collections:commons-collections:$commonsCollectionsVersion")
+    compile("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
 }
