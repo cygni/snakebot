@@ -1,28 +1,14 @@
 package se.cygni.game.transformation;
 
-import com.sun.media.jfxmedia.logging.Logger;
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.LoggerFactory;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.worldobject.SnakePart;
 import se.cygni.game.worldobject.WorldObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.IntFunction;
-import java.util.function.IntPredicate;
+import java.util.*;
 import java.util.function.Supplier;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Adds WorldObject at random free Tiles on a grid, until the grid is full or the specified number has been added.

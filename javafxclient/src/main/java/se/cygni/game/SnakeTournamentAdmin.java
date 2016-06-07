@@ -60,8 +60,8 @@ public class SnakeTournamentAdmin extends Application implements EventListener {
     @Override
     public void start(Stage primaryStage) {
 
-        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
-//        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
+//        eventSocketClient = new EventSocketClient("ws://localhost:8080/events-native", this);
+        eventSocketClient = new EventSocketClient("ws://snake.cygni.se/events-native", this);
 
         BorderPane root = new BorderPane();
 
@@ -247,6 +247,12 @@ public class SnakeTournamentAdmin extends Application implements EventListener {
         });
         flow.getChildren().add(startButton);
 
+        Button subscribetBtn = new Button("Subscribe");
+        subscribetBtn.setOnAction(event -> {
+            subscribe();
+        });
+        flow.getChildren().add(subscribetBtn);
+
         Button createTornamentBtn = new Button("Create T");
         createTornamentBtn.setOnAction(event -> {
             createTournament();
@@ -279,6 +285,15 @@ public class SnakeTournamentAdmin extends Application implements EventListener {
     private void startGame(ActiveGame game) {
         eventSocketClient.setGameIdFilter(game.gameId);
         eventSocketClient.startGame(game.gameId);
+    }
+
+    private void subscribe() {
+        ActiveGame game = activeGameListView.getSelectionModel().getSelectedItem();
+
+        if (game == null) {
+            return;
+        }
+        eventSocketClient.setGameIdFilter(game.gameId);
     }
 
     private void killTournament() {
