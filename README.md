@@ -1,5 +1,5 @@
 # snakebot
-[![Build Status](http://jenkins.snake.cygni.se/buildStatus/icon?job=Snake)](http://jenkins.snake.cygni.se/job/Snake/)
+[![Build Status](http://jenkins.snake.cygni.se/buildStatus/icon?job=snakebot)](http://jenkins.snake.cygni.se/job/snakebot/)
 
 A multi player, server based snake game for computer bots as players
 
