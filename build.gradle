@@ -97,15 +97,6 @@ subprojects {
         testCompile 'org.hamcrest:hamcrest-library:1.3'
     }
 
-    sonarqube {
-        properties {
-            property "sonar.host.url", "http://sonarqube.docker.snake:9000"
-            property "sonar.java.source property", "1.8"
-            property "sonar.login", "admin"
-            property "sonar.password", "admin"
-        }
-    }
-
     test {
         jacoco {
             append = false
@@ -114,5 +105,5 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '2.14'
 }
