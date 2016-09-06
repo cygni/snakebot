@@ -5,7 +5,7 @@ jar {
 dependencies {
     compile("org.springframework:spring-core:$springVersion")
     compile("org.springframework:spring-context:$springVersion")
-    compile("org.apache.karaf.shell:org.apache.karaf.shell.table:4.0.5");
+    compile("org.apache.karaf.shell:org.apache.karaf.shell.table:4.0.6");
     compile("org.apache.commons:commons-lang3:$commonsLangVersion")
     compile("ch.qos.logback:logback-classic:$logbackVersion")
     compile("org.slf4j:slf4j-api:$slf4jVersion")
