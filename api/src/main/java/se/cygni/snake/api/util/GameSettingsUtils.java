@@ -11,7 +11,7 @@ public class GameSettingsUtils {
                 .withWidth(WorldSize.SMALL)
                 .withHeight(WorldSize.SMALL)
                 .withFoodEnabled(true)
-                .withObstaclesEnabled(false)
+                .withObstaclesEnabled(true)
                 .build();
     }
 
