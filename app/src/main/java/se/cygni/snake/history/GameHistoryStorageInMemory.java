@@ -34,13 +34,14 @@ public class GameHistoryStorageInMemory implements GameHistoryStorage {
     public void addToStorage(InternalGameEvent internalGameEvent) {
 
         GameMessage gameMessage = internalGameEvent.getGameMessage();
-        String gameId = MessageUtils.extractGameId(gameMessage);
+        Optional<String> extractGameId = MessageUtils.extractGameId(gameMessage);
 
-        if (gameId == null) {
+        if (!extractGameId.isPresent()) {
             log.debug("Received a GameEvent without gameId, discarding it. Type: {}", gameMessage.getType());
             return;
         }
 
+        String gameId = extractGameId.get();
 
         log.debug("Storing GameMessage for gameId: {}", gameId);
 

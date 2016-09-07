@@ -4,6 +4,7 @@ import org.springframework.beans.BeanUtils;
 import se.cygni.snake.api.GameMessage;
 
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 public class MessageUtils {
 
@@ -12,15 +13,17 @@ public class MessageUtils {
         return dst;
     }
 
-    public static String extractGameId(GameMessage message) {
+    public static Optional<String> extractGameId(GameMessage message) {
+
         try {
             Method m = BeanUtils.findDeclaredMethod(message.getClass(), "getGameId", null);
             if (m != null) {
-                return (String) m.invoke(message);
+                return Optional.of((String) m.invoke(message));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            // It's okay
         }
-        return null;
+
+        return Optional.empty();
     }
 }
