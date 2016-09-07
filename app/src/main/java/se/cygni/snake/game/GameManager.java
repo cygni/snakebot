@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class GameManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GameManager.class);
+    private static final Logger log = LoggerFactory.getLogger(GameManager.class);
 
     EventBus globalEventBus;
 
@@ -90,7 +90,7 @@ public class GameManager {
     private void registerGame(Game game) {
         activeGames.put(game.getGameId(), game);
 
-        LOGGER.info("Registered new game, posting to GlobalEventBus...");
+        log.info("Registered new game, posting to GlobalEventBus...");
         globalEventBus.post(new InternalGameEvent(
                 System.currentTimeMillis(),
                 new GameCreatedEvent(game.getGameId())));

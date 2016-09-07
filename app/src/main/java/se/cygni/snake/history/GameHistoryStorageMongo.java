@@ -2,14 +2,13 @@ package se.cygni.snake.history;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
-import se.cygni.snake.api.event.MapUpdateEvent;
+import se.cygni.snake.api.GameMessage;
+import se.cygni.snake.event.InternalGameEvent;
 
-import java.util.*;
+import java.util.List;
 
-@Component
-@Profile({"production"})
+//@Component
+//@Profile({"production"})
 public class GameHistoryStorageMongo implements GameHistoryStorage {
 
     private static Logger log = LoggerFactory
@@ -20,19 +19,17 @@ public class GameHistoryStorageMongo implements GameHistoryStorage {
     }
 
     @Override
-    public void addToStorage(MapUpdateEvent mapUpdateEvent) {
+    public void addToStorage(InternalGameEvent internalGameEvent) {
 
     }
 
     @Override
-    public List<MapUpdateEvent> getAllMapUpdatesForGame(String gameId) {
-        List<MapUpdateEvent> mapUpdates = new ArrayList<>();
-        return mapUpdates;
+    public List<GameMessage> getAllMessagesForGame(String gameId) {
+        return null;
     }
 
     @Override
     public List<String> listGamesWithPlayer(String playerName) {
-        List<String> games = new ArrayList<>();
-        return games;
+        return null;
     }
 }

@@ -2,13 +2,17 @@ package se.cygni.snake.history;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.event.InternalGameEvent;
 
 @Service
 public class GameHistory {
+
+    private static Logger log = LoggerFactory
+            .getLogger(GameHistory.class);
 
     private final EventBus eventBus;
     private final GameHistoryStorage storage;
@@ -19,16 +23,17 @@ public class GameHistory {
         this.storage = storage;
 
         this.eventBus.register(this);
+
+        log.debug("Created GameHistory collector and registered to eventbus: {}", eventBus.toString());
     }
 
     @Subscribe
     public void onInternalGameEvent(InternalGameEvent gameEvent) {
 
-        if (!(gameEvent.getGameMessage() instanceof MapUpdateEvent)) {
-            return;
-        }
+        log.debug("Got an InternalGameEvent");
 
-        storage.addToStorage((MapUpdateEvent)gameEvent.getGameMessage());
+        storage.addToStorage(gameEvent);
+
     }
 
 }

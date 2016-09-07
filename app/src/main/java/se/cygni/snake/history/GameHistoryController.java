@@ -1,10 +1,11 @@
 package se.cygni.snake.history;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import se.cygni.snake.api.event.MapUpdateEvent;
+import se.cygni.snake.api.GameMessage;
 
 import java.util.List;
 
@@ -18,10 +19,17 @@ public class GameHistoryController {
         this.storage = storage;
     }
 
-    @RequestMapping("/history")
-    public List<MapUpdateEvent> authenticate(
-            @RequestParam(value="gameId") String gameId) {
+    @RequestMapping(value = "/history/{gameId}", method = RequestMethod.GET)
+    public List<GameMessage> getGame(
+                @PathVariable("gameId") String gameId) {
 
-        return storage.getAllMapUpdatesForGame(gameId);
+        return storage.getAllMessagesForGame(gameId);
+    }
+
+    @RequestMapping(value = "/history/search/{name}", method = RequestMethod.GET)
+    public List<String> searchGame(
+            @PathVariable("name") String name) {
+
+        return storage.listGamesWithPlayer(name);
     }
 }
