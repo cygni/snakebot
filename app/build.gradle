@@ -32,6 +32,11 @@ configurations {
     compile.exclude module: "spring-boot-starter-tomcat"
 }
 
+project.ext {
+    builddate = new Date()
+    buildnumber = "$System.env.BUILD_NUMBER"
+}
+
 //springBoot {
 //    buildInfo()
 //}
