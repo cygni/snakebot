@@ -6,18 +6,13 @@ import org.slf4j.LoggerFactory;
 import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.random.XORShiftRandom;
-import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
-import se.cygni.game.transformation.AddWorldObjectAtRandomPositionInGrid;
-import se.cygni.game.transformation.AddWorldObjectsInCircle;
-import se.cygni.game.transformation.DecrementTailProtection;
-import se.cygni.game.transformation.RemoveRandomWorldObject;
+import se.cygni.game.transformation.*;
 import se.cygni.game.worldobject.Food;
 import se.cygni.game.worldobject.Obstacle;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.model.PointReason;
 import se.cygni.snake.apiconversion.GameMessageConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
@@ -95,6 +90,7 @@ public class GameEngine {
         Collections.shuffle(snakeHeads, new XORShiftRandom());
         AddWorldObjectsInCircle snakeHeadsInCircleFormation = new AddWorldObjectsInCircle(snakeHeads, 0.9d);
         world = snakeHeadsInCircleFormation.transform(world);
+
         GameStartingEvent gameStartingEvent = new GameStartingEvent(
                 gameId,
                 playerManager.size(),
@@ -108,7 +104,7 @@ public class GameEngine {
                 .map(operand -> new Food())
                 .forEach(worldObject -> world = new AddWorldObjectAtRandomPosition(worldObject).transform(world));
         AddWorldObjectAtRandomPositionInGrid.GridFilter mazeFilter = AddWorldObjectAtRandomPositionInGrid.fromStringMap(
-                " #       #     #         " +
+                        " #       #     #         " +
                         " # ### # ### # # ##### # " +
                         " # #   #     # # #   # # " +
                         " # # ### ####### # # # # " +
@@ -199,23 +195,10 @@ public class GameEngine {
                     if (gameFeatures.isFoodEnabled()) {
                         randomFood();
                     }
-
-                    if (gameFeatures.isObstaclesEnabled()) {
-                        randomObstacle();
-                    }
                 }
 
                 // Set internal state to not running
                 isRunning.set(false);
-
-                // Game is Over, assign points to last man standing
-                Set<IPlayer> livingPlayers = playerManager.getLivePlayers();
-
-                for (IPlayer player : livingPlayers) {
-                    player.addPoints(
-                            PointReason.LAST_SNAKE_ALIVE,
-                            gameFeatures.getPointsLastSnakeLiving());
-                }
 
                 // Create GameResult
                 Set<IPlayer> allPlayers = playerManager.toSet();
@@ -251,20 +234,6 @@ public class GameEngine {
 
         Thread t = new Thread(r);
         t.start();
-    }
-
-    private void randomObstacle() {
-        if (shouldExecute(gameFeatures.getRemoveObstacleLikelihood())) {
-            RemoveRandomWorldObject<Obstacle> removeTransform =
-                    new RemoveRandomWorldObject<>(Obstacle.class);
-            world = removeTransform.transform(world);
-        }
-
-        if (shouldExecute(gameFeatures.getAddObstacleLikelihood())) {
-            AddWorldObjectAtRandomPosition addTransform =
-                    new AddWorldObjectAtRandomPosition(new Obstacle());
-            world = addTransform.transform(world);
-        }
     }
 
     private void randomFood() {

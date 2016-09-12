@@ -6,41 +6,99 @@ import org.junit.Test;
 public class GameFeaturesTest {
 
     @Test
-    public void testDivisibleBy25() throws Exception {
+    public void testStartSnakeLengthIsMax10() throws Exception {
         GameFeatures gf = new GameFeatures();
-
-        gf.setWidth(74);
-        gf.setHeight(34);
-
+        gf.setStartSnakeLength(22);
         gf.applyValidation();
 
-        Assert.assertEquals(50, gf.getWidth());
-        Assert.assertEquals(25, gf.getHeight());
+        Assert.assertEquals(10, gf.getStartSnakeLength());
     }
 
     @Test
-    public void testMinSize25() throws Exception {
+    public void testStartSnakeLengthIsMin1() throws Exception {
         GameFeatures gf = new GameFeatures();
-
-        gf.setWidth(1);
-        gf.setHeight(-4);
-
+        gf.setStartSnakeLength(-12);
         gf.applyValidation();
 
-        Assert.assertEquals(25, gf.getWidth());
-        Assert.assertEquals(25, gf.getHeight());
+        Assert.assertEquals(1, gf.getStartSnakeLength());
+
+        gf.setStartSnakeLength(0);
+        gf.applyValidation();
+        Assert.assertEquals(1, gf.getStartSnakeLength());
     }
 
     @Test
-    public void testMaxSize100() throws Exception {
+    public void testMaxNoofPlayersIsMax20() throws Exception {
         GameFeatures gf = new GameFeatures();
-
-        gf.setWidth(100);
-        gf.setHeight(175);
-
+        gf.setMaxNoofPlayers(99);
         gf.applyValidation();
 
-        Assert.assertEquals(100, gf.getWidth());
-        Assert.assertEquals(100, gf.getHeight());
+        Assert.assertEquals(20, gf.getMaxNoofPlayers());
+    }
+
+    @Test
+    public void testMaxNoofPlayersIsMin2() throws Exception {
+        GameFeatures gf = new GameFeatures();
+        gf.setMaxNoofPlayers(-2);
+        gf.applyValidation();
+
+        Assert.assertEquals(2, gf.getMaxNoofPlayers());
+
+        gf.setMaxNoofPlayers(0);
+        gf.applyValidation();
+
+        Assert.assertEquals(2, gf.getMaxNoofPlayers());
+    }
+
+    @Test
+    public void testSpontaneousGrowthEveryNWorldTickIsMin2() throws Exception {
+        GameFeatures gf = new GameFeatures();
+        gf.setSpontaneousGrowthEveryNWorldTick(-2);
+        gf.applyValidation();
+
+        Assert.assertEquals(2, gf.getSpontaneousGrowthEveryNWorldTick());
+
+        gf.setSpontaneousGrowthEveryNWorldTick(0);
+        gf.applyValidation();
+
+        Assert.assertEquals(2, gf.getSpontaneousGrowthEveryNWorldTick());
+    }
+
+    @Test
+    public void testStartObstaclesIsPositive() throws Exception {
+        GameFeatures gf = new GameFeatures();
+        gf.setStartObstacles(-2);
+        gf.applyValidation();
+
+        Assert.assertEquals(0, gf.getStartObstacles());
+
+        gf.setStartObstacles(0);
+        gf.applyValidation();
+
+        Assert.assertEquals(0, gf.getStartObstacles());
+
+        gf.setStartObstacles(7);
+        gf.applyValidation();
+
+        Assert.assertEquals(7, gf.getStartObstacles());
+    }
+
+    @Test
+    public void testStartFoodIsPositive() throws Exception {
+        GameFeatures gf = new GameFeatures();
+        gf.setStartFood(-2);
+        gf.applyValidation();
+
+        Assert.assertEquals(0, gf.getStartFood());
+
+        gf.setStartFood(0);
+        gf.applyValidation();
+
+        Assert.assertEquals(0, gf.getStartFood());
+
+        gf.setStartFood(7);
+        gf.applyValidation();
+
+        Assert.assertEquals(7, gf.getStartFood());
     }
 }

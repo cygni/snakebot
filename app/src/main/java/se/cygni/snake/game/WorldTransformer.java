@@ -329,33 +329,21 @@ public class WorldTransformer {
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(oc.getPosition()),
                         worldTick);
-                playerManager.getPlayer(playerId).addPoints(
-                        PointReason.SUICIDE,
-                        gameFeatures.getPointsSuicide());
             } catch (WallCollision wc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithWall,
                         ws.translatePosition(wc.getPosition()),
                         worldTick);
-                playerManager.getPlayer(playerId).addPoints(
-                        PointReason.SUICIDE,
-                        gameFeatures.getPointsSuicide());
             } catch (SnakeCollision sc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithSelf,
                         ws.translatePosition(sc.getPosition()),
                         worldTick);
-                playerManager.getPlayer(playerId).addPoints(
-                        PointReason.SUICIDE,
-                        gameFeatures.getPointsSuicide());
             } catch (TransformationException oc) {
                 snakeDied(snakeHead,
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(0),
                         worldTick);
-                playerManager.getPlayer(playerId).addPoints(
-                        PointReason.SUICIDE,
-                        gameFeatures.getPointsSuicide());
             }
         }
 

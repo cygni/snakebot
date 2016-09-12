@@ -28,8 +28,6 @@ public class GameEngineTest {
     //@Before
     public void setup() {
         GameFeatures gameFeatures = new GameFeatures();
-        gameFeatures.setWidth(15);
-        gameFeatures.setHeight(15);
         gameFeatures.setTimeInMsPerTick(1000);
         gameFeatures.setMaxNoofPlayers(25);
         gameFeatures.setSpontaneousGrowthEveryNWorldTick(2);

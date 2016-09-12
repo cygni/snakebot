@@ -40,8 +40,6 @@ public class GameManager {
     public Game createTrainingGame() {
         GameFeatures gameFeatures = new GameFeatures();
         gameFeatures.setTrainingGame(true);
-        gameFeatures.setHeight(25);
-        gameFeatures.setWidth(25);
         Game game = new Game(gameFeatures, globalEventBus, true, viewUrl);
 
         registerGame(game);
