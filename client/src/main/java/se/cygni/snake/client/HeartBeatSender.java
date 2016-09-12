@@ -13,7 +13,7 @@ import se.cygni.snake.api.request.HeartBeatRequest;
  */
 public class HeartBeatSender implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HeartBeatSender.class);
+    private static final Logger log = LoggerFactory.getLogger(HeartBeatSender.class);
 
     private static final int DEFAULT_HEARTBEAT_PERIOD_IN_SECONDS = 30;
 
@@ -30,7 +30,7 @@ public class HeartBeatSender implements Runnable {
         try {
             Thread.sleep(DEFAULT_HEARTBEAT_PERIOD_IN_SECONDS * 1000);
         } catch (InterruptedException e) {
-            LOGGER.error("Heartbeat sleep period interrupted", e);
+            log.error("Heartbeat sleep period interrupted", e);
         }
 
         sendHeartbeat();
@@ -38,12 +38,12 @@ public class HeartBeatSender implements Runnable {
 
     private void sendHeartbeat() {
         try {
-            LOGGER.trace("Sending heartbeat");
+            log.trace("Sending heartbeat");
             HeartBeatRequest heartBeatRequest = new HeartBeatRequest();
             heartBeatRequest.setReceivingPlayerId(playerId);
             session.sendMessage(new TextMessage(GameMessageParser.encodeMessage(heartBeatRequest)));
         } catch (Exception e) {
-            LOGGER.error("Failed to send heartbeat over websocket", e);
+            log.error("Failed to send heartbeat over websocket", e);
         }
     }
 }

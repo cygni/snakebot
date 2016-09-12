@@ -35,7 +35,7 @@ import java.net.UnknownHostException;
 
 public abstract class BaseSnakeClient extends TextWebSocketHandler implements SnakeClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseSnakeClient.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseSnakeClient.class);
 
     private WebSocketSession session;
 
@@ -45,13 +45,13 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private boolean tournamentEnded = false;
 
     public void registerForGame(GameSettings gameSettings) {
-        LOGGER.info("Register for game...");
+        log.info("Register for game...");
         RegisterPlayer registerPlayer = new RegisterPlayer(getName(), gameSettings);
         sendMessage(registerPlayer);
     }
 
     public void startGame() {
-        LOGGER.info("Starting game...");
+        log.info("Starting game...");
         StartGame startGame = new StartGame();
         startGame.setReceivingPlayerId(playerId);
         sendMessage(startGame);
@@ -93,7 +93,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to load properties file, could not determine client version");
+            log.error("Failed to load properties file, could not determine client version");
         }
         return version;
     }
@@ -111,12 +111,12 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     private void disconnect() {
-        LOGGER.info("Disconnecting from server");
+        log.info("Disconnecting from server");
         if (session != null) {
             try {
                 session.close();
             } catch (IOException e) {
-                LOGGER.warn("Failed to close websocket connection");
+                log.warn("Failed to close websocket connection");
             } finally {
                 session = null;
             }
@@ -125,7 +125,7 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
 
     public ListenableFuture<WebSocketSession> connect() {
         String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString().toLowerCase());
-        LOGGER.info("Connecting to {}", uri);
+        log.info("Connecting to {}", uri);
 
         WebSocketClient wsClient = new StandardWebSocketClient();
         return wsClient.doHandshake(this, uri);
@@ -140,21 +140,21 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private void sendMessage(GameMessage message) {
 
         try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Sending: {}", GameMessageParser.encodeMessage(message));
+            if (log.isDebugEnabled()) {
+                log.debug("Sending: {}", GameMessageParser.encodeMessage(message));
             }
 
             session.sendMessage(new TextMessage(
                     GameMessageParser.encodeMessage(message)
             ));
         } catch (Exception e) {
-            LOGGER.error("Failed to send message over websocket", e);
+            log.error("Failed to send message over websocket", e);
         }
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        LOGGER.info("Connected to server");
+        log.info("Connected to server");
         this.session = session;
         this.onConnected();
         sendHeartbeat();
@@ -173,11 +173,11 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         String messageRaw = msgBuffer.toString();
         msgBuffer = new StringBuilder();
 
-        LOGGER.debug("Incoming message: {}", messageRaw);
+        log.debug("Incoming message: {}", messageRaw);
         try {
             // Deserialize message
             GameMessage gameMessage = GameMessageParser.decodeMessage(messageRaw);
-            LOGGER.debug(messageRaw);
+            log.debug(messageRaw);
 
             if (gameMessage instanceof PlayerRegistered) {
                 this.onPlayerRegistered((PlayerRegistered) gameMessage);
@@ -210,6 +210,10 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
                 this.onInvalidPlayerName((InvalidPlayerName) gameMessage);
             }
 
+            if (gameMessage instanceof GameLinkEvent) {
+                this.onGameLink((GameLinkEvent)gameMessage);
+            }
+
             if (gameMessage instanceof HeartBeatResponse) {
                 this.sendHeartbeat();
             }
@@ -217,30 +221,30 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (gameMessage instanceof InvalidMessage) {
                 InvalidMessage invalidMessage = (InvalidMessage) gameMessage;
 
-                LOGGER.error("Server did not understand my last message");
-                LOGGER.error("Message sent: " + invalidMessage.getReceivedMessage());
-                LOGGER.error("Error message: " + invalidMessage.getErrorMessage());
+                log.error("Server did not understand my last message");
+                log.error("Message sent: " + invalidMessage.getReceivedMessage());
+                log.error("Error message: " + invalidMessage.getErrorMessage());
             }
         } catch (Exception e) {
-            LOGGER.error("Could not understand received message from server: {}", messageRaw, e);
+            log.error("Could not understand received message from server: {}", messageRaw, e);
         }
     }
 
     @OnError
     public void onError(Throwable exception, Session session) {
-        LOGGER.error("Websocket error", exception);
+        log.error("Websocket error", exception);
     }
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        LOGGER.warn("Transport error", exception);
+        log.warn("Transport error", exception);
         disconnect();
         onSessionClosed();
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        LOGGER.warn("Server connection closed");
+        log.warn("Server connection closed");
         disconnect();
         onSessionClosed();
     }

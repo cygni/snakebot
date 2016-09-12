@@ -30,7 +30,7 @@ import java.util.*;
 
 @Component
 public class TournamentManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TournamentManager.class);
+    private static final Logger log = LoggerFactory.getLogger(TournamentManager.class);
 
     private GameManager gameManager;
     private final EventBus outgoingEventBus;
@@ -93,7 +93,7 @@ public class TournamentManager {
     }
 
     private void completeTournament() {
-        LOGGER.info("We have a tournament result!");
+        log.info("We have a tournament result!");
 
         TournamentPlannedGame lastGame = tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().get(0);
         GameResult gameResult = lastGame.getGame().getGameResult();
@@ -105,7 +105,7 @@ public class TournamentManager {
             int c = 1;
             for (IPlayer player : gameResult.getSortedResult()) {
                 playerPoints.add(new PlayerPoints(player.getName(), player.getPlayerId(), player.getTotalPoints()));
-                LOGGER.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
+                log.info("{}. {} - {} pts", c++, player.getName(), player.getTotalPoints());
             }
         }
 
@@ -134,7 +134,7 @@ public class TournamentManager {
 
     private void organizePlayersInLevel() {
 
-        LOGGER.info("Organizing players in Level. Current level: {}, noof levels: {}", currentLevel, tournamentPlan.getLevels().size());
+        log.info("Organizing players in Level. Current level: {}, noof levels: {}", currentLevel, tournamentPlan.getLevels().size());
         if (isTournamentComplete()) {
             completeTournament();
             return;
@@ -154,9 +154,9 @@ public class TournamentManager {
         for (TournamentPlannedGame tGame : tLevel.getPlannedGames()) {
 
             Set<IPlayer> players = TournamentUtil.getRandomPlayers(playersInTournament, tGame.getExpectedNoofPlayers());
-            LOGGER.info("adding noof players to new game: {}", players.size());
+            log.info("adding noof players to new game: {}", players.size());
             if (players.size() == 0) {
-                LOGGER.error("Hoa, got 0 players to add to game...");
+                log.error("Hoa, got 0 players to add to game...");
                 continue;
             }
             tGame.setPlayers(players);
@@ -227,7 +227,7 @@ public class TournamentManager {
         if (internalGameEvent.getGameMessage() instanceof GameEndedEvent) {
             GameEndedEvent gee = (GameEndedEvent)internalGameEvent.getGameMessage();
             if (games.containsKey(gee.getGameId())) {
-                LOGGER.info("GameId: {} ended.", gee.getGameId());
+                log.info("GameId: {} ended.", gee.getGameId());
                 if (areAllGamesInLevelComplete(currentLevel)) {
                     currentLevel++;
                     organizePlayersInLevel();
@@ -245,11 +245,11 @@ public class TournamentManager {
 
         for (TournamentPlannedGame tGame : tLevel.getPlannedGames()) {
             if (!tGame.getGame().isEnded()) {
-                LOGGER.info("Tournament level: {} is not complete.", level);
+                log.info("Tournament level: {} is not complete.", level);
                 return false;
             }
         }
-        LOGGER.info("Tournament level: {} is complete.", level);
+        log.info("Tournament level: {} is complete.", level);
         return true;
     }
 

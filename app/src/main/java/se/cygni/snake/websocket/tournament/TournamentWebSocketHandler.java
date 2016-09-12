@@ -9,7 +9,7 @@ import se.cygni.snake.websocket.BaseGameSocketHandler;
 
 public class TournamentWebSocketHandler extends BaseGameSocketHandler {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(TournamentWebSocketHandler.class);
+    private static Logger log = LoggerFactory.getLogger(TournamentWebSocketHandler.class);
 
     private TournamentManager tournamentManager;
 
@@ -17,7 +17,7 @@ public class TournamentWebSocketHandler extends BaseGameSocketHandler {
     public TournamentWebSocketHandler(TournamentManager tournamentManager) {
         this.tournamentManager = tournamentManager;
 
-        LOGGER.info("Started tournament web socket handler");
+        log.info("Started tournament web socket handler");
 
         // Get an eventbus and register this handler
         this.setOutgoingEventBus(tournamentManager.getOutgoingEventBus());

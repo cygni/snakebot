@@ -12,7 +12,7 @@ public class PotentialDirection implements Comparable<PotentialDirection> {
 
     public static SnakeDirection[] POSSIBLE_DIRECTIONS = {SnakeDirection.UP, SnakeDirection.DOWN, SnakeDirection.LEFT, SnakeDirection.RIGHT};
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PotentialDirection.class);
+    private static final Logger log = LoggerFactory.getLogger(PotentialDirection.class);
 
     static final int DEFAULT_KEEP_GOING_SCORE = 10;
     static final int DEFAULT_EMPTY_SCORE = 100;

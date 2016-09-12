@@ -31,7 +31,7 @@ import java.util.stream.IntStream;
 
 public class WorldTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorldTransformer.class);
+    private static final Logger log = LoggerFactory.getLogger(WorldTransformer.class);
 
 //    private final Game game;
     private final GameFeatures gameFeatures;
@@ -99,7 +99,7 @@ public class WorldTransformer {
         int snakesAliveAtEnd = resultingWorld.listPositionsWithContentOf(SnakeHead.class).length;
 
         if (snakesAliveAtStart != snakesAliveAtEnd + snakesDiedThisRound) {
-            LOGGER.error("SnakeHead count doesn't match up. Start: {}, End: {}, Died: " + snakesDiedThisRound, snakesAliveAtStart, snakesAliveAtEnd);
+            log.error("SnakeHead count doesn't match up. Start: {}, End: {}, Died: " + snakesDiedThisRound, snakesAliveAtStart, snakesAliveAtEnd);
         }
         return resultingWorld;
     }
@@ -212,7 +212,7 @@ public class WorldTransformer {
                     gameFeatures.getPointsPerNibble()
             );
         } catch (TransformationException e) {
-            LOGGER.error("TailNibbled transformation failed.", e);
+            log.error("TailNibbled transformation failed.", e);
         }
     }
 
@@ -427,7 +427,7 @@ public class WorldTransformer {
 
         snakesDiedThisRound++;
         IPlayer deadPlayer = playerManager.getPlayer(head.getPlayerId());
-        LOGGER.info("Death occurred. GameId: {}, Player: {}, with id: {}, died at: {}",
+        log.info("Death occurred. GameId: {}, Player: {}, with id: {}, died at: {}",
                 gameId,
                 deadPlayer.getName(),
                 deadPlayer.getPlayerId(),

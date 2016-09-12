@@ -6,6 +6,7 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import se.cygni.snake.api.event.GameAbortedEvent;
 import se.cygni.snake.api.event.GameCreatedEvent;
@@ -27,6 +28,9 @@ public class GameManager {
 
     private Map<String, Game> activeGames = new ConcurrentHashMap<>(new HashMap<>());
 
+    @Value("${snakebot.view.url}")
+    private String viewUrl;
+
     @Autowired
     public GameManager(EventBus globalEventBus) {
         this.globalEventBus = globalEventBus;
@@ -38,14 +42,14 @@ public class GameManager {
         gameFeatures.setTrainingGame(true);
         gameFeatures.setHeight(25);
         gameFeatures.setWidth(25);
-        Game game = new Game(gameFeatures, globalEventBus, true);
+        Game game = new Game(gameFeatures, globalEventBus, true, viewUrl);
 
         registerGame(game);
         return game;
     }
 
     public Game createGame(GameFeatures gameFeatures) {
-        Game game = new Game(gameFeatures, globalEventBus, false);
+        Game game = new Game(gameFeatures, globalEventBus, false, viewUrl);
         registerGame(game);
 
         return game;

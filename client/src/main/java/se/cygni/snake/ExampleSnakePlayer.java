@@ -134,7 +134,12 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-        startGame();
+//        startGame();
+    }
+
+    @Override
+    public void onGameLink(GameLinkEvent gameLinkEvent) {
+        log.info("The game can be viewed at: {}", gameLinkEvent.getUrl());
     }
 
     @Override

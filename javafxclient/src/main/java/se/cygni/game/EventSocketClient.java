@@ -26,7 +26,7 @@ import se.cygni.snake.eventapi.response.ActiveGamesList;
 
 public class EventSocketClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventSocketClient.class);
+    private static final Logger log = LoggerFactory.getLogger(EventSocketClient.class);
 
     private String url = "ws://localhost:8080/events";
     private EventListener listener;
@@ -54,7 +54,7 @@ public class EventSocketClient {
             TextMessage textMessage = new TextMessage(msg);
             webSocketSession.sendMessage(textMessage);
         } catch (Exception e) {
-            LOGGER.error("Error sending api message", e);
+            log.error("Error sending api message", e);
         }
     }
 
@@ -136,13 +136,13 @@ public class EventSocketClient {
 
             @Override
             public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-                LOGGER.info("transport error ");
+                log.info("transport error ");
                 exception.printStackTrace();
             }
 
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-                LOGGER.info("connection closed");
+                log.info("connection closed");
             }
 
             @Override

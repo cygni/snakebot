@@ -21,6 +21,8 @@ public interface SnakeClient {
 
     void onInvalidPlayerName(InvalidPlayerName invalidPlayerName);
 
+    void onGameLink(GameLinkEvent gameLinkEvent);
+
     String getServerHost();
 
     int getServerPort();
