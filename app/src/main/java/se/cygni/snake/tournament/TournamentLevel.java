@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class TournamentLevel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TournamentLevel.class);
+    private static final Logger log = LoggerFactory.getLogger(TournamentLevel.class);
 
     private final int levelIndex;
     private final int expectedNoofPlayers;
@@ -55,7 +55,7 @@ public class TournamentLevel {
                 index++;
                 addedEnough = added == noofToAdvance || index >= gameResult.size();
             }
-            LOGGER.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
+            log.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
                     game.getGame().getPlayerManager().size(),
                     gameResult.size(),
                     gameAdvancing.size());

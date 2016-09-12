@@ -10,7 +10,7 @@ import se.cygni.snake.websocket.BaseGameSocketHandler;
 
 public class TrainingWebSocketHandler extends BaseGameSocketHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrainingWebSocketHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(TrainingWebSocketHandler.class);
 
     private final GameManager gameManager;
     private final Game game;
@@ -18,7 +18,7 @@ public class TrainingWebSocketHandler extends BaseGameSocketHandler {
     @Autowired
     public TrainingWebSocketHandler(GameManager gameManager) {
         this.gameManager = gameManager;
-        LOGGER.info("Started training web socket handler");
+        log.info("Started training web socket handler");
 
         game = gameManager.createTrainingGame();
 
@@ -29,7 +29,7 @@ public class TrainingWebSocketHandler extends BaseGameSocketHandler {
 
     @Override
     protected void playerLostConnection() {
-        LOGGER.info("{} lost connection", getPlayerId());
+        log.info("{} lost connection", getPlayerId());
         game.playerLostConnection(getPlayerId());
         game.abort();
     }

@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseGameSocketHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(BaseGameSocketHandler.class);
 
     private final String playerId;
     private EventBus outgoingEventBus;
@@ -45,13 +45,13 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
         try {
             sendSnakeMessage(heartBeatResponse);
         } catch (Exception e) {
-            LOGGER.error("Failed to send heartbeat response", e);
+            log.error("Failed to send heartbeat response", e);
         }
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        LOGGER.debug("Received: {}", message.getPayload());
+        log.debug("Received: {}", message.getPayload());
 
         try {
             // Deserialize message
@@ -68,7 +68,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
             // Send to game
             incomingEventBus.post(gameMessage);
         } catch (Throwable e) {
-            LOGGER.error("Could not handle incoming text message: {}", e.getMessage());
+            log.error("Could not handle incoming text message: {}", e.getMessage());
 
             InvalidMessage invalidMessage = new InvalidMessage(
                     "Could not understand this message. Error:" + e.getMessage(),
@@ -77,7 +77,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
             invalidMessage.setReceivingPlayerId(playerId);
 
             try {
-                LOGGER.info("Sending InvalidMessage to client.");
+                log.info("Sending InvalidMessage to client.");
                 outgoingEventBus.post(invalidMessage);
             } catch (Throwable ee) {
                 ee.printStackTrace();
@@ -87,7 +87,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        LOGGER.error("handleTransportError", exception);
+        log.error("handleTransportError", exception);
         session.close(CloseStatus.SERVER_ERROR);
     }
 
@@ -98,7 +98,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
         outgoingEventBus.unregister(this);
         playerLostConnection();
 
-        LOGGER.info("afterConnectionClosed {}", status);
+        log.info("afterConnectionClosed {}", status);
     }
 
     @Override
@@ -115,7 +115,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
         }
         try {
             String msg = GameMessageParser.encodeMessage(message);
-            LOGGER.debug("Sending: {}", msg);
+            log.debug("Sending: {}", msg);
             webSocketSession.sendMessage(new TextMessage(msg));
         } catch (Exception e) {
             e.printStackTrace();

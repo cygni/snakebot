@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.cygni.game.Player;
 import se.cygni.game.enums.Direction;
+import se.cygni.snake.api.event.GameLinkEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
@@ -30,7 +31,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Game {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Game.class);
+    private static final Logger log = LoggerFactory.getLogger(Game.class);
 
     private final boolean trainingGame;
     private final EventBus incomingEventBus;
@@ -40,14 +41,16 @@ public class Game {
     private GameFeatures gameFeatures;
     private final GameEngine gameEngine;
     private final EventBus globalEventBus;
+    private final String viewUrl;
 
     private Random botSelector = new Random(System.currentTimeMillis());
 
-    public Game(GameFeatures gameFeatures, EventBus globalEventBus, boolean trainingGame) {
+    public Game(GameFeatures gameFeatures, EventBus globalEventBus, boolean trainingGame, String viewUrl) {
 
         this.globalEventBus = globalEventBus;
         this.gameFeatures = gameFeatures;
         this.trainingGame = trainingGame;
+        this.viewUrl = viewUrl;
         gameId = UUID.randomUUID().toString();
         gameEngine = new GameEngine(gameFeatures, playerManager, gameId, globalEventBus);
         incomingEventBus = new EventBus("game-" + gameId + "-incoming");
@@ -63,7 +66,7 @@ public class Game {
     @Subscribe
     public void startGame(StartGame startGame) {
         if (trainingGame) {
-            LOGGER.info("Starting game: {}", gameId);
+            log.info("Starting game: {}", gameId);
             startGame();
         }
     }
@@ -95,6 +98,7 @@ public class Game {
         MessageUtils.copyCommonAttributes(registerPlayer, playerRegistered);
 
         outgoingEventBus.post(playerRegistered);
+        sendGameLink(player);
         publishGameChanged();
     }
 
@@ -105,7 +109,7 @@ public class Game {
         Direction direction = DirectionConverter.toDirection(registerMove.getDirection());
 
         if (!gameId.equals(registerMove.getGameId())) {
-            LOGGER.warn("Player: {}, playerId: {}, tried to register move for wrong game. Aborting that move.",
+            log.warn("Player: {}, playerId: {}, tried to register move for wrong game. Aborting that move.",
                     playerManager.getPlayerName(playerId),
                     playerId);
             return;
@@ -120,7 +124,7 @@ public class Game {
 
     @Subscribe
     public void clientInfo(ClientInfo clientInfo) {
-        LOGGER.info("Client Info: {}", clientInfo);
+        log.info("Client Info: {}", clientInfo);
     }
 
     public void startGame() {
@@ -135,6 +139,12 @@ public class Game {
     public void addPlayer(IPlayer player) {
         playerManager.add(player);
         publishGameChanged();
+    }
+
+    private void sendGameLink(Player player) {
+        GameLinkEvent gle = new GameLinkEvent(gameId, viewUrl + gameId);
+        gle.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(gle);
     }
 
     public PlayerManager getPlayerManager() {
@@ -165,9 +175,9 @@ public class Game {
         try {
             IPlayer player = playerManager.getPlayer(playerId);
             player.dead(gameEngine.getCurrentWorldTick());
-            LOGGER.info("Player: {} , playerId: {} lost connection and was therefore killed.", player.getName(), playerId);
+            log.info("Player: {} , playerId: {} lost connection and was therefore killed.", player.getName(), playerId);
         } catch (Exception e) {
-            LOGGER.warn("PlayerId: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
+            log.warn("PlayerId: {} lost connection but I could not remove her (which is OK, she probably wasn't registered in the first place)", playerId);
         }
         if (playerManager.getLiveAndRemotePlayers().size() == 0) {
             abort();
