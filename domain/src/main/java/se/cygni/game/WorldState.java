@@ -187,6 +187,19 @@ public class WorldState {
             isTileContentOfType(position, clazz)).toArray();
     }
 
+    public int[] listEmptyPositionsWithPadding(int padding) {
+        int[] nonEmptyPositions = listNonEmptyPositions();
+        
+        return IntStream.range(0, getSize()).filter( position -> {
+
+        }).toArray();
+    }
+
+    public int[] listNonEmptyPositions() {
+        return IntStream.range(0, getSize()).filter( position ->
+                !isTileEmpty(position)).toArray();
+    }
+
     public int[] listEmptyPositions() {
         return listPositionsWithContentOf(Empty.class);
     }

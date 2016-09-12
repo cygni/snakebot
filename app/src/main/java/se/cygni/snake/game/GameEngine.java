@@ -10,6 +10,7 @@ import se.cygni.game.transformation.*;
 import se.cygni.game.worldobject.Food;
 import se.cygni.game.worldobject.Obstacle;
 import se.cygni.game.worldobject.SnakeHead;
+import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
@@ -22,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * GameEngine is responsible for:
@@ -80,29 +82,57 @@ public class GameEngine {
         isRunning.set(false);
     }
 
+    private void initPlacePlayers() {
+        // Place players
+        List<SnakeHead> snakeHeads = playerManager.toSet().stream().map(player -> new SnakeHead(player.getName(), player.getPlayerId(), 0)).collect(Collectors.toList());
+        AddWorldObjectsInCircle snakeHeadsInCircleFormation = new AddWorldObjectsInCircle(snakeHeads, 0.9d);
+        world = snakeHeadsInCircleFormation.transform(world);
+    }
 
+    private void initPlaceFood() {
+        if (gameFeatures.isFoodEnabled()) {
+            IntStream.range(0, gameFeatures.getStartFood()).forEach(n -> {
+                AddWorldObjectAtRandomPosition addFoodTransform = new AddWorldObjectAtRandomPosition(new Food());
+                world = addFoodTransform.transform(world);
+            });
+        }
+    }
+
+    private void initPlaceObstacles() {
+        if (gameFeatures.isObstaclesEnabled()) {
+
+        }
+    }
+
+    private void notifyAllPlayers(GameMessage message) {
+        notifyPlayers(playerManager.toSet(), message);
+    }
+
+    private void notifyPlayers(Set<IPlayer> players, GameMessage message) {
+        players.stream().forEach( player -> {
+            player.onGameMessage(message);
+        });
+
+        InternalGameEvent gevent = new InternalGameEvent(
+                System.currentTimeMillis(),
+                message);
+        globalEventBus.post(gevent);
+    }
 
     private void initGame() {
         world = new WorldState(gameFeatures.getWidth(), gameFeatures.getHeight());
 
-        // Place players
-        List<SnakeHead> snakeHeads = playerManager.toSet().stream().map(player -> new SnakeHead(player.getName(), player.getPlayerId(), 0)).collect(Collectors.toList());
-        Collections.shuffle(snakeHeads, new XORShiftRandom());
-        AddWorldObjectsInCircle snakeHeadsInCircleFormation = new AddWorldObjectsInCircle(snakeHeads, 0.9d);
-        world = snakeHeadsInCircleFormation.transform(world);
+        initPlacePlayers();
 
-        GameStartingEvent gameStartingEvent = new GameStartingEvent(
+        notifyAllPlayers(new GameStartingEvent(
                 gameId,
                 playerManager.size(),
-                world.getWidth(), world.getHeight());
+                world.getWidth(), world.getHeight()));
 
-        playerManager.toSet().stream().forEach( player -> {
-            player.onGameStart(gameStartingEvent);
-        });
+        initPlaceFood();
 
-        Collections.nCopies(gameFeatures.getStartFood(), "").stream()
-                .map(operand -> new Food())
-                .forEach(worldObject -> world = new AddWorldObjectAtRandomPosition(worldObject).transform(world));
+        initPlaceObstacles();
+
         AddWorldObjectAtRandomPositionInGrid.GridFilter mazeFilter = AddWorldObjectAtRandomPositionInGrid.fromStringMap(
                         " #       #     #         " +
                         " # ### # ### # # ##### # " +
@@ -133,10 +163,6 @@ public class GameEngine {
 
         AddWorldObjectAtRandomPositionInGrid addObstacles = new AddWorldObjectAtRandomPositionInGrid(random, () -> new Obstacle(), mazeFilter.invert());
         world = addObstacles.gridInsert(world, gameFeatures.getStartObstacles());
-
-        InternalGameEvent gevent = new InternalGameEvent(System.currentTimeMillis(),
-                gameStartingEvent);
-        globalEventBus.post(gevent);
     }
 
 
@@ -164,9 +190,7 @@ public class GameEngine {
                     MapUpdateEvent mapUpdateEvent = GameMessageConverter
                             .onWorldUpdate(world, gameId, currentWorldTick, players);
 
-                    livePlayers.stream().forEach( player -> {
-                        player.onWorldUpdate(mapUpdateEvent);
-                    });
+                    notifyPlayers(livePlayers, mapUpdateEvent);
 
                     InternalGameEvent gevent = new InternalGameEvent(
                             System.currentTimeMillis(), mapUpdateEvent);
@@ -218,9 +242,7 @@ public class GameEngine {
                         players
                 );
 
-                players.stream().forEach( player -> {
-                    player.onGameEnded(gameEndedEvent);
-                });
+                notifyPlayers(players, gameEndedEvent);
 
                 InternalGameEvent gevent = new InternalGameEvent(
                         System.currentTimeMillis(),

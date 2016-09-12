@@ -1,9 +1,24 @@
 package se.cygni.snake.player;
 
+import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.PointReason;
 
 public interface IPlayer extends Comparable<IPlayer> {
+
+    default void onGameMessage(GameMessage gameMessage) {
+        if (gameMessage instanceof  MapUpdateEvent) {
+            onWorldUpdate((MapUpdateEvent)gameMessage);
+        } else if (gameMessage instanceof  SnakeDeadEvent) {
+            onSnakeDead((SnakeDeadEvent)gameMessage);
+        } else if (gameMessage instanceof  GameEndedEvent) {
+            onGameEnded((GameEndedEvent)gameMessage);
+        } else if (gameMessage instanceof  GameStartingEvent) {
+            onGameStart((GameStartingEvent)gameMessage);
+        } else if (gameMessage instanceof  TournamentEndedEvent) {
+            onTournamentEnded((TournamentEndedEvent)gameMessage);
+        }
+    }
 
     void onWorldUpdate(MapUpdateEvent mapUpdateEvent);
 

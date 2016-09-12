@@ -3,10 +3,11 @@ package se.cygni.game.transformation;
 import se.cygni.game.Coordinate;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
+import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.worldobject.SnakePart;
 import se.cygni.game.worldobject.WorldObject;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -16,12 +17,12 @@ import java.util.stream.IntStream;
  */
 public class AddWorldObjectsInCircle implements WorldTransformation {
 
-    private final Collection<? extends WorldObject> worldObjects;
+    private final List<? extends WorldObject> worldObjects;
     private final double scaleFactor;
 
-
-    public AddWorldObjectsInCircle(Collection<? extends WorldObject> worldObjects, double scaleFactor) {
+    public AddWorldObjectsInCircle(List<? extends WorldObject> worldObjects, double scaleFactor) {
         this.worldObjects = worldObjects;
+        Collections.shuffle(this.worldObjects, new XORShiftRandom());
         this.scaleFactor = scaleFactor;
     }
 
