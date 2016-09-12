@@ -16,8 +16,6 @@ public class TournamentPlanConverterTest {
     @Test
     public void testGetTournamentPlan() throws Exception {
         GameFeatures gf = new GameFeatures();
-        gf.setHeight(25);
-        gf.setWidth(25);
 
         Set<IPlayer> players = TournamentPlanTest.getPlayers(20);
         PlayerManager playerManager = new PlayerManager();

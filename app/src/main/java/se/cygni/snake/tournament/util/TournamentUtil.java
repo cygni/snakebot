@@ -8,7 +8,8 @@ import java.util.*;
 public class TournamentUtil {
 
     private static int PLAYERS_SMALL = 5;
-    private static int PLAYERS_MEDIUM = 8;
+    private static int PLAYERS_STANDARD = 7;
+    private static int PLAYERS_MEDIUM = 10;
     private static int PLAYERS_LARGE = 13;
     private static int PLAYERS_XLARGE = 17;
 
@@ -57,8 +58,11 @@ public class TournamentUtil {
         if (maxPlayersPerGame <= PLAYERS_SMALL)
             return -3;
 
-        if (maxPlayersPerGame <= PLAYERS_MEDIUM)
+        if (maxPlayersPerGame <= PLAYERS_STANDARD)
             return -4;
+
+        if (maxPlayersPerGame <= PLAYERS_MEDIUM)
+            return -5;
 
         if (maxPlayersPerGame <= PLAYERS_LARGE)
             return -7;
@@ -71,12 +75,15 @@ public class TournamentUtil {
 
         /*
             5 players —> 25x25 (625)
-            8 players —> 50x50 (2500)
+            7 players -> 46x34 (1564)
+            10 players —> 50x50 (2500)
             13 players —> 75x75 (5625)
             17 players —> 100x100 (10000)
          */
         if (gameSize <= 625) {
             return PLAYERS_SMALL;
+        } else if (gameSize <= 1564) {
+            return PLAYERS_STANDARD;
         } else if (gameSize <= 2500) {
             return PLAYERS_MEDIUM;
         } else if (gameSize <= 5625) {

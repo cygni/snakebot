@@ -2,11 +2,9 @@ package se.cygni.snake.game;
 
 public class GameFeatures {
 
-    // World width
-    private int width = 25;
+    private int width = 46;
 
-    // World height
-    private int height = 25;
+    private int height = 34;
 
     // Maximum noof players in this game
     private int maxNoofPlayers = 10;
@@ -22,10 +20,6 @@ public class GameFeatures {
 
     // Randomly place food
     private boolean foodEnabled = true;
-
-    // Traveling to the edge does not kill but moves to
-    // corresponding edge on other side.
-    private boolean edgeWrapsAround = false;
 
     // If a snake manages to nibble on the tail
     // of another snake it will consume that tail part.
@@ -47,13 +41,9 @@ public class GameFeatures {
     // food will be removed from the world
     private int removeFoodLikelihood = 5;
 
-    // Likelihood (in percent) that a new obstacle will be
-    // added to the world
-    private int addObstacleLikelihood = 10;
-
-    // Likelihood (in percent) that an
-    // obstacle will be removed from the world
-    private int removeObstacleLikelihood = 5;
+    // The amount of obstacles to populate the
+    // board with.
+    private double obstacleIntensity = 1;
 
     // Snake grow every N world ticks.
     // 0 for disabled
@@ -77,16 +67,8 @@ public class GameFeatures {
     // of another snake
     private int pointsPerNibble = 10;
 
-    // Points given to the last living snake (unless
-    // the game has been stopped before this happens)
-    private int pointsLastSnakeLiving = 10;
-
     // Number of rounds a tail is protected after nibble
     private int noofRoundsTailProtectedAfterNibble = 3;
-
-    // If a snake kills itself by hitting a wall or another
-    // snake.
-    private int pointsSuicide = -10;
 
     // The starting count for obstacles
     private int startObstacles = 0;
@@ -99,21 +81,12 @@ public class GameFeatures {
      * Enforces limits on some values
      */
     public void applyValidation() {
+        startSnakeLength = Math.min(10, startSnakeLength);
+        startSnakeLength = Math.max(1, startSnakeLength);
 
-        // Ensure min 25
-        width = width < 25 ? 25 : width;
-        height = height < 25 ? 25 : height;
+        maxNoofPlayers = Math.min(20, maxNoofPlayers);
+        maxNoofPlayers = Math.max(2, maxNoofPlayers);
 
-        // Ensure divisible by 25
-        width = width % 25 == 0 ? width : width - width % 25;
-        height = height % 25 == 0 ? height : height - height % 25;
-
-        // Max 100 wide and high
-        width = width > 100 ? 100 : width;
-        height = height > 100 ? 100 : height;
-
-        startSnakeLength = startSnakeLength > 10 ? 10 : startSnakeLength;
-        maxNoofPlayers = maxNoofPlayers > 20 ? 20 : maxNoofPlayers;
         spontaneousGrowthEveryNWorldTick = spontaneousGrowthEveryNWorldTick < 2 ? 2 : spontaneousGrowthEveryNWorldTick;
         startObstacles = Math.max(0, startObstacles);
         startFood = Math.max(0, startFood);
@@ -123,16 +96,8 @@ public class GameFeatures {
         return width;
     }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
     public int getHeight() {
         return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
     }
 
     public int getMaxNoofPlayers() {
@@ -175,14 +140,6 @@ public class GameFeatures {
         this.foodEnabled = foodEnabled;
     }
 
-    public boolean isEdgeWrapsAround() {
-        return edgeWrapsAround;
-    }
-
-    public void setEdgeWrapsAround(boolean edgeWrapsAround) {
-        this.edgeWrapsAround = edgeWrapsAround;
-    }
-
     public boolean isHeadToTailConsumes() {
         return headToTailConsumes;
     }
@@ -207,28 +164,20 @@ public class GameFeatures {
         this.addFoodLikelihood = addFoodLikelihood;
     }
 
+    public double getObstacleIntensity() {
+        return obstacleIntensity;
+    }
+
+    public void setObstacleIntensity(double obstacleIntensity) {
+        this.obstacleIntensity = obstacleIntensity;
+    }
+
     public int getRemoveFoodLikelihood() {
         return removeFoodLikelihood;
     }
 
     public void setRemoveFoodLikelihood(int removeFoodLikelihood) {
         this.removeFoodLikelihood = removeFoodLikelihood;
-    }
-
-    public int getAddObstacleLikelihood() {
-        return addObstacleLikelihood;
-    }
-
-    public void setAddObstacleLikelihood(int addObstacleLikelihood) {
-        this.addObstacleLikelihood = addObstacleLikelihood;
-    }
-
-    public int getRemoveObstacleLikelihood() {
-        return removeObstacleLikelihood;
-    }
-
-    public void setRemoveObstacleLikelihood(int removeObstacleLikelihood) {
-        this.removeObstacleLikelihood = removeObstacleLikelihood;
     }
 
     public int getSpontaneousGrowthEveryNWorldTick() {
@@ -271,14 +220,6 @@ public class GameFeatures {
         this.pointsPerCausedDeath = pointsPerCausedDeath;
     }
 
-    public int getPointsLastSnakeLiving() {
-        return pointsLastSnakeLiving;
-    }
-
-    public void setPointsLastSnakeLiving(int pointsLastSnakeLiving) {
-        this.pointsLastSnakeLiving = pointsLastSnakeLiving;
-    }
-
     public int getPointsPerNibble() {
         return pointsPerNibble;
     }
@@ -293,14 +234,6 @@ public class GameFeatures {
 
     public void setNoofRoundsTailProtectedAfterNibble(int noofRoundsTailProtectedAfterNibble) {
         this.noofRoundsTailProtectedAfterNibble = noofRoundsTailProtectedAfterNibble;
-    }
-
-    public int getPointsSuicide() {
-        return pointsSuicide;
-    }
-
-    public void setPointsSuicide(int pointsSuicide) {
-        this.pointsSuicide = pointsSuicide;
     }
 
     public int getStartObstacles() {
