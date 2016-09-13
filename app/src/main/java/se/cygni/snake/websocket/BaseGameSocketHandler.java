@@ -43,6 +43,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
     private void sendHeartbeat() {
         HeartBeatResponse heartBeatResponse = new HeartBeatResponse();
         try {
+            heartBeatResponse.setReceivingPlayerId(playerId);
             sendSnakeMessage(heartBeatResponse);
         } catch (Exception e) {
             log.error("Failed to send heartbeat response", e);

@@ -8,7 +8,6 @@ import se.cygni.game.enums.Direction;
 import se.cygni.game.random.XORShiftRandom;
 import se.cygni.game.transformation.*;
 import se.cygni.game.worldobject.Food;
-import se.cygni.game.worldobject.Obstacle;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.event.GameEndedEvent;
@@ -100,7 +99,10 @@ public class GameEngine {
 
     private void initPlaceObstacles() {
         if (gameFeatures.isObstaclesEnabled()) {
-
+            IntStream.range(0, gameFeatures.getStartObstacles()).forEach(n -> {
+                AddRandomObstacle obstacleTransform = new AddRandomObstacle();
+                world = obstacleTransform.transform(world);
+            });
         }
     }
 
@@ -110,7 +112,11 @@ public class GameEngine {
 
     private void notifyPlayers(Set<IPlayer> players, GameMessage message) {
         players.stream().forEach( player -> {
-            player.onGameMessage(message);
+            try {
+                player.onGameMessage((GameMessage) message.clone());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
         InternalGameEvent gevent = new InternalGameEvent(
@@ -129,40 +135,8 @@ public class GameEngine {
                 playerManager.size(),
                 world.getWidth(), world.getHeight()));
 
-        initPlaceFood();
-
         initPlaceObstacles();
-
-        AddWorldObjectAtRandomPositionInGrid.GridFilter mazeFilter = AddWorldObjectAtRandomPositionInGrid.fromStringMap(
-                        " #       #     #         " +
-                        " # ### # ### # # ##### # " +
-                        " # #   #     # # #   # # " +
-                        " # # ### ####### # # # # " +
-                        " # #   # #   #   # #   # " +
-                        " # ### ### # # ### ##### " +
-                        " #   #     # # # #   #   " +
-                        " ##### ##### # # ### # ##" +
-                        "     # #   #   #   # #   " +
-                        "#### ### # ### # # # ### " +
-                        "     #   #   #   # # # # " +
-                        " ##### ##### # ##### # # " +
-                        " #     #   # # #   # #   " +
-                        " # ##### ### ### # # # ##" +
-                        "   #     #   #   #   #   " +
-                        "###### ### ### ######### " +
-                        "     #   # #   #       # " +
-                        " # # ### # ### ### ### # " +
-                        " # # #   #   #   # #   # " +
-                        "## # # ##### ### # # ### " +
-                        "   #   #   # #   # #   # " +
-                        " # ##### # # # ### ### # " +
-                        " # #   # #   #   #   # # " +
-                        " ### # # ####### ### # # " +
-                        "     #           #   #   "
-                , 25);
-
-        AddWorldObjectAtRandomPositionInGrid addObstacles = new AddWorldObjectAtRandomPositionInGrid(random, () -> new Obstacle(), mazeFilter.invert());
-        world = addObstacles.gridInsert(world, gameFeatures.getStartObstacles());
+        initPlaceFood();
     }
 
 

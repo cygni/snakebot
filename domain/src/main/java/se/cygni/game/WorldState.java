@@ -187,12 +187,16 @@ public class WorldState {
             isTileContentOfType(position, clazz)).toArray();
     }
 
-    public int[] listEmptyPositionsWithPadding(int padding) {
-        int[] nonEmptyPositions = listNonEmptyPositions();
-        
-        return IntStream.range(0, getSize()).filter( position -> {
+    public int[] listEmptyPositionsWithPadding() {
+        return IntStream.range(0, getSize()).filter( position ->
+            isTileEmpty(position) && !hasAdjacentFilledTile(position)
+        ).toArray();
+    }
 
-        }).toArray();
+    public boolean hasAdjacentFilledTile(int pos) {
+        return IntStream.of(listAdjacentTiles(pos)).filter( position ->
+            !isTileEmpty(position)
+        ).findFirst().isPresent();
     }
 
     public int[] listNonEmptyPositions() {

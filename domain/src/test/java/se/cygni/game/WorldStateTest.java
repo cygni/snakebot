@@ -16,6 +16,8 @@ import java.util.stream.IntStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WorldStateTest {
 
@@ -194,6 +196,39 @@ public class WorldStateTest {
 
         assertArrayEquals(new int[] {5, 15, 25}, foodPositions);
         assertArrayEquals(new int[] {78, 88, 92, 98}, obstaclePositions);
+    }
+
+    @Test
+    public void testHasAdjacentFilledTile() throws Exception {
+        int[] obstaclePositions = new int[] { 2, 6, 85 };
+        WorldState ws = SnakeTestUtil.createWorld(Obstacle.class, 10, 10, obstaclePositions);
+
+        int[] adjacentPositions = new int[] {1, 12, 3, 5, 16, 7, 75, 86, 95, 84};
+
+        IntStream.of(adjacentPositions).forEach( pos -> {
+            assertTrue("Asserting pos: " + pos, ws.hasAdjacentFilledTile(pos));
+        });
+
+        IntStream.range(0, 100).
+            filter( pos -> !ArrayUtils.contains(adjacentPositions, pos)).
+            forEach( pos -> {
+                assertFalse("Asserting pos: " + pos, ws.hasAdjacentFilledTile(pos));
+        });
+    }
+
+
+    @Test
+    public void testListEmptyPositionsWithPadding() throws Exception {
+        int[] obstaclePositions = new int[] { 2, 6, 85 };
+        WorldState ws = SnakeTestUtil.createWorld(Obstacle.class, 10, 10, obstaclePositions);
+
+        int[] adjacentPositions = new int[] {1, 12, 3, 5, 16, 7, 75, 86, 95, 84};
+
+        assertArrayEquals(IntStream.range(0, 100).
+                filter(
+                        pos -> !ArrayUtils.contains(adjacentPositions, pos)
+                && !ArrayUtils.contains(obstaclePositions, pos)).toArray(),
+                ws.listEmptyPositionsWithPadding());
     }
 
     @Test

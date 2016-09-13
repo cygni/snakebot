@@ -17,6 +17,10 @@ public class Coordinate {
         return y;
     }
 
+    public Coordinate translate(int deltaX, int deltaY) {
+        return new Coordinate(x + deltaX, y + deltaY);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
