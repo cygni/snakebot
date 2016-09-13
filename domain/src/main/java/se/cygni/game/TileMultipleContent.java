@@ -179,6 +179,39 @@ public class TileMultipleContent {
         return snakeIds;
     }
 
+    public boolean containsExactlyOneHeadAndOneTail() {
+        if (size() != 2)
+            return false;
+
+        WorldObject wo1 = contents.get(0);
+        WorldObject wo2 = contents.get(1);
+
+        SnakeHead head = null;
+        SnakeBody tail = null;
+
+        if (wo1 instanceof SnakeHead)
+            head = (SnakeHead) wo1;
+        else if (wo2 instanceof SnakeHead)
+            head = (SnakeHead) wo2;
+
+        if (wo1 instanceof SnakeBody) {
+            SnakeBody body = (SnakeBody) wo1;
+            if (body.isTail()) {
+                tail = body;
+            }
+        } else if (wo2 instanceof SnakeBody) {
+            SnakeBody body = (SnakeBody) wo2;
+            if (body.isTail()) {
+                tail = body;
+            }
+        }
+
+        if (head == null || tail == null)
+            return false;
+
+        return true;
+    }
+
     private <T extends WorldObject> T getFirstContentOfType(Class<T> type) {
         for (WorldObject wo : contents) {
             if (wo.getClass().equals(type)) {
