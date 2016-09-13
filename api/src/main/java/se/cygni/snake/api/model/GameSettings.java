@@ -38,10 +38,6 @@ public class GameSettings {
     // food will be removed from the world
     private int removeFoodLikelihood = 5;
 
-    // The amount of obstacles to populate the
-    // board with.
-    private double obstacleIntensity = 1;
-
     // Snake grow every N world ticks.
     // 0 for disabled
     private int spontaneousGrowthEveryNWorldTick = 3;
@@ -69,6 +65,9 @@ public class GameSettings {
 
     // The starting count for food
     private int startFood = 0;
+
+    // The starting count for obstacles
+    private int startObstacles = 5;
 
     public int getMaxNoofPlayers() {
         return maxNoofPlayers;
@@ -194,14 +193,6 @@ public class GameSettings {
         this.spontaneousGrowthEveryNWorldTick = spontaneousGrowthEveryNWorldTick;
     }
 
-    public double getObstacleIntensity() {
-        return obstacleIntensity;
-    }
-
-    public void setObstacleIntensity(double obstacleIntensity) {
-        this.obstacleIntensity = obstacleIntensity;
-    }
-
     public void setTrainingGame(boolean trainingGame) {
         this.trainingGame = trainingGame;
     }
@@ -217,7 +208,8 @@ public class GameSettings {
                 "\n, headToTailConsumes=" + headToTailConsumes +
                 "\n, tailConsumeGrows=" + tailConsumeGrows +
                 "\n, addFoodLikelihood=" + addFoodLikelihood +
-                "\n, obstacleIntensity=" + obstacleIntensity +
+                "\n, startObstacles=" + startObstacles +
+                "\n, startFood=" + startFood +
                 "\n, removeFoodLikelihood=" + removeFoodLikelihood +
                 "\n, spontaneousGrowthEveryNWorldTick=" + spontaneousGrowthEveryNWorldTick +
                 "\n, trainingGame=" + trainingGame +
@@ -235,6 +227,14 @@ public class GameSettings {
 
     public void setStartFood(int startFood) {
         this.startFood = startFood;
+    }
+
+    public int getStartObstacles() {
+        return startObstacles;
+    }
+
+    public void setStartObstacles(int startObstacles) {
+        this.startObstacles = startObstacles;
     }
 
     public static class GameSettingsBuilder {
@@ -256,6 +256,7 @@ public class GameSettings {
         private int pointsPerNibble = 10;
         private int noofRoundsTailProtectedAfterNibble = 3;
         private int startFood = 0;
+        private int startObstacles = 5;
 
         public GameSettingsBuilder() {
         }
@@ -351,6 +352,11 @@ public class GameSettings {
             return this;
         }
 
+        public GameSettingsBuilder withStartObstacles(int startObstacles) {
+            this.startObstacles = startObstacles;
+            return this;
+        }
+
         public GameSettings build() {
             GameSettings gameSettings = new GameSettings();
             gameSettings.setMaxNoofPlayers(maxNoofPlayers);
@@ -361,7 +367,7 @@ public class GameSettings {
             gameSettings.setHeadToTailConsumes(headToTailConsumes);
             gameSettings.setTailConsumeGrows(tailConsumeGrows);
             gameSettings.setAddFoodLikelihood(addFoodLikelihood);
-            gameSettings.setObstacleIntensity(obstacleIntensity);
+            gameSettings.setStartObstacles(startObstacles);
             gameSettings.setRemoveFoodLikelihood(removeFoodLikelihood);
             gameSettings.setSpontaneousGrowthEveryNWorldTick(spontaneousGrowthEveryNWorldTick);
             gameSettings.setTrainingGame(trainingGame);

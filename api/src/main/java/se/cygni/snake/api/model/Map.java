@@ -2,11 +2,9 @@ package se.cygni.snake.api.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import se.cygni.snake.api.GameMessage;
-import se.cygni.snake.api.type.GameMessageType;
 
-@GameMessageType
-public class Map extends GameMessage {
+
+public class Map {
     final int width, height;
     final long worldTick;
 

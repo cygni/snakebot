@@ -7,6 +7,7 @@ import se.cygni.game.testutil.SnakeTestUtil;
 import se.cygni.game.transformation.AddWorldObjectAtRandomPosition;
 import se.cygni.game.worldobject.*;
 import se.cygni.snake.api.GameMessageParser;
+import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.api.model.*;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.bot.RandomBot;
@@ -92,11 +93,12 @@ public class WorldStateConverterTest {
         Map map = WorldStateConverter.convertWorldState(ws, 1, players);
 
         // Make sure serialisation works
-        String mapStr = GameMessageParser.encodeMessage(map);
-        System.out.println(mapStr);
+        MapUpdateEvent mue = new MapUpdateEvent(0, "id", map);
+        String mapUpdateStr = GameMessageParser.encodeMessage(mue);
 
         // Make sure deserialisation works
-        Map reparsedMap = (Map) GameMessageParser.decodeMessage(mapStr);
+        MapUpdateEvent mueReparsed = (MapUpdateEvent) GameMessageParser.decodeMessage(mapUpdateStr);
+        Map reparsedMap = mueReparsed.getMap();
 
         SnakeInfo sn1 = map.getSnakeInfos()[0];
         SnakeInfo sn2 = map.getSnakeInfos()[1];
@@ -132,10 +134,13 @@ public class WorldStateConverterTest {
         Map map = converter.convertWorldState(ws, 1, players);
 
         // Make sure serialisation works
-        String mapStr = GameMessageParser.encodeMessage(map);
+        MapUpdateEvent mue = new MapUpdateEvent(0, "id", map);
+        String mapUpdateStr = GameMessageParser.encodeMessage(mue);
+
 
         // Make sure deserialisation works
-        Map reparsedMap = (Map) GameMessageParser.decodeMessage(mapStr);
+        MapUpdateEvent mueReparsed = (MapUpdateEvent) GameMessageParser.decodeMessage(mapUpdateStr);
+        Map reparsedMap = mueReparsed.getMap();
 
         // Assert snakeinfo
         assertEquals(1, reparsedMap.getSnakeInfos().length);
@@ -159,11 +164,14 @@ public class WorldStateConverterTest {
         WorldStateConverter converter = new WorldStateConverter();
         Map map = converter.convertWorldState(ws, 1, new HashSet<>());
 
+        MapUpdateEvent mue = new MapUpdateEvent(0, "id", map);
+
         // Make sure serialisation works
-        String mapStr = GameMessageParser.encodeMessage(map);
+        String mapUpdateStr = GameMessageParser.encodeMessage(mue);
 
         // Make sure deserialisation works
-        Map reparsedMap = (Map) GameMessageParser.decodeMessage(mapStr);
+        MapUpdateEvent mueReparsed = (MapUpdateEvent) GameMessageParser.decodeMessage(mapUpdateStr);
+        Map reparsedMap = mueReparsed.getMap();
 
         // Assert values
         assertEquals(3, reparsedMap.getWidth());
@@ -177,8 +185,6 @@ public class WorldStateConverterTest {
             assertArrayEquals(new int[] {4}, reparsedMap.getFoodPositions());
 
         }
-
-
 
         // No snakeinfo
         assertEquals(0, map.getSnakeInfos().length);

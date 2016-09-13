@@ -4,6 +4,8 @@ import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.worldobject.SnakeHead;
 
+import java.util.stream.IntStream;
+
 public class DecrementTailProtection implements WorldTransformation {
 
     @Override
@@ -12,10 +14,10 @@ public class DecrementTailProtection implements WorldTransformation {
         Tile[] tiles = currentWorld.getTiles();
         int[] headPositions = currentWorld.listPositionsWithContentOf(SnakeHead.class);
 
-        for (int headPos : headPositions) {
-            SnakeHead snakeHead = (SnakeHead)tiles[headPos].getContent();
+        IntStream.of(headPositions).forEach( headPosition -> {
+            SnakeHead snakeHead = (SnakeHead)tiles[headPosition].getContent();
             snakeHead.decrementTailProtection();
-        }
+        });
 
         return new WorldState(currentWorld.getWidth(), currentWorld.getHeight(), tiles);
     }

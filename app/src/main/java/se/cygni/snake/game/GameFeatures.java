@@ -41,10 +41,6 @@ public class GameFeatures {
     // food will be removed from the world
     private int removeFoodLikelihood = 5;
 
-    // The amount of obstacles to populate the
-    // board with.
-    private double obstacleIntensity = 1;
-
     // Snake grow every N world ticks.
     // 0 for disabled
     private int spontaneousGrowthEveryNWorldTick = 3;
@@ -71,7 +67,7 @@ public class GameFeatures {
     private int noofRoundsTailProtectedAfterNibble = 3;
 
     // The starting count for obstacles
-    private int startObstacles = 0;
+    private int startObstacles = 5;
 
     // The starting count for food
     private int startFood = 0;
@@ -162,14 +158,6 @@ public class GameFeatures {
 
     public void setAddFoodLikelihood(int addFoodLikelihood) {
         this.addFoodLikelihood = addFoodLikelihood;
-    }
-
-    public double getObstacleIntensity() {
-        return obstacleIntensity;
-    }
-
-    public void setObstacleIntensity(double obstacleIntensity) {
-        this.obstacleIntensity = obstacleIntensity;
     }
 
     public int getRemoveFoodLikelihood() {

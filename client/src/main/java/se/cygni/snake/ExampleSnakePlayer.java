@@ -64,7 +64,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
-        //ansiPrinter.printMap(mapUpdateEvent);
+        ansiPrinter.printMap(mapUpdateEvent);
 
         // MapUtil contains lot's of useful methods for querying the map!
         MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), getPlayerId());
@@ -134,7 +134,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
         // Disable this if you want to start the game manually from
         // the web GUI
-//        startGame();
+        startGame();
     }
 
     @Override
@@ -151,6 +151,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     public void onConnected() {
         log.info("Connected as: {}, registering for {}...", getName(), gameMode);
         GameSettings gameSettings = GameSettingsUtils.trainingWorld();
+        gameSettings.setStartObstacles(10);
         registerForGame(gameSettings);
     }
 
