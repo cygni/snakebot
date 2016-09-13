@@ -33,7 +33,6 @@ public class WorldTransformer {
 
     private static final Logger log = LoggerFactory.getLogger(WorldTransformer.class);
 
-//    private final Game game;
     private final GameFeatures gameFeatures;
     private final PlayerManager playerManager;
     private final String gameId;
@@ -247,9 +246,8 @@ public class WorldTransformer {
                 tile.countInstancesOf(SnakeBody.class) +
                         tile.countInstancesOf(SnakeHead.class)
                         > 1
-        ).map(mtile -> {
-            return mtile.listSnakeIdsPresent();
-        }).collect(Collectors.toList());
+        ).map(mtile -> mtile.listSnakeIdsPresent()).
+                collect(Collectors.toList());
 
         // If there exists two or more tiles with the same combination
         // of snake parts they are overlapping
@@ -269,7 +267,13 @@ public class WorldTransformer {
         int count = 0;
         for (TileMultipleContent tile : tiles) {
             List<String> currentPlayerIds = tile.listSnakeIdsPresent();
-            if (CollectionUtils.isSubCollection(playerIds, currentPlayerIds)) {
+            boolean containsHeadAndTail = tile.containsExactlyOneHeadAndOneTail();
+            boolean headToTailConsumes = gameFeatures.isHeadToTailConsumes();
+
+            if (containsHeadAndTail && headToTailConsumes) {
+                continue;
+            }
+            else if (CollectionUtils.isSubCollection(playerIds, currentPlayerIds)) {
                 count++;
             }
         }
@@ -396,15 +400,6 @@ public class WorldTransformer {
                 }
         );
         return tiles;
-    }
-
-    private boolean deathConsideredSuicide(DeathReason deathReason) {
-        if (deathReason == DeathReason.CollisionWithSelf ||
-                deathReason == DeathReason.CollisionWithWall ||
-                deathReason == DeathReason.CollisionWithObstacle) {
-            return true;
-        }
-        return false;
     }
 
     private void snakeDied(
