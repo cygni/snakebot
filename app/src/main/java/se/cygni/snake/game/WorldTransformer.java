@@ -38,6 +38,7 @@ public class WorldTransformer {
     private final String gameId;
     private final EventBus globalEventBus;
     private int snakesDiedThisRound = 0;
+    private ThreadLocal<WorldState> startingWorldState = new ThreadLocal<>();
 
     public WorldTransformer(GameFeatures gameFeatures, PlayerManager playerManager, String gameId, EventBus globalEventBus) {
         this.gameFeatures = gameFeatures;
@@ -53,6 +54,7 @@ public class WorldTransformer {
             boolean spontaneousGrowth,
             long worldTick) throws TransformationException {
 
+        startingWorldState.set(ws);
         snakesDiedThisRound = 0;
         int snakesAliveAtStart = ws.listPositionsWithContentOf(SnakeHead.class).length;
 
@@ -128,29 +130,33 @@ public class WorldTransformer {
         // Create a merged view of all states
         TileMultipleContent[] mergedTileContent = mergeStates(worldStates);
 
+        // Find snake heads that have passed through each other. This is
+        // immediate death. Example:
+        // | B1 | H1 | H2 | B2 | (H1 moves left, H2 moves right)
+        // results in:
+        // |    | B1 H2 | H1 B2 |    |
+        Set<String> snakeHeadsPassingThrough = getHeadsPassingThrough(mergedTileContent);
+        mergedTileContent = snakeDied(
+                snakeToWorldState,
+                snakeHeadsPassingThrough,
+                DeathReason.CollisionWithSnake,
+                worldTick);
+
+        if (snakeToWorldState.isEmpty()) {
+            return snakeToWorldState.values().stream().collect(Collectors.toList());
+        }
+
         // Find snakes overlapping on more than one tile,
         // this kills both of them.
         Set<String> overlappingSnakes = getOverlappingSnakes(mergedTileContent);
-        for (String snakeId : overlappingSnakes) {
+        mergedTileContent = snakeDied(
+                snakeToWorldState,
+                overlappingSnakes,
+                DeathReason.CollisionWithSnake,
+                worldTick);
 
-            WorldState ws = snakeToWorldState.get(snakeId);
-            snakeToWorldState.remove(snakeId);
-            SnakeHead snakeHead = ws.getSnakeHeadById(snakeId);
-            snakeDied(
-                    snakeHead,
-                    DeathReason.CollisionWithSnake,
-                    ws.translatePosition(snakeHead.getPosition()),
-                    worldTick);
-        }
-
-        // If there were overlapping snakes we need to update the list of
-        // world states and the merged state.
-        if (!overlappingSnakes.isEmpty()) {
-            worldStates = snakeToWorldState.values().stream().collect(Collectors.toList());
-            if (worldStates.isEmpty()) {
-                return worldStates;
-            }
-            mergedTileContent = mergeStates(worldStates);
+        if (snakeToWorldState.isEmpty()) {
+            return snakeToWorldState.values().stream().collect(Collectors.toList());
         }
 
         // Validate all tiles
@@ -164,16 +170,11 @@ public class WorldTransformer {
                 }
 
                 // Remove all WorldStates with SnakesHeads involving this clash
-                List<SnakeHead> snakeHeads = tile.listOffendingSnakeHeads();
-                snakeHeads.stream().forEach(snakeHead -> {
-                    WorldState ws = snakeToWorldState.get(snakeHead.getPlayerId());
-                    snakeToWorldState.remove(snakeHead.getPlayerId());
-                    snakeDied(
-                            snakeHead,
-                            DeathReason.CollisionWithSnake,
-                            ws.translatePosition(snakeHead.getPosition()),
-                            worldTick);
-                });
+                snakeDied(
+                        snakeToWorldState,
+                        tile.listOffendingSnakeHeadIds(),
+                        DeathReason.CollisionWithSnake,
+                        worldTick);
 
                 // Assign points to SnakeParts still living
                 List<SnakeBody> survivors = tile.listContentsOfType(SnakeBody.class);
@@ -231,9 +232,52 @@ public class WorldTransformer {
         return false;
     }
 
+    private Set<String> getHeadsPassingThrough(TileMultipleContent[] tiles) {
+        Set<String> passingThroughHeads = new HashSet<>();
+
+        // Find any two snake heads that have switched places.
+        WorldState startState = startingWorldState.get();
+
+        Map<String, Integer> newSnakeHeadPositions = new HashMap<>();
+        Map<Integer, List<String>> newPositionsPerSnakeHead = new HashMap<>();
+
+        for (TileMultipleContent tile : tiles) {
+            List<SnakeHead> heads = tile.listContentsOfType(SnakeHead.class);
+            for (SnakeHead head : heads) {
+                newSnakeHeadPositions.put(head.getPlayerId(), head.getPosition());
+
+                List<String> ids = newPositionsPerSnakeHead.getOrDefault(head.getPosition(), new ArrayList<>());
+                ids.add(head.getPlayerId());
+                newPositionsPerSnakeHead.put(head.getPosition(), ids);
+            }
+        }
+
+        startState.listSnakeIds().stream().forEach(snakeId -> {
+            int originalHeadPosition = startState.getPositionOfSnakeHead(snakeId);
+
+            // The snake might have died already
+            if (newSnakeHeadPositions.containsKey(snakeId)) {
+                int newHeadPosition = newSnakeHeadPositions.get(snakeId);
+
+                List<String> ids = newPositionsPerSnakeHead.getOrDefault(originalHeadPosition, new ArrayList<>());
+                for (String newHead : ids) {
+                    if (newSnakeHeadPositions.get(newHead) == originalHeadPosition &&
+                            newHeadPosition == startState.getPositionOfSnakeHead(newHead)) {
+                        passingThroughHeads.add(newHead);
+                        passingThroughHeads.add(snakeId);
+                    }
+                }
+            }
+        });
+
+        return passingThroughHeads;
+    }
+
     /**
-     * Two Snakes may overlap on more than one tile if the
-     * heads meet and pass through each other.
+     * Two Snakes will overlap on more than one tile if the
+     * heads meet and pass through each other. Or if they both
+     * eat each others tail at the same time. This last case
+     * may be okay if headToTail is enabled.
      *
      * @param tiles
      * @return List of playerIds of Snakes that overlap
@@ -267,6 +311,7 @@ public class WorldTransformer {
         int count = 0;
         for (TileMultipleContent tile : tiles) {
             List<String> currentPlayerIds = tile.listSnakeIdsPresent();
+
             boolean containsHeadAndTail = tile.containsExactlyOneHeadAndOneTail();
             boolean headToTailConsumes = gameFeatures.isHeadToTailConsumes();
 
@@ -329,22 +374,22 @@ public class WorldTransformer {
                 worldStates.add(nws);
 
             } catch (ObstacleCollision oc) {
-                snakeDied(snakeHead,
+                notifySnakeDied(snakeHead,
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(oc.getPosition()),
                         worldTick);
             } catch (WallCollision wc) {
-                snakeDied(snakeHead,
+                notifySnakeDied(snakeHead,
                         DeathReason.CollisionWithWall,
                         ws.translatePosition(wc.getPosition()),
                         worldTick);
             } catch (SnakeCollision sc) {
-                snakeDied(snakeHead,
+                notifySnakeDied(snakeHead,
                         DeathReason.CollisionWithSelf,
                         ws.translatePosition(sc.getPosition()),
                         worldTick);
             } catch (TransformationException oc) {
-                snakeDied(snakeHead,
+                notifySnakeDied(snakeHead,
                         DeathReason.CollisionWithObstacle,
                         ws.translatePosition(0),
                         worldTick);
@@ -355,6 +400,9 @@ public class WorldTransformer {
     }
 
     private TileMultipleContent[] mergeStates(List<WorldState> worldStates) {
+        if (worldStates.isEmpty())
+            return new TileMultipleContent[0];
+
         WorldState firstState = worldStates.get(0);
         TileMultipleContent[] mTiles = convertToTileMultipleContent(
                 firstState.getTiles());
@@ -402,15 +450,58 @@ public class WorldTransformer {
         return tiles;
     }
 
-    private void snakeDied(
+    private TileMultipleContent[] snakeDied(
+            Map<String, WorldState> snakeToWorldState,
+            Collection<String> snakeIds,
+            DeathReason deathReason,
+            long worldTick) {
+
+        snakeIds.stream().forEach( snakeId -> {
+            SnakeHead snakeHead = removeSnake(snakeToWorldState, snakeId);
+            notifySnakeDied(
+                    snakeHead,
+                    deathReason,
+                    startingWorldState.get().translatePosition(snakeHead.getPosition()),
+                    worldTick);
+        });
+
+        return mergeStates(snakeToWorldState.values().stream().collect(Collectors.toList()));
+    }
+
+    private TileMultipleContent[] snakeDied(
+            Map<String, WorldState> snakeToWorldState,
+            String snakeId,
+            DeathReason deathReason,
+            long worldTick) {
+        SnakeHead snakeHead = removeSnake(snakeToWorldState, snakeId);
+        notifySnakeDied(
+                snakeHead,
+                deathReason,
+                startingWorldState.get().translatePosition(snakeHead.getPosition()),
+                worldTick);
+
+        return mergeStates(snakeToWorldState.values().stream().collect(Collectors.toList()));
+    }
+
+    private SnakeHead removeSnake(
+            Map<String, WorldState> snakeToWorldState,
+            String snakeId) {
+        WorldState ws = snakeToWorldState.get(snakeId);
+        snakeToWorldState.remove(snakeId);
+        return ws.getSnakeHeadById(snakeId);
+    }
+
+    private void notifySnakeDied(
             SnakeHead head,
             DeathReason deathReason,
             Coordinate coordinate,
             long worldTick) {
 
         snakesDiedThisRound++;
+        
         IPlayer deadPlayer = playerManager.getPlayer(head.getPlayerId());
-        log.info("Death occurred. GameId: {}, Player: {}, with id: {}, died at: {}",
+        log.info("Death occurred by: {}. GameId: {}, Player: {}, with id: {}, died at: {}",
+                deathReason,
                 gameId,
                 deadPlayer.getName(),
                 deadPlayer.getPlayerId(),

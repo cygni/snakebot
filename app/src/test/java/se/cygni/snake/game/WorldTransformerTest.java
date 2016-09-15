@@ -31,12 +31,14 @@ public class WorldTransformerTest {
     public void setup() {
         globalEventBus = new EventBus("globaleventbus");
         gameFeatures = new GameFeatures();
+        gameFeatures.setHeadToTailConsumes(true);
 
         playerManager = mock(PlayerManager.class);
         game = mock(Game.class);
         when(game.getGlobalEventBus()).thenReturn(globalEventBus);
         when(game.getGameFeatures()).thenReturn(gameFeatures);
         when(game.getPlayerManager()).thenReturn(playerManager);
+        when(game.getGameId()).thenReturn("mock-game-id");
     }
 
 
@@ -44,16 +46,19 @@ public class WorldTransformerTest {
     public void testSimpleMove() throws Exception {
         WorldState ws = new WorldState(10, 10);
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 22, 32);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 22, 32);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 42, 43);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.UP);
-                put("id2", Direction.DOWN);
+                put(p1.getPlayerId(), Direction.UP);
+                put(p2.getPlayerId(), Direction.DOWN);
             }
         };
 
@@ -61,11 +66,11 @@ public class WorldTransformerTest {
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(52, transformedWorld.getSnakeHeadForBodyAt(52).getPosition());
-        assertEquals("id2", transformedWorld.getSnakeHeadForBodyAt(52).getPlayerId());
+        assertEquals(p2.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(52).getPlayerId());
         assertArrayEquals(new int[] {52, 42}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(52)));
 
         assertEquals(12, transformedWorld.getSnakeHeadForBodyAt(12).getPosition());
-        assertEquals("id1", transformedWorld.getSnakeHeadForBodyAt(12).getPlayerId());
+        assertEquals(p1.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(12).getPlayerId());
         assertArrayEquals(new int[] {12, 22}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(12)));
     }
 
@@ -74,19 +79,19 @@ public class WorldTransformerTest {
     public void testCollisionWithWallMove() throws Exception {
         WorldState ws = new WorldState(10, 10);
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 2, 12);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 2, 12);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 42, 43);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.UP);
-                put("id2", Direction.DOWN);
+                put(p1.getPlayerId(), Direction.UP);
+                put(p2.getPlayerId(), Direction.DOWN);
             }
         };
 
@@ -97,7 +102,7 @@ public class WorldTransformerTest {
         assertArrayEquals(new int[] {52, 42}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(52)));
 
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
-        verify(mockedPlayer1).dead(5);
+        verify(p1).dead(5);
     }
 
     @Test
@@ -105,11 +110,11 @@ public class WorldTransformerTest {
         WorldState ws = new WorldState(10, 10);
         Obstacle obstacle = new Obstacle();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 15, 16);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 15, 16);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 42, 43);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -117,8 +122,8 @@ public class WorldTransformerTest {
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.LEFT);
-                put("id2", Direction.DOWN);
+                put(p1.getPlayerId(), Direction.LEFT);
+                put(p2.getPlayerId(), Direction.DOWN);
             }
         };
 
@@ -131,7 +136,7 @@ public class WorldTransformerTest {
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead(5);
+        verify(p1).dead(5);
     }
 
     @Test
@@ -140,11 +145,11 @@ public class WorldTransformerTest {
         Obstacle obstacle = new Obstacle();
         Food food = new Food();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 15, 16);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 15, 16);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 42, 43);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -153,8 +158,8 @@ public class WorldTransformerTest {
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.LEFT);
-                put("id2", Direction.DOWN);
+                put(p1.getPlayerId(), Direction.LEFT);
+                put(p2.getPlayerId(), Direction.DOWN);
             }
         };
 
@@ -162,17 +167,17 @@ public class WorldTransformerTest {
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(52, transformedWorld.getSnakeHeadForBodyAt(52).getPosition());
-        assertEquals("id2", transformedWorld.getSnakeHeadForBodyAt(52).getPlayerId());
+        assertEquals(p2.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(52).getPlayerId());
         assertArrayEquals(new int[] {52, 42}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(52)));
 
         assertEquals(14, transformedWorld.getSnakeHeadForBodyAt(14).getPosition());
-        assertEquals("id1", transformedWorld.getSnakeHeadForBodyAt(14).getPlayerId());
+        assertEquals(p1.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(14).getPlayerId());
         assertArrayEquals(new int[] {14, 15, 16}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(14)));
 
         assertEquals(2, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(72).getContent());
-        verify(mockedPlayer1).addPoints(PointReason.FOOD, gameFeatures.getPointsPerFood());
+        verify(p1).addPoints(PointReason.FOOD, gameFeatures.getPointsPerFood());
     }
 
     @Test
@@ -180,13 +185,11 @@ public class WorldTransformerTest {
         WorldState ws = new WorldState(10, 10);
         Obstacle obstacle = new Obstacle();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 32, 33);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 42, 43, 44);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 32, 33);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 42, 43, 44);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -194,8 +197,8 @@ public class WorldTransformerTest {
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.DOWN);
-                put("id2", Direction.LEFT);
+                put(p1.getPlayerId(), Direction.DOWN);
+                put(p2.getPlayerId(), Direction.LEFT);
             }
         };
 
@@ -203,14 +206,14 @@ public class WorldTransformerTest {
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(41, transformedWorld.getSnakeHeadForBodyAt(41).getPosition());
-        assertEquals("id2", transformedWorld.getSnakeHeadForBodyAt(41).getPlayerId());
+        assertEquals(p2.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(41).getPlayerId());
         assertArrayEquals(new int[] {41, 42, 43}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(41)));
 
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead(5);
-        verify(mockedPlayer2).addPoints(PointReason.CAUSED_SNAKE_DEATH, gameFeatures.getPointsPerCausedDeath());
+        verify(p1).dead(5);
+        verify(p2).addPoints(PointReason.CAUSED_SNAKE_DEATH, gameFeatures.getPointsPerCausedDeath());
     }
 
     @Test
@@ -218,14 +221,13 @@ public class WorldTransformerTest {
         WorldState ws = new WorldState(10, 10);
         Obstacle obstacle = new Obstacle();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 73, 72);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 75, 76);
-        SnakePart[] parts3 = SnakeTestUtil.createSnake("test3", "id3", 23, 24);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+        RemotePlayer p3 = createPlayer("player3");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 73, 72);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 75, 76);
+        SnakePart[] parts3 = SnakeTestUtil.createSnake(p3.getName(), p3.getPlayerId(), 23, 24);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -234,9 +236,9 @@ public class WorldTransformerTest {
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.RIGHT);
-                put("id2", Direction.LEFT);
-                put("id3", Direction.LEFT);
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+                put(p3.getPlayerId(), Direction.LEFT);
             }
         };
 
@@ -244,14 +246,14 @@ public class WorldTransformerTest {
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(22, transformedWorld.getSnakeHeadForBodyAt(22).getPosition());
-        assertEquals("id3", transformedWorld.getSnakeHeadForBodyAt(22).getPlayerId());
+        assertEquals(p3.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(22).getPlayerId());
         assertArrayEquals(new int[] {22, 23}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(22)));
 
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead(5);
-        verify(mockedPlayer2).dead(5);
+        verify(p1).dead(5);
+        verify(p2).dead(5);
     }
 
     @Test
@@ -259,14 +261,13 @@ public class WorldTransformerTest {
         WorldState ws = new WorldState(10, 10);
         Obstacle obstacle = new Obstacle();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 34, 35);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 33, 43);
-        SnakePart[] parts3 = SnakeTestUtil.createSnake("test3", "id3", 82, 81);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+        RemotePlayer p3 = createPlayer("player3");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 34, 35);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 33, 43);
+        SnakePart[] parts3 = SnakeTestUtil.createSnake(p3.getName(), p3.getPlayerId(), 82, 81);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -275,9 +276,9 @@ public class WorldTransformerTest {
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.LEFT);
-                put("id2", Direction.UP);
-                put("id3", Direction.RIGHT);
+                put(p1.getPlayerId(), Direction.LEFT);
+                put(p2.getPlayerId(), Direction.UP);
+                put(p3.getPlayerId(), Direction.RIGHT);
             }
         };
 
@@ -285,36 +286,36 @@ public class WorldTransformerTest {
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(33, transformedWorld.getSnakeHeadForBodyAt(33).getPosition());
-        assertEquals("id1", transformedWorld.getSnakeHeadForBodyAt(33).getPlayerId());
+        assertEquals(p1.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(33).getPlayerId());
         assertArrayEquals(new int[] {33,34}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(33)));
 
         assertEquals(23, transformedWorld.getSnakeHeadForBodyAt(23).getPosition());
-        assertEquals("id2", transformedWorld.getSnakeHeadForBodyAt(23).getPlayerId());
+        assertEquals(p2.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(23).getPlayerId());
         assertArrayEquals(new int[] {23}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(23)));
 
         assertEquals(83, transformedWorld.getSnakeHeadForBodyAt(83).getPosition());
-        assertEquals("id3", transformedWorld.getSnakeHeadForBodyAt(83).getPlayerId());
+        assertEquals(p3.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(83).getPlayerId());
         assertArrayEquals(new int[] {83, 82}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(83)));
 
         assertEquals(3, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).addPoints(PointReason.NIBBLE, gameFeatures.getPointsPerNibble());
+        verify(p1).addPoints(PointReason.NIBBLE, gameFeatures.getPointsPerNibble());
     }
 
     @Test
     public void testCollisionTwoSnakeHeadsPassingMove() throws Exception {
+        gameFeatures.setHeadToTailConsumes(false);
         WorldState ws = new WorldState(10, 10);
         Obstacle obstacle = new Obstacle();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 34, 33);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 35, 36);
-        SnakePart[] parts3 = SnakeTestUtil.createSnake("test3", "id3", 23, 24);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+        RemotePlayer p3 = createPlayer("player3");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 34, 33);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 35, 36);
+        SnakePart[] parts3 = SnakeTestUtil.createSnake(p3.getName(), p3.getPlayerId(), 23, 24);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
@@ -323,9 +324,9 @@ public class WorldTransformerTest {
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.RIGHT);
-                put("id2", Direction.LEFT);
-                put("id3", Direction.LEFT);
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+                put(p3.getPlayerId(), Direction.LEFT);
             }
         };
 
@@ -333,37 +334,39 @@ public class WorldTransformerTest {
         WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
 
         assertEquals(22, transformedWorld.getSnakeHeadForBodyAt(22).getPosition());
-        assertEquals("id3", transformedWorld.getSnakeHeadForBodyAt(22).getPlayerId());
+        assertEquals(p3.getPlayerId(), transformedWorld.getSnakeHeadForBodyAt(22).getPlayerId());
         assertArrayEquals(new int[] {22, 23}, transformedWorld.getSnakeSpread(transformedWorld.getSnakeHeadForBodyAt(22)));
 
         assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead(5);
-        verify(mockedPlayer2).dead(5);
+        verify(p1).dead(5);
+        verify(p2).dead(5);
     }
 
     @Test
-    public void testCollisionTwoSnakeHeadsPassingAllDeadMove() throws Exception {
+    public void testCollisionThreeHeads() throws Exception {
         WorldState ws = new WorldState(10, 10);
         Obstacle obstacle = new Obstacle();
 
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 34, 33);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 35, 36);
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+        RemotePlayer p3 = createPlayer("player3");
 
-        RemotePlayer mockedPlayer1 = mock(RemotePlayer.class);
-        RemotePlayer mockedPlayer2 = mock(RemotePlayer.class);
-        when(playerManager.getPlayer("id1")).thenReturn(mockedPlayer1);
-        when(playerManager.getPlayer("id2")).thenReturn(mockedPlayer2);
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 34, 33);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 36, 37);
+        SnakePart[] parts3 = SnakeTestUtil.createSnake(p3.getName(), p3.getPlayerId(), 45, 55);
 
         ws = SnakeTestUtil.addSnake(ws, parts1);
         ws = SnakeTestUtil.addSnake(ws, parts2);
+        ws = SnakeTestUtil.addSnake(ws, parts3);
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, obstacle, 14);
 
         Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
             {
-                put("id1", Direction.RIGHT);
-                put("id2", Direction.LEFT);
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+                put(p3.getPlayerId(), Direction.UP);
             }
         };
 
@@ -373,7 +376,195 @@ public class WorldTransformerTest {
         assertEquals(0, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
 
         assertEquals(obstacle, transformedWorld.getTile(14).getContent());
-        verify(mockedPlayer1).dead(5);
-        verify(mockedPlayer2).dead(5);
+        verify(p1).dead(5);
+        verify(p2).dead(5);
+        verify(p3).dead(5);
+    }
+
+    @Test
+    public void testCollisionHeadToHead() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        Obstacle obstacle = new Obstacle();
+
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 34, 33);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 36, 37);
+
+        ws = SnakeTestUtil.addSnake(ws, parts1);
+        ws = SnakeTestUtil.addSnake(ws, parts2);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, obstacle, 14);
+
+        Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
+            {
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+            }
+        };
+
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
+        WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
+
+        assertEquals(0, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
+
+        assertEquals(obstacle, transformedWorld.getTile(14).getContent());
+        verify(p1).dead(5);
+        verify(p2).dead(5);
+    }
+
+    @Test
+    public void testCollisionPassThrough() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        Obstacle obstacle = new Obstacle();
+
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 34, 33, 32);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 35, 36, 37);
+
+        ws = SnakeTestUtil.addSnake(ws, parts1);
+        ws = SnakeTestUtil.addSnake(ws, parts2);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, obstacle, 14);
+
+        Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
+            {
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+            }
+        };
+
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
+        WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
+
+        assertEquals(0, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
+
+        assertEquals(obstacle, transformedWorld.getTile(14).getContent());
+        verify(p1).dead(5);
+        verify(p2).dead(5);
+    }
+
+    @Test
+    public void testCollisionTwoSnakeHeadsPassingLandingOnTail() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        Obstacle obstacle = new Obstacle();
+
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 34, 33);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 35, 36);
+
+        ws = SnakeTestUtil.addSnake(ws, parts1);
+        ws = SnakeTestUtil.addSnake(ws, parts2);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, obstacle, 14);
+
+        Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
+            {
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+            }
+        };
+
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
+        WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
+
+        assertEquals(0, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
+
+        assertEquals(obstacle, transformedWorld.getTile(14).getContent());
+        verify(p1).dead(5);
+        verify(p2).dead(5);
+    }
+
+    @Test
+    public void testEatEachOthersTail() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        Obstacle obstacle = new Obstacle();
+
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 33, 43, 53);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 44, 34, 24);
+
+        ws = SnakeTestUtil.addSnake(ws, parts1);
+        ws = SnakeTestUtil.addSnake(ws, parts2);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, obstacle, 14);
+
+        Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
+            {
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+            }
+        };
+
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
+        WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
+
+        assertEquals(2, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
+
+        SnakeHead head1 = transformedWorld.getSnakeHeadById(p1.getPlayerId());
+        assertEquals(2, transformedWorld.getSnakeSpread(head1).length);
+
+        SnakeHead head2 = transformedWorld.getSnakeHeadById(p2.getPlayerId());
+        assertEquals(2, transformedWorld.getSnakeSpread(head2).length);
+
+        assertEquals(obstacle, transformedWorld.getTile(14).getContent());
+        verify(p1).addPoints(
+                PointReason.NIBBLE,
+                gameFeatures.getPointsPerNibble()
+        );
+        verify(p2).addPoints(
+                PointReason.NIBBLE,
+                gameFeatures.getPointsPerNibble()
+        );
+    }
+
+    @Test
+    public void testOneEatsTailOtherCollides() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        Obstacle obstacle = new Obstacle();
+
+        RemotePlayer p1 = createPlayer("player1");
+        RemotePlayer p2 = createPlayer("player2");
+
+        SnakePart[] parts1 = SnakeTestUtil.createSnake(p1.getName(), p1.getPlayerId(), 63, 73, 83, 93);
+        SnakePart[] parts2 = SnakeTestUtil.createSnake(p2.getName(), p2.getPlayerId(), 74, 64, 54);
+
+        ws = SnakeTestUtil.addSnake(ws, parts1);
+        ws = SnakeTestUtil.addSnake(ws, parts2);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, obstacle, 14);
+
+        Map<String, Direction> snakeDirections = new HashMap<String, Direction>() {
+            {
+                put(p1.getPlayerId(), Direction.RIGHT);
+                put(p2.getPlayerId(), Direction.LEFT);
+            }
+        };
+
+        WorldTransformer transformer = new WorldTransformer(game.getGameFeatures(), game.getPlayerManager(), game.getGameId(), game.getGlobalEventBus());
+        WorldState transformedWorld = transformer.transform(snakeDirections, gameFeatures, ws, false, 5);
+
+        assertEquals(1, transformedWorld.listPositionsWithContentOf(SnakeHead.class).length);
+        SnakeHead head1 = transformedWorld.getSnakeHeadById(p1.getPlayerId());
+        assertEquals(4, transformedWorld.getSnakeSpread(head1).length);
+
+        assertEquals(obstacle, transformedWorld.getTile(14).getContent());
+        verify(p2).dead(5);
+        verify(p1).addPoints(
+                PointReason.NIBBLE,
+                gameFeatures.getPointsPerNibble()
+        );
+    }
+
+    private RemotePlayer createPlayer(String name) {
+        RemotePlayer mockPlayer = mock(RemotePlayer.class);
+        when(mockPlayer.getName()).thenReturn(name);
+        when(mockPlayer.getPlayerId()).thenReturn("id-" + name);
+
+        when(playerManager.getPlayer("id-" + name)).thenReturn(mockPlayer);
+
+        return mockPlayer;
     }
 }

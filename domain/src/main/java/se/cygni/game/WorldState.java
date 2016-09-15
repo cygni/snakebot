@@ -73,6 +73,17 @@ public class WorldState {
         return getTile(position).getContent().getClass() == clazz;
     }
 
+    public int getPositionOfSnakeHead(String playerId) {
+        int[] snakeHeadPositions = listPositionsWithContentOf(SnakeHead.class);
+
+        for (int position : snakeHeadPositions) {
+            SnakeHead sh = (SnakeHead)getTile(position).getContent();
+            if (sh.getPlayerId().equals(playerId))
+                return position;
+        }
+        return -1;
+    }
+
     public SnakeHead getSnakeHeadById(String playerId) {
         int[] snakeHeadPositions = listPositionsWithContentOf(SnakeHead.class);
         for (int pos : snakeHeadPositions) {
