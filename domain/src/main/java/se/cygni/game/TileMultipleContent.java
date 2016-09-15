@@ -1,6 +1,5 @@
 package se.cygni.game;
 
-import se.cygni.game.transformation.WorldTransformation;
 import se.cygni.game.worldobject.*;
 
 import java.util.ArrayList;
@@ -10,11 +9,9 @@ import java.util.stream.Collectors;
 public class TileMultipleContent {
 
     private final List<WorldObject> contents;
-    private final List<WorldTransformation> resultingTransformations;
 
     public TileMultipleContent() {
         contents = new ArrayList<>();
-        resultingTransformations = new ArrayList<>();
     }
 
     public TileMultipleContent(WorldObject content) {
@@ -90,30 +87,9 @@ public class TileMultipleContent {
             return true;
         }
 
-        // Perhaps all of the cases below can be shorted to:
         if (contents.size() >= 2) {
             return false;
         }
-
-//        // More than one SnakeHead is never ok
-//        if (countInstancesOf(SnakeHead.class) > 1) {
-//            return false;
-//        }
-//
-//        // More than one SnakeBody is never ok
-//        if (countInstancesOf(SnakeBody.class) > 1) {
-//            return false;
-//        }
-//
-//        // Combination of Obstacle and SnakePart is never ok
-//        if (containsType(Obstacle.class) && containsType(SnakePart.class)) {
-//            return false;
-//        }
-
-        // Combination of SnakeHead and SnakeTail might be ok
-//        if (containsType(SnakeHead.class) && containsType(SnakeBody.class)) {
-//            return true;
-//        }
 
         return true;
     }
@@ -135,6 +111,13 @@ public class TileMultipleContent {
 
     public List<SnakeHead> listOffendingSnakeHeads() {
         return listContentsOfType(SnakeHead.class);
+    }
+
+    public List<String> listOffendingSnakeHeadIds() {
+        return listContentsOfType(SnakeHead.class)
+                .stream()
+                .map(snakeHead -> snakeHead.getPlayerId())
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
