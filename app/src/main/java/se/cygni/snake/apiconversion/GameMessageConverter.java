@@ -3,6 +3,7 @@ package se.cygni.snake.apiconversion;
 import se.cygni.game.WorldState;
 import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.DeathReason;
+import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.player.IPlayer;
 
 import java.util.Set;
@@ -26,8 +27,8 @@ public class GameMessageConverter {
                 WorldStateConverter.convertWorldState(worldState, gameTick, players));
     }
 
-    public static GameStartingEvent onGameStart(String gameId, int noofPlayers, int width, int height) {
-        return new GameStartingEvent(gameId, noofPlayers, width, height);
+    public static GameStartingEvent onGameStart(String gameId, int noofPlayers, int width, int height, GameFeatures gameFeatures) {
+        return new GameStartingEvent(gameId, noofPlayers, width, height, GameSettingsConverter.toGameSettings(gameFeatures));
     }
 
     public static GameAbortedEvent onGameAborted(String gameId) {

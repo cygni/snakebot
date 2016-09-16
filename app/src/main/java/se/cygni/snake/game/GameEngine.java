@@ -14,6 +14,7 @@ import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.apiconversion.GameMessageConverter;
+import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
 
@@ -133,7 +134,8 @@ public class GameEngine {
         notifyAllPlayers(new GameStartingEvent(
                 gameId,
                 playerManager.size(),
-                world.getWidth(), world.getHeight()));
+                world.getWidth(), world.getHeight(),
+                GameSettingsConverter.toGameSettings(gameFeatures)));
 
         initPlaceObstacles();
         initPlaceFood();
@@ -165,10 +167,6 @@ public class GameEngine {
                             .onWorldUpdate(world, gameId, currentWorldTick, players);
 
                     notifyPlayers(livePlayers, mapUpdateEvent);
-
-                    InternalGameEvent gevent = new InternalGameEvent(
-                            System.currentTimeMillis(), mapUpdateEvent);
-                    globalEventBus.post(gevent);
 
                     long tstart = System.currentTimeMillis();
                     try {
@@ -218,11 +216,11 @@ public class GameEngine {
 
                 notifyPlayers(players, gameEndedEvent);
 
-                InternalGameEvent gevent = new InternalGameEvent(
-                        System.currentTimeMillis(),
-                        gameEndedEvent);
-                globalEventBus.post(gevent);
-                globalEventBus.post(gevent.getGameMessage());
+//                InternalGameEvent gevent = new InternalGameEvent(
+//                        System.currentTimeMillis(),
+//                        gameEndedEvent);
+//                globalEventBus.post(gevent);
+//                globalEventBus.post(gevent.getGameMessage());
 
                 publishGameChanged();
             }
