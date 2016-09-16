@@ -2,6 +2,7 @@ package se.cygni.snake.api.util;
 
 import org.junit.Test;
 import se.cygni.snake.api.event.GameStartingEvent;
+import se.cygni.snake.api.model.GameSettings;
 import se.cygni.snake.api.response.HeartBeatResponse;
 
 import java.util.Optional;
@@ -14,7 +15,7 @@ public class MessageUtilsTest {
 
     @Test
     public void extractGameId() throws Exception {
-        GameStartingEvent gse = new GameStartingEvent("aaa", 2, 10, 10);
+        GameStartingEvent gse = new GameStartingEvent("aaa", 2, 10, 10, new GameSettings());
 
         Optional<String> value = MessageUtils.extractGameId(gse);
         assertTrue(value.isPresent());
