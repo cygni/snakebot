@@ -53,6 +53,7 @@ subprojects {
         jacksonVersion = '2.8.2'
         springBootVersion = '1.4.0.RELEASE'
         springVersion = '4.3.2.RELEASE'
+        springDataMongoVersion = '1.9.2.RELEASE'
         commonsMathVersion = '3.6.1'
         commonsLangVersion = '3.4'
         commonsBeanutilsVersion = '1.9.2'
@@ -105,5 +106,5 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '3.1'
 }

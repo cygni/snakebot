@@ -1,16 +1,21 @@
 package se.cygni.snake.history;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import se.cygni.snake.api.GameMessage;
-import se.cygni.snake.api.event.MapUpdateEvent;
-import se.cygni.snake.api.model.SnakeInfo;
-import se.cygni.snake.api.util.MessageUtils;
-import se.cygni.snake.event.InternalGameEvent;
+import se.cygni.snake.history.repository.GameHistory;
+import se.cygni.snake.history.repository.GameHistorySearchItem;
+import se.cygni.snake.history.repository.GameHistorySearchResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 //@Profile({"development"})
@@ -21,91 +26,59 @@ public class GameHistoryStorageInMemory implements GameHistoryStorage {
     private static Logger log = LoggerFactory
             .getLogger(GameHistoryStorageInMemory.class);
 
-    private final List<String> gameIds = new LinkedList<>();
+    private final EventBus eventBus;
 
-    private Map<String, SortedSet<InternalGameEvent>> store = Collections.synchronizedMap(new HashMap<>());
-    private Comparator<InternalGameEvent> internalGameEventComparator = (InternalGameEvent m1, InternalGameEvent m2) -> Long.compare(m1.getTstamp(), m2.getTstamp());
+    private List<GameHistory> gameHistories = Collections.synchronizedList(new ArrayList<>());
 
-    public GameHistoryStorageInMemory() {
+    @Autowired
+    public GameHistoryStorageInMemory(EventBus eventBus) {
         log.debug("GameHistoryStorageInMemory started");
+
+        this.eventBus = eventBus;
+        this.eventBus.register(this);
     }
 
     @Override
-    public void addToStorage(InternalGameEvent internalGameEvent) {
-
-        GameMessage gameMessage = internalGameEvent.getGameMessage();
-        Optional<String> extractGameId = MessageUtils.extractGameId(gameMessage);
-
-        if (!extractGameId.isPresent()) {
-            log.debug("Received a GameEvent without gameId, discarding it. Type: {}", gameMessage.getType());
-            return;
-        }
-
-        String gameId = extractGameId.get();
-
-        log.debug("Storing GameMessage for gameId: {}", gameId);
-
-        if (!store.containsKey(gameId)) {
-            gameIds.add(0, gameId);
-            store.put(gameId, new TreeSet<>(internalGameEventComparator));
-        }
-
-        store.get(gameId).add(internalGameEvent);
-    }
-
-
-    @Override
-    public List<GameMessage> getAllMessagesForGame(String gameId) {
-
-        if (!store.containsKey(gameId)) {
-            return new ArrayList<GameMessage>();
-        }
-
-        return store.get(gameId).stream().map(internalGameEvent -> {
-            return internalGameEvent.getGameMessage();
-        }).collect(Collectors.toList());
+    @Subscribe
+    public void addGameHistory(GameHistory gameHistory) {
+        log.debug("Adding GameHistory to memory!");
+        gameHistories.add(gameHistory);
     }
 
     @Override
-    public List<String> listGamesWithPlayer(String playerName) {
-
-        return gameIds.stream().filter(gameId -> {
-            return hasGamePlayerWithName(gameId, playerName);
-        }).collect(Collectors.toList());
-
+    public Optional<GameHistory> getGameHistory(String gameId) {
+        return gameHistories
+                .stream()
+                .filter(gameHistory -> gameHistory.getGameId().equals(gameId))
+                .findFirst();
     }
 
-    private boolean hasGamePlayerWithName(String gameId, String name) {
-        SortedSet<InternalGameEvent> events = store.get(gameId);
+    @Override
+    public GameHistorySearchResult listGamesWithPlayer(String playerName) {
+        GameHistorySearchResult result = new GameHistorySearchResult();
 
-        if (events == null || events.size() == 0)
-            return false;
+        List<GameHistorySearchItem> items = gameHistories
+                .stream()
+                .filter(gameHistory -> ArrayUtils.contains(gameHistory.getPlayerNames(), playerName))
+                .map(gameHistory -> {
+                    return new GameHistorySearchItem(
+                            gameHistory.getGameId(),
+                            gameHistory.getPlayerNames(),
+                            gameHistory.getGameDate()
+                    );
+                })
+                .collect(Collectors.toList());
 
-        Optional<InternalGameEvent> firstMapUpdate =  events.stream().filter(internalGameEvent -> {
-                return internalGameEvent.getGameMessage() instanceof MapUpdateEvent;
-            }).findFirst();
-
-        if (firstMapUpdate.isPresent()) {
-            MapUpdateEvent mapUpdateEvent = (MapUpdateEvent)firstMapUpdate.get().getGameMessage();
-
-            boolean containsName = Arrays.stream(mapUpdateEvent.getMap().getSnakeInfos()).map(SnakeInfo::getName).filter(snakename -> {
-                return snakename.equals(name);
-            }).findFirst().isPresent();
-
-            return containsName;
-        }
-
-        return false;
+        result.setItems(items);
+        return result;
     }
 
     @Scheduled(fixedDelay = 30000L)
     private void removeOldGames() {
         log.debug("Checking of stored game can be removed...");
-        while (gameIds.size() > MAX_NOOF_GAMES_IN_MEMORY - 1) {
-            String id = gameIds.get(gameIds.size() - 1);
-            store.remove(id);
-            gameIds.remove(id);
-            log.debug("Removed gameId: {}", id);
+        while (gameHistories.size() > MAX_NOOF_GAMES_IN_MEMORY - 1) {
+            GameHistory gameHistory = gameHistories.remove(0);
+            log.debug("Removed gameId: {}", gameHistory.getGameId());
         }
         log.debug("...done checking for removable games");
     }

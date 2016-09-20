@@ -1,15 +1,15 @@
 package se.cygni.snake.history;
 
-import se.cygni.snake.api.GameMessage;
-import se.cygni.snake.event.InternalGameEvent;
+import se.cygni.snake.history.repository.GameHistory;
+import se.cygni.snake.history.repository.GameHistorySearchResult;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface GameHistoryStorage {
 
-    void addToStorage(InternalGameEvent internalGameEvent);
+    void addGameHistory(GameHistory gameHistory);
 
-    List<GameMessage> getAllMessagesForGame(String gameId);
-    List<String> listGamesWithPlayer(String playerName);
+    Optional<GameHistory> getGameHistory(String gameId);
+    GameHistorySearchResult listGamesWithPlayer(String playerName);
 
 }

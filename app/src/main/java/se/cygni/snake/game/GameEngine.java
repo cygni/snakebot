@@ -215,13 +215,6 @@ public class GameEngine {
                 );
 
                 notifyPlayers(players, gameEndedEvent);
-
-//                InternalGameEvent gevent = new InternalGameEvent(
-//                        System.currentTimeMillis(),
-//                        gameEndedEvent);
-//                globalEventBus.post(gevent);
-//                globalEventBus.post(gevent.getGameMessage());
-
                 publishGameChanged();
             }
         };
