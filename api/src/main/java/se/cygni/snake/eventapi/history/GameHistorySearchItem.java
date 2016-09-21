@@ -1,4 +1,4 @@
-package se.cygni.snake.history.repository;
+package se.cygni.snake.eventapi.history;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;

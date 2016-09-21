@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import se.cygni.snake.history.repository.GameHistory;
-import se.cygni.snake.history.repository.GameHistorySearchResult;
+import se.cygni.snake.eventapi.history.GameHistory;
+import se.cygni.snake.eventapi.history.GameHistorySearchResult;
 
 import java.util.Optional;
 

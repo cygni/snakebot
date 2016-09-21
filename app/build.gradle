@@ -63,8 +63,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-websocket')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-jetty')
-    compile("org.springframework.data:spring-data-mongodb:$springDataMongoVersion")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    compile('org.elasticsearch:elasticsearch:2.4.0')
 
     compile("com.google.guava:guava:$guavaVersion")
     compile("commons-beanutils:commons-beanutils:$commonsBeanutilsVersion")

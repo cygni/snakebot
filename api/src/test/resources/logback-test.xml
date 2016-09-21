@@ -1,6 +1,6 @@
 <configuration>
 
-    <contextName>Snake-bot-server</contextName>
+    <contextName>Snake-bot-api</contextName>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 

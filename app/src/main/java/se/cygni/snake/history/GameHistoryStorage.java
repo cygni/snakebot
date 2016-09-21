@@ -1,7 +1,7 @@
 package se.cygni.snake.history;
 
-import se.cygni.snake.history.repository.GameHistory;
-import se.cygni.snake.history.repository.GameHistorySearchResult;
+import se.cygni.snake.eventapi.history.GameHistory;
+import se.cygni.snake.eventapi.history.GameHistorySearchResult;
 
 import java.util.Optional;
 
