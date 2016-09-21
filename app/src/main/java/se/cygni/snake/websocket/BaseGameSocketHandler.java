@@ -52,7 +52,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.debug("Received: {}", message.getPayload());
+        log.trace("Received: {}", message.getPayload());
 
         try {
             // Deserialize message
@@ -116,7 +116,7 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
         }
         try {
             String msg = GameMessageParser.encodeMessage(message);
-            log.debug("Sending: {}", msg);
+            log.trace("Sending: {}", msg);
             webSocketSession.sendMessage(new TextMessage(msg));
         } catch (Exception e) {
             e.printStackTrace();

@@ -71,7 +71,6 @@ public class GameHistoryStorageElastic implements GameHistoryStorage {
                 .setQuery(QueryBuilders.idsQuery(elasticType).addIds(gameId))
                 .execute().actionGet();
         try {
-            log.debug(esResponse.getHits().getAt(0).getSourceAsString());
             return Optional.of((GameHistory)ApiMessageParser.decodeMessage(esResponse.getHits().getAt(0).getSourceAsString()));
         } catch (Exception e) {
             e.printStackTrace();

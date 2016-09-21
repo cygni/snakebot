@@ -76,12 +76,10 @@ public class GameHistoryStorageInMemory implements GameHistoryStorage {
 
     @Scheduled(fixedDelay = 30000L)
     private void removeOldGames() {
-        log.debug("Checking of stored game can be removed...");
         while (gameHistories.size() > MAX_NOOF_GAMES_IN_MEMORY - 1) {
             GameHistory gameHistory = gameHistories.remove(0);
             log.debug("Removed gameId: {}", gameHistory.getGameId());
         }
-        log.debug("...done checking for removable games");
     }
 
 }
