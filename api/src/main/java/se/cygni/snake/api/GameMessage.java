@@ -1,6 +1,14 @@
 package se.cygni.snake.api;
 
-public class GameMessage implements Cloneable {
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
+public abstract class GameMessage implements Cloneable {
 
     private String receivingPlayerId;
     private final String type = this.getClass().getCanonicalName();

@@ -1,4 +1,4 @@
-package se.cygni.snake.history.repository;
+package se.cygni.snake.eventapi.history;
 
 import java.util.List;
 
