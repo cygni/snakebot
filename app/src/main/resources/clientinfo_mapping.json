@@ -6,15 +6,19 @@
           "type": "string",
           "index": "not_analyzed"
         },
-        "ipAddress": {
-          "type": "ip",
-          "index": "not_analyzed"
-        },
         "language": {
           "type": "string",
           "index": "not_analyzed"
         },
+        "languageVersion": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
         "operatingSystem": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "operatingSystemVersion": {
           "type": "string",
           "index": "not_analyzed"
         },

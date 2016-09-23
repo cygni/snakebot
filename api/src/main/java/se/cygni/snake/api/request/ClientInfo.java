@@ -18,18 +18,21 @@ public class ClientInfo extends GameMessage {
     private final String id = UUID.randomUUID().toString();
 
     private final String language;
+    private final String languageVersion;
     private final String operatingSystem;
-    private final String ipAddress;
+    private final String operatingSystemVersion;
     private final String clientVersion;
 
     @JsonCreator
     public ClientInfo(@JsonProperty("language") String language,
+                      @JsonProperty("languageVersion") String languageVersion,
                       @JsonProperty("operatingSystem") String operatingSystem,
-                      @JsonProperty("ipAddress") String ipAddress,
+                      @JsonProperty("operatingSystemVersion") String operatingSystemVersion,
                       @JsonProperty("clientVersion") String clientVersion) {
         this.language = language;
+        this.languageVersion = languageVersion;
         this.operatingSystem = operatingSystem;
-        this.ipAddress = ipAddress;
+        this.operatingSystemVersion = operatingSystemVersion;
         this.clientVersion = clientVersion;
     }
 
@@ -37,12 +40,16 @@ public class ClientInfo extends GameMessage {
         return language;
     }
 
+    public String getLanguageVersion() {
+        return languageVersion;
+    }
+
     public String getOperatingSystem() {
         return operatingSystem;
     }
 
-    public String getIpAddress() {
-        return ipAddress;
+    public String getOperatingSystemVersion() {
+        return operatingSystemVersion;
     }
 
     public String getClientVersion() {
@@ -57,9 +64,11 @@ public class ClientInfo extends GameMessage {
     @Override
     public String toString() {
         return "ClientInfo{" +
-                "language='" + language + '\'' +
+                "id='" + id + '\'' +
+                ", language='" + language + '\'' +
+                ", languageVersion='" + languageVersion + '\'' +
                 ", operatingSystem='" + operatingSystem + '\'' +
-                ", ipAddress='" + ipAddress + '\'' +
+                ", operatingSystemVersion='" + operatingSystemVersion + '\'' +
                 ", clientVersion='" + clientVersion + '\'' +
                 '}';
     }

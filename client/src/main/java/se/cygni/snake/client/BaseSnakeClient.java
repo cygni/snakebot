@@ -30,8 +30,6 @@ import javax.websocket.Session;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 
 public abstract class BaseSnakeClient extends TextWebSocketHandler implements SnakeClient {
 
@@ -64,18 +62,15 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public void sendClientInfo() {
-        String ipAddress = null;
-        try {
-            ipAddress = Inet4Address.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            ipAddress = "127.0.0.1";
-        }
         String clientVersion = readVersionFromPropertiesFile();
 
-        String language = String.format("Java %s", SystemUtils.JAVA_VERSION);
-        String os = String.format("%s %s", SystemUtils.OS_NAME, SystemUtils.OS_VERSION);
+        ClientInfo clientInfo = new ClientInfo(
+                "Java",
+                SystemUtils.JAVA_VERSION,
+                SystemUtils.OS_NAME,
+                SystemUtils.OS_VERSION,
+                clientVersion);
 
-        ClientInfo clientInfo = new ClientInfo(language, os, ipAddress, clientVersion);
         sendMessage(clientInfo);
     }
 
