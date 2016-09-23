@@ -200,7 +200,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
     @Subscribe
     public void onInternalGameEvent(InternalGameEvent event) {
 
-        log.info("EventSocketHandler got a message: " + event.getGameMessage().getType());
+        log.info("EventSocketHandler got a message: " + event.getGameMessage().getClass());
         GameMessage gameMessage = event.getGameMessage();
 
         if (gameMessage instanceof GameCreatedEvent ||

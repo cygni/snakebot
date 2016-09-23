@@ -44,7 +44,7 @@ public class GameHistoryCache {
         Optional<String> extractGameId = MessageUtils.extractGameId(gameMessage);
 
         if (!extractGameId.isPresent()) {
-            log.debug("Received a GameEvent without gameId, discarding it. Type: {}", gameMessage.getType());
+            log.debug("Received a GameEvent without gameId, discarding it. Type: {}", gameMessage.getClass());
             return;
         }
 
@@ -56,12 +56,12 @@ public class GameHistoryCache {
                 store.put(gameId, new TreeSet<>(internalGameEventComparator));
             }
 
-            log.debug("Storing GameMessage: {} for gameId: {}", gameMessage.getType(), gameId);
+            log.debug("Storing GameMessage: {} for gameId: {}", gameMessage.getClass(), gameId);
             store.get(gameId).add(internalGameEvent);
         }
 
         if (gameEndedMessages.contains(gameMessage.getClass())) {
-            log.debug("Going to persist gameId: {} on cause of: {}", gameId, gameMessage.getType());
+            log.debug("Going to persist gameId: {} on cause of: {}", gameId, gameMessage.getClass());
             persistAndRemoveGame(gameId);
         }
     }

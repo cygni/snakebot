@@ -12,11 +12,11 @@ public abstract class GameMessage implements Cloneable {
 
     private String receivingPlayerId;
     private long timestamp = System.currentTimeMillis();
-    private final String type = this.getClass().getCanonicalName();
-
-    public String getType() {
-        return type;
-    }
+//    private final String type = this.getClass().getCanonicalName();
+//
+//    public String getType() {
+//        return type;
+//    }
 
     public String getReceivingPlayerId() {
         return receivingPlayerId;
