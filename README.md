@@ -4,7 +4,14 @@
 A multi player, server based snake game for computer bots as players
 
 Clients connect via a websocket through which events and commands are sent bidirectionally.
-Several client implementations exist, check here: [Cygni Snake implementations](https://github.com/cygni/snakebot-clients)
+Several client implementations exist:
+
+[Java](https://github.com/cygni/snakebot-client-java)
+[.NET](https://github.com/cygni/snakebot-client-dotnet)
+[JavaScript](https://github.com/cygni/snakebot-client-js)
+[Rust](https://github.com/cygni/snakebot-client-rust)
+[ClojureScript](https://github.com/cygni/snakebot-client-clojurescript)
+[Go](https://github.com/cygni/snakebot-client-golang)
 
 To clean and build:
 ```
@@ -25,3 +32,26 @@ If you change the client code/api and want to test locally, you need to publish 
 ```
 > ./gradlew publishToMavenLocal
 ```
+
+## To test production-like environment locally
+Start ElasticSearch:
+```
+> docker run -d -p 9200:9200 -p 9300:9300 -v ~/tmp/es-config:/usr/share/elasticsearch/config -v ~/tmp/es-data:/usr/share/elasticsearch/data --name=es elasticsearch:2.4 -Des.network.host=0.0.0.0
+```
+
+Start Kibana:
+```
+> docker run --name kibana --link es:elasticsearch -p 5601:5601 kibana
+```
+
+Update local host file:
+```
+> sudo echo "127.0.0.1    elasticsearch" >> /etc/hosts
+```
+
+Start the application from your IDE with production profile:
+```
+-Dspring.profiles.active=production
+```
+
+Create the Elasticsearch indexes by following these [instructions](elasticsearch.md)

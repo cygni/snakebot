@@ -1,4 +1,4 @@
-package se.cygni.snake.history;
+package se.cygni.snake.persistence.history;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

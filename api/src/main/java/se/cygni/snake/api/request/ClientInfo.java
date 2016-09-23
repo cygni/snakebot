@@ -1,9 +1,12 @@
 package se.cygni.snake.api.request;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.type.GameMessageType;
+
+import java.util.UUID;
 
 /**
  * @author Alan Tibbetts
@@ -11,6 +14,8 @@ import se.cygni.snake.api.type.GameMessageType;
  */
 @GameMessageType
 public class ClientInfo extends GameMessage {
+
+    private final String id = UUID.randomUUID().toString();
 
     private final String language;
     private final String operatingSystem;
@@ -42,6 +47,11 @@ public class ClientInfo extends GameMessage {
 
     public String getClientVersion() {
         return clientVersion;
+    }
+
+    @JsonIgnore
+    public String getId() {
+        return id;
     }
 
     @Override

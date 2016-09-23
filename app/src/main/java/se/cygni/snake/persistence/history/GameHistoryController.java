@@ -1,4 +1,4 @@
-package se.cygni.snake.history;
+package se.cygni.snake.persistence.history;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

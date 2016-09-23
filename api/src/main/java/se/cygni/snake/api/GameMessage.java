@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public abstract class GameMessage implements Cloneable {
 
     private String receivingPlayerId;
+    private long timestamp = System.currentTimeMillis();
     private final String type = this.getClass().getCanonicalName();
 
     public String getType() {
@@ -23,6 +24,14 @@ public abstract class GameMessage implements Cloneable {
 
     public void setReceivingPlayerId(String receivingPlayerId) {
         this.receivingPlayerId = receivingPlayerId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override

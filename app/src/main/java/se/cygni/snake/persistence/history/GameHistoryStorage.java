@@ -1,4 +1,4 @@
-package se.cygni.snake.history;
+package se.cygni.snake.persistence.history;
 
 import se.cygni.snake.eventapi.history.GameHistory;
 import se.cygni.snake.eventapi.history.GameHistorySearchResult;

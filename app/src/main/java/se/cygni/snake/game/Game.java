@@ -125,6 +125,7 @@ public class Game {
     @Subscribe
     public void clientInfo(ClientInfo clientInfo) {
         log.info("Client Info: {}", clientInfo);
+        globalEventBus.post(clientInfo);
     }
 
     public void startGame() {

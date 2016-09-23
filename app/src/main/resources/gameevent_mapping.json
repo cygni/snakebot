@@ -1,0 +1,148 @@
+{
+  "mappings": {
+    "event": {
+      "properties": {
+        "deathReason": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "gameId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "gameSettings": {
+          "properties": {
+            "addFoodLikelihood": {
+              "type": "long"
+            },
+            "foodEnabled": {
+              "type": "boolean"
+            },
+            "headToTailConsumes": {
+              "type": "boolean"
+            },
+            "maxNoofPlayers": {
+              "type": "long"
+            },
+            "noofRoundsTailProtectedAfterNibble": {
+              "type": "long"
+            },
+            "obstaclesEnabled": {
+              "type": "boolean"
+            },
+            "pointsPerCausedDeath": {
+              "type": "long"
+            },
+            "pointsPerFood": {
+              "type": "long"
+            },
+            "pointsPerLength": {
+              "type": "long"
+            },
+            "pointsPerNibble": {
+              "type": "long"
+            },
+            "removeFoodLikelihood": {
+              "type": "long"
+            },
+            "spontaneousGrowthEveryNWorldTick": {
+              "type": "long"
+            },
+            "startFood": {
+              "type": "long"
+            },
+            "startObstacles": {
+              "type": "long"
+            },
+            "startSnakeLength": {
+              "type": "long"
+            },
+            "tailConsumeGrows": {
+              "type": "boolean"
+            },
+            "timeInMsPerTick": {
+              "type": "long"
+            },
+            "trainingGame": {
+              "type": "boolean"
+            }
+          }
+        },
+        "gameTick": {
+          "type": "long"
+        },
+        "height": {
+          "type": "long"
+        },
+        "map": {
+          "properties": {
+            "foodPositions": {
+              "type": "long"
+            },
+            "height": {
+              "type": "long"
+            },
+            "obstaclePositions": {
+              "type": "long"
+            },
+            "snakeInfos": {
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "name": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "points": {
+                  "type": "long"
+                },
+                "positions": {
+                  "type": "long"
+                },
+                "tailProtectedForGameTicks": {
+                  "type": "long"
+                }
+              }
+            },
+            "width": {
+              "type": "long"
+            },
+            "worldTick": {
+              "type": "long"
+            }
+          }
+        },
+        "noofPlayers": {
+          "type": "long"
+        },
+        "playerId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "playerWinnerId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "timestamp": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "width": {
+          "type": "long"
+        },
+        "x": {
+          "type": "long"
+        },
+        "y": {
+          "type": "long"
+        }
+      }
+    }
+  }
+}
