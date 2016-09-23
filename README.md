@@ -6,12 +6,12 @@ A multi player, server based snake game for computer bots as players
 Clients connect via a websocket through which events and commands are sent bidirectionally.
 Several client implementations exist:
 
-[Java](https://github.com/cygni/snakebot-client-java)
-[.NET](https://github.com/cygni/snakebot-client-dotnet)
-[JavaScript](https://github.com/cygni/snakebot-client-js)
-[Rust](https://github.com/cygni/snakebot-client-rust)
-[ClojureScript](https://github.com/cygni/snakebot-client-clojurescript)
-[Go](https://github.com/cygni/snakebot-client-golang)
+* [Java](https://github.com/cygni/snakebot-client-java)
+* [.NET](https://github.com/cygni/snakebot-client-dotnet)
+* [JavaScript](https://github.com/cygni/snakebot-client-js)
+* [Rust](https://github.com/cygni/snakebot-client-rust)
+* [ClojureScript](https://github.com/cygni/snakebot-client-clojurescript)
+* [Go](https://github.com/cygni/snakebot-client-golang)
 
 To clean and build:
 ```
@@ -54,4 +54,4 @@ Start the application from your IDE with production profile:
 -Dspring.profiles.active=production
 ```
 
-Create the Elasticsearch indexes by following these [instructions](elasticsearch.md)
+Create the Elasticsearch indexes by following these [instructions](app/docs/elasticsearch.md)

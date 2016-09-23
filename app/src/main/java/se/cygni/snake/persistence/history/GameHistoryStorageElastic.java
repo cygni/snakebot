@@ -167,7 +167,7 @@ public class GameHistoryStorageElastic implements GameHistoryStorage {
             Iterator<SearchHit> searchHitIterator = esResponse.getHits().iterator();
             int counter = 0;
             while (searchHitIterator.hasNext() && counter < MAX_SEARCH_RESULT) {
-                GameHistory gh = (GameHistory)ApiMessageParser.decodeMessage(searchHitIterator.next().getSourceAsString());
+                GameHistoryPersisted gh = (GameHistoryPersisted)ApiMessageParser.decodeMessage(searchHitIterator.next().getSourceAsString());
                 items.add(new GameHistorySearchItem(gh.getGameId(), gh.getPlayerNames(), gh.getGameDate()));
                 counter++;
             }
