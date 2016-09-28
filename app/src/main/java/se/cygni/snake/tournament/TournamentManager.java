@@ -21,6 +21,7 @@ import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.apiconversion.TournamentPlanConverter;
 import se.cygni.snake.event.InternalGameEvent;
+import se.cygni.snake.eventapi.model.TournamentGamePlan;
 import se.cygni.snake.game.*;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
@@ -125,11 +126,6 @@ public class TournamentManager {
                 tee);
         globalEventBus.post(gevent);
         globalEventBus.post(gevent.getGameMessage());
-
-        tournamentActive = false;
-        tournamentStarted = false;
-
-        killTournament();
     }
 
     private void organizePlayersInLevel() {
@@ -290,12 +286,25 @@ public class TournamentManager {
     }
 
     public void publishTournamentPlan() {
-        globalEventBus.post(
-                TournamentPlanConverter.getTournamentPlan(
-                        tournamentPlan,
-                        tournamentName,
-                        tournamentId
-                ));
+        globalEventBus.post(getTournamentPlan());
+    }
+
+    public TournamentGamePlan getTournamentPlan() {
+        return TournamentPlanConverter.getTournamentPlan(
+                tournamentPlan,
+                tournamentName,
+                tournamentId
+        );
+    }
+
+    public GameSettings getGameSettings() {
+        return GameSettingsConverter.toGameSettings(
+                gameFeatures
+        );
+    }
+
+    public PlayerManager getPlayerManager() {
+        return playerManager;
     }
 
     public EventBus getOutgoingEventBus() {

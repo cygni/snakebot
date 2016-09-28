@@ -301,7 +301,7 @@ public class SnakeTournamentAdmin extends Application implements EventListener {
     }
 
     private void createTournament() {
-        eventSocketClient.sendApiMesssage(new CreateTournament("fake", "My Tournament"));
+        eventSocketClient.sendApiMesssage(new CreateTournament("fake", "My TournamentInfo"));
     }
 
     private void startTournament() {

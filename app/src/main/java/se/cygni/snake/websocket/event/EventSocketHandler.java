@@ -25,6 +25,7 @@ import se.cygni.snake.eventapi.exception.Unauthorized;
 import se.cygni.snake.eventapi.model.ActiveGame;
 import se.cygni.snake.eventapi.model.ActiveGamePlayer;
 import se.cygni.snake.eventapi.model.TournamentGamePlan;
+import se.cygni.snake.eventapi.model.TournamentInfo;
 import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
 import se.cygni.snake.eventapi.response.NoActiveTournamentEvent;
@@ -102,16 +103,12 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             } else if (apiMessage instanceof GetActiveTournament) {
                 if(tournamentManager.isTournamentActive()) {
-
-                    sendApiMessage(new TournamentCreated(
+                    sendApiMessage(new TournamentInfo(
                             tournamentManager.getTournamentId(),
                             tournamentManager.getTournamentName(),
-                            GameSettingsConverter.toGameSettings(
-                                    tournamentManager.getGameFeatures()
-                            )
-                    ));
-                    tournamentManager.publishTournamentPlan();
-                }else {
+                            tournamentManager.getGameSettings(),
+                            tournamentManager.getTournamentPlan()));
+                } else {
                     sendApiMessage(new NoActiveTournamentEvent());
                 }
             } else if (apiMessage instanceof KillTournament) {
@@ -156,6 +153,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
 //                tournamentManager.startGame(startGame.getGameId());
             }
         } catch (Exception e) {
+            log.debug("Got exception when handling API message", e);
             return false;
         }
         return true;
@@ -242,8 +240,12 @@ public class EventSocketHandler extends TextWebSocketHandler {
         sendGameMessage(heartBeatResponse);
     }
 
+    private void sendTournamentInfo() {
+        log.info("Sending tournament info");
+    }
+
     private void sendListOfActiveGames() {
-        log.info("Seding updated list of games");
+        log.info("Sending updated list of games");
         List<Game> games = gameManager.listAllGames();
 
         List<ActiveGame> activeGames = games.stream().map(game -> {
