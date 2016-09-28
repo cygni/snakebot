@@ -1,13 +1,22 @@
 package se.cygni.snake.api;
 
-public class GameMessage implements Cloneable {
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
+public abstract class GameMessage implements Cloneable {
 
     private String receivingPlayerId;
-    private final String type = this.getClass().getCanonicalName();
-
-    public String getType() {
-        return type;
-    }
+    private long timestamp = System.currentTimeMillis();
+//    private final String type = this.getClass().getCanonicalName();
+//
+//    public String getType() {
+//        return type;
+//    }
 
     public String getReceivingPlayerId() {
         return receivingPlayerId;
@@ -15,6 +24,14 @@ public class GameMessage implements Cloneable {
 
     public void setReceivingPlayerId(String receivingPlayerId) {
         this.receivingPlayerId = receivingPlayerId;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override

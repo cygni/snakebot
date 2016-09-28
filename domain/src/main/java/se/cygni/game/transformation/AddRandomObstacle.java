@@ -1,6 +1,8 @@
 package se.cygni.game.transformation;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.cygni.game.Coordinate;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
@@ -10,6 +12,9 @@ import se.cygni.game.worldobject.Obstacle;
 import java.util.Random;
 
 public class AddRandomObstacle implements WorldTransformation {
+
+    private static Logger log = LoggerFactory
+            .getLogger(AddRandomObstacle.class);
 
     private Random random = new XORShiftRandom();
     final static int[] sizes = new int[] {1, 2, 3};
@@ -46,7 +51,7 @@ public class AddRandomObstacle implements WorldTransformation {
             }
 
             if (!placedObstacle)
-                System.out.println("\n\n\nHad to replace obstacle!\n\n");
+                log.debug("Had to replace obstacle!");
         }
 
         return new WorldState(currentWorld.getWidth(), currentWorld.getHeight(), tiles);

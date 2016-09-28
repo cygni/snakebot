@@ -1,4 +1,4 @@
-package se.cygni.snake.history;
+package se.cygni.snake.persistence.history;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -6,11 +6,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import se.cygni.snake.history.repository.GameHistory;
-import se.cygni.snake.history.repository.GameHistorySearchItem;
-import se.cygni.snake.history.repository.GameHistorySearchResult;
+import se.cygni.snake.eventapi.history.GameHistory;
+import se.cygni.snake.eventapi.history.GameHistorySearchItem;
+import se.cygni.snake.eventapi.history.GameHistorySearchResult;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-//@Profile({"development"})
+@Profile({"!production"})
 @Component
 public class GameHistoryStorageInMemory implements GameHistoryStorage {
 
@@ -75,12 +76,10 @@ public class GameHistoryStorageInMemory implements GameHistoryStorage {
 
     @Scheduled(fixedDelay = 30000L)
     private void removeOldGames() {
-        log.debug("Checking of stored game can be removed...");
         while (gameHistories.size() > MAX_NOOF_GAMES_IN_MEMORY - 1) {
             GameHistory gameHistory = gameHistories.remove(0);
             log.debug("Removed gameId: {}", gameHistory.getGameId());
         }
-        log.debug("...done checking for removable games");
     }
 
 }

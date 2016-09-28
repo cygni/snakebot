@@ -1,4 +1,4 @@
-package se.cygni.snake.history;
+package se.cygni.snake.persistence.history;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -11,7 +11,7 @@ import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.SnakeInfo;
 import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.event.InternalGameEvent;
-import se.cygni.snake.history.repository.GameHistory;
+import se.cygni.snake.eventapi.history.GameHistory;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -44,7 +44,7 @@ public class GameHistoryCache {
         Optional<String> extractGameId = MessageUtils.extractGameId(gameMessage);
 
         if (!extractGameId.isPresent()) {
-            log.debug("Received a GameEvent without gameId, discarding it. Type: {}", gameMessage.getType());
+            log.debug("Received a GameEvent without gameId, discarding it. Type: {}", gameMessage.getClass());
             return;
         }
 
@@ -56,11 +56,12 @@ public class GameHistoryCache {
                 store.put(gameId, new TreeSet<>(internalGameEventComparator));
             }
 
-            log.debug("Storing GameMessage: {} for gameId: {}", gameMessage.getType(), gameId);
+            log.debug("Storing GameMessage: {} for gameId: {}", gameMessage.getClass(), gameId);
             store.get(gameId).add(internalGameEvent);
         }
 
         if (gameEndedMessages.contains(gameMessage.getClass())) {
+            log.debug("Going to persist gameId: {} on cause of: {}", gameId, gameMessage.getClass());
             persistAndRemoveGame(gameId);
         }
     }
@@ -71,9 +72,9 @@ public class GameHistoryCache {
     }
 
     private void persistAndRemoveGame(String gameId) {
-        log.debug("Persisting gameId: {}", gameId);
         GameHistory gameHistory = getGameHistory(gameId);
         if (gameHistory != null) {
+            log.debug("Persisting gameId: {}", gameId);
             eventBus.post(gameHistory);
             gameIds.remove(gameId);
             store.remove(gameId);
@@ -85,12 +86,11 @@ public class GameHistoryCache {
             return null;
         }
 
-        GameHistory gameHistory = new GameHistory(gameId);
-        gameHistory.setGameDate(extractGameDate(gameId));
-        gameHistory.setPlayerNames(getPlayersForGame(gameId));
-        gameHistory.setMessages(getGameMessagesForGame(gameId));
-
-        return gameHistory;
+        return new GameHistory(
+                gameId,
+                getPlayersForGame(gameId),
+                extractGameDate(gameId),
+                getGameMessagesForGame(gameId));
     }
 
     private List<GameMessage> getGameMessagesForGame(String gameId) {

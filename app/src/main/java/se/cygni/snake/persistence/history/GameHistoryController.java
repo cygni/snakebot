@@ -1,5 +1,7 @@
-package se.cygni.snake.history;
+package se.cygni.snake.persistence.history;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,13 +9,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import se.cygni.snake.history.repository.GameHistory;
-import se.cygni.snake.history.repository.GameHistorySearchResult;
+import se.cygni.snake.eventapi.history.GameHistory;
+import se.cygni.snake.eventapi.history.GameHistorySearchResult;
 
 import java.util.Optional;
 
 @RestController
 public class GameHistoryController {
+
+    private static Logger log = LoggerFactory
+            .getLogger(GameHistoryController.class);
 
     private final GameHistoryStorage storage;
 
@@ -35,9 +40,19 @@ public class GameHistoryController {
     }
 
     @RequestMapping(value = "/history/search/{name}", method = RequestMethod.GET)
-    public GameHistorySearchResult searchGame(
+    public ResponseEntity<GameHistorySearchResult> searchGame(
             @PathVariable("name") String name) {
 
-        return storage.listGamesWithPlayer(name);
+        try {
+            GameHistorySearchResult result = storage.listGamesWithPlayer(name);
+            if (result.getItems().size() == 0) {
+                return new ResponseEntity(HttpStatus.NOT_FOUND);
+            } else {
+                return new ResponseEntity<GameHistorySearchResult>(result, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            log.error("Failed to search for games with player: {}", name, e);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
     }
 }

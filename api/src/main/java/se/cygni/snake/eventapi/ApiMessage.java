@@ -1,11 +1,18 @@
 package se.cygni.snake.eventapi;
 
-public class ApiMessage {
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-    private final String type = this.getClass().getCanonicalName();
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "type"
+)
+public abstract class ApiMessage {
 
-    public String getType() {
-        return type;
-    }
+//    private final String type = this.getClass().getCanonicalName();
+//
+//    public String getType() {
+//        return type;
+//    }
 
 }

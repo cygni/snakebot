@@ -1,0 +1,36 @@
+{
+  "mappings": {
+    "client": {
+      "properties": {
+        "clientVersion": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "language": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "languageVersion": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "operatingSystem": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "operatingSystemVersion": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "receivingPlayerId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "mappings": {
+    "game": {
+      "properties": {
+        "eventIds": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "gameDate": {
+          "type": "date",
+          "format": "yyy-MM-dd HH:mm:ss.SSS||yyyy-MM-dd||strict_date_optional_time||epoch_millis"
+        },
+        "gameId": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "playerNames": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  }
+}
