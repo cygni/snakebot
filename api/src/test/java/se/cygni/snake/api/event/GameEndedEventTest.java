@@ -20,4 +20,5 @@ public class GameEndedEventTest {
         assertEquals(4, parsedgee.getGameTick());
         assertEquals("rPlayerId", parsedgee.getReceivingPlayerId());
     }
+
 }

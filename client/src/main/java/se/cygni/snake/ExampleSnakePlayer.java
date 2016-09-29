@@ -27,11 +27,11 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     private AnsiPrinter ansiPrinter;
     private String name = "#emil_" + random.nextInt(1000);
-    private String host = "localhost";
-    private int port = 8080;
-//    private String host = "snake.cygni.se";
-//    private int port = 80;
-    private GameMode gameMode = GameMode.TOURNAMENT;
+//    private String host = "localhost";
+//    private int port = 8080;
+    private String host = "snake.cygni.se";
+    private int port = 80;
+    private GameMode gameMode = GameMode.TRAINING;
 
     public static void main(String[] args) {
 
@@ -107,7 +107,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent) {
-        log.info("TournamentInfo has ended, winner playerId: {}", tournamentEndedEvent.getPlayerWinnerId());
+        log.info("Tournament has ended, winner playerId: {}", tournamentEndedEvent.getPlayerWinnerId());
         int c = 1;
         for (PlayerPoints pp : tournamentEndedEvent.getGameResult()) {
             log.info("{}. {} - {} points", c++, pp.getName(), pp.getPoints());

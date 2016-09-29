@@ -31,8 +31,6 @@ public abstract class BaseGameSocketHandler extends TextWebSocketHandler {
 
         // Create a playerId for this player
         playerId = UUID.randomUUID().toString();
-
-
     }
 
     @Override
