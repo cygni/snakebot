@@ -19,17 +19,17 @@ public class IPlayerComparator implements Comparator<IPlayer> {
     public int compare(IPlayer o1, IPlayer o2) {
         // Note reversed order!
 
-        // Points comes first
-        int pointCp = Integer.compare(o2.getTotalPoints(), o1.getTotalPoints());
-        if (pointCp != 0)
-            return pointCp;
-
-        // Then alive or dead
+        // First alive or dead
         if (o2.isAlive() && !o1.isAlive())
             return 1;
 
         if (o1.isAlive() && !o2.isAlive())
             return -1;
+
+        // Then points
+        int pointCp = Integer.compare(o2.getTotalPoints(), o1.getTotalPoints());
+        if (pointCp != 0)
+            return pointCp;
 
         // Then point distribution
         for (PointReason reason : POINT_REASON_PRIORITY) {

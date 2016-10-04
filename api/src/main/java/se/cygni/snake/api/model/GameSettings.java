@@ -245,7 +245,6 @@ public class GameSettings {
         private boolean foodEnabled = true;
         private boolean headToTailConsumes = true;
         private boolean tailConsumeGrows = false;
-        private double obstacleIntensity = 10;
         private int addFoodLikelihood = 15;
         private int removeFoodLikelihood = 5;
         private int spontaneousGrowthEveryNWorldTick = 3;
@@ -273,11 +272,6 @@ public class GameSettings {
 
         public GameSettingsBuilder withTimeInMsPerTick(int timeInMsPerTick) {
             this.timeInMsPerTick = timeInMsPerTick;
-            return this;
-        }
-
-        public GameSettingsBuilder withObstacleIntensity(double obstacleIntensity) {
-            this.obstacleIntensity = obstacleIntensity;
             return this;
         }
 

@@ -199,7 +199,7 @@ public class GameEngine {
                 // Create GameResult
                 Set<IPlayer> allPlayers = playerManager.toSet();
                 for (IPlayer player : allPlayers) {
-                    gameResult.addResult(player.getTotalPoints(), player);
+                    gameResult.addResult(player);
                 }
 
                 gameComplete.set(true);
