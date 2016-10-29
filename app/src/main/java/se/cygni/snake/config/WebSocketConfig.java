@@ -1,6 +1,5 @@
 package se.cygni.snake.config;
 
-import com.google.common.eventbus.EventBus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
@@ -9,7 +8,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.handler.PerConnectionWebSocketHandler;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-import se.cygni.snake.game.GameManager;
+import se.cygni.snake.websocket.arena.ArenaWebSocketHandler;
 import se.cygni.snake.websocket.event.EventSocketHandler;
 import se.cygni.snake.websocket.tournament.TournamentWebSocketHandler;
 import se.cygni.snake.websocket.training.TrainingWebSocketHandler;
@@ -23,6 +22,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(eventWebSocketHandler(), "/events-native").setAllowedOrigins("*");
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
         registry.addHandler(snakeTournamentWebSocketHandler(), "/tournament");
+        registry.addHandler(snakeArenaWebSocketHandler(), "/arena");
     }
 
     @Bean
@@ -39,6 +39,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public WebSocketHandler snakeTournamentWebSocketHandler() {
         return new PerConnectionWebSocketHandler(TournamentWebSocketHandler.class, true);
     }
+
+    @Bean
+    public WebSocketHandler snakeArenaWebSocketHandler() {
+        return new PerConnectionWebSocketHandler(ArenaWebSocketHandler.class, true);
+    }
+
     @Bean
     public ServletServerContainerFactoryBean createServletServerContainerFactoryBean() {
         ServletServerContainerFactoryBean container = new ServletServerContainerFactoryBean();
