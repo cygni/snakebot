@@ -1,94 +1,93 @@
 package se.cygni.snake.tournament.util;
 
-import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.player.IPlayer;
 
 import java.util.*;
 
 public class TournamentUtil {
 
-    private static int PLAYERS_SMALL = 5;
-    private static int PLAYERS_STANDARD = 7;
-    private static int PLAYERS_MEDIUM = 10;
-    private static int PLAYERS_LARGE = 13;
-    private static int PLAYERS_XLARGE = 17;
-
-
-    public static Set<IPlayer> getRandomPlayers(Set<IPlayer> players, int noofPlayers) {
-        Set<IPlayer> randomPlayers = new HashSet<>();
-        List<IPlayer> startPlayers = new ArrayList<>(players);
-        Collections.shuffle(startPlayers);
-        int acutalNoofPlayers = Math.min(noofPlayers, startPlayers.size());
-        for (int i = 0; i < acutalNoofPlayers; i++) {
-            randomPlayers.add(startPlayers.get(i));
+    /**
+     * Given the total number of players and the available number of games this
+     * method distributes the number of players per game as evenly as possible.
+     *
+     * @param noofPlayers
+     * @param noofGames
+     * @return An integer array with the number of players per game
+     */
+    public static int[] getNumberOfPlayersPerGame(int noofPlayers, int noofGames) {
+        if (noofPlayers <= 0) {
+            return new int[0];
         }
-        return randomPlayers;
-    }
 
-    public static int getNoofPlayersAdvancing(int noofPlayers, int maxPlayersPerGame) {
-        int noofGames = getNoofGamesForPlayers(noofPlayers, maxPlayersPerGame);
-
-        int[] playersPerGame = getPlayerDistribution(noofPlayers, noofGames);
-        int playersOut = getNoofPlayersOut(maxPlayersPerGame);
-        int sum = 0;
-        for (int i = 0; i < playersPerGame.length; i++) {
-            if (playersPerGame[i] + playersOut <= 0) {
-                playersPerGame[i] = 1;
-            } else {
-                playersPerGame[i] += playersOut;
-            }
-            sum += playersPerGame[i];
-        }
-        return sum;
-    }
-
-    public static int[] getPlayerDistribution(int noofPlayers, int noofGames) {
         int[] playersPerGame = new int[noofGames];
+
         for (int i = 0; i < noofPlayers; i++) {
             playersPerGame[i%noofGames] += 1;
         }
         return playersPerGame;
     }
 
-    public static int getNoofGamesForPlayers(int noofPlayers, int maxPlayersPerGame) {
-        return (int) Math.ceil((double) noofPlayers / (double) maxPlayersPerGame);
-    }
-
-    public static int getNoofPlayersOut(int maxPlayersPerGame) {
-        if (maxPlayersPerGame <= PLAYERS_SMALL)
-            return -3;
-
-        if (maxPlayersPerGame <= PLAYERS_STANDARD)
-            return -4;
-
-        if (maxPlayersPerGame <= PLAYERS_MEDIUM)
-            return -5;
-
-        if (maxPlayersPerGame <= PLAYERS_LARGE)
-            return -7;
-
-        return -9;
-    }
-
-    public static int getMaxNoofPlayersPerGame(GameFeatures gameFeatures) {
-        int gameSize = gameFeatures.getWidth() * gameFeatures.getHeight();
-
-        /*
-            5 players —> 25x25 (625)
-            7 players -> 46x34 (1564)
-            10 players —> 50x50 (2500)
-            13 players —> 75x75 (5625)
-            17 players —> 100x100 (10000)
-         */
-        if (gameSize <= 625) {
-            return PLAYERS_SMALL;
-        } else if (gameSize <= 1564) {
-            return PLAYERS_STANDARD;
-        } else if (gameSize <= 2500) {
-            return PLAYERS_MEDIUM;
-        } else if (gameSize <= 5625) {
-            return PLAYERS_LARGE;
+    /**
+     * Calculates the number of levels needed to determine a winner in a final game
+     * given the number of players and max number of players per game. The calculation
+     * is based on the fact that the number of games in each level is always 2^levelIndex.
+     *
+     * @param noofPlayers
+     * @param maxNoofPlayersPerGame
+     * @return The numbers of levels needed to establish a winner.
+     */
+    public static int getNoofLevels(int noofPlayers, int maxNoofPlayersPerGame) {
+        if (noofPlayers < 1) {
+            return 0;
         }
-        return PLAYERS_XLARGE;
+
+        if (noofPlayers <= maxNoofPlayersPerGame) {
+            return 1;
+        }
+
+        int level = 0;
+        double noofMatches =(double) noofPlayers / (double) maxNoofPlayersPerGame;
+
+        // Find the *first* exponent of 2 that enables more than noofMatches
+        while (true) {
+            if (Math.pow(2, level) >= noofMatches)
+                return level + 1;
+
+            level++;
+        }
+    }
+
+    /**
+     * Calculates the number of games needed per level. The number
+     * of games per level are always 2^levelIndex. I.e. the number of games
+     * in level 3: 2^3 = 8
+     *
+     * @param noofLevels
+     * @return An array of ints with the number of games per level
+     */
+    public static int[] getGameDistribution(int noofLevels) {
+        if (noofLevels < 1) {
+            return new int[0];
+        }
+
+        int[] gameDistribution = new int[noofLevels];
+
+        int c = 0;
+        for (int i = noofLevels-1; i>= 0; i--) {
+            gameDistribution[c++] = (int)Math.pow(2, i);
+        }
+
+        return gameDistribution;
+    }
+
+    public static Set<IPlayer> getRandomPlayers(Set<IPlayer> players, int noofPlayers) {
+        Set<IPlayer> randomPlayers = new HashSet<>();
+        List<IPlayer> startPlayers = new ArrayList<>(players);
+        Collections.shuffle(startPlayers);
+        int actualNoofPlayers = Math.min(noofPlayers, startPlayers.size());
+        for (int i = 0; i < actualNoofPlayers; i++) {
+            randomPlayers.add(startPlayers.get(i));
+        }
+        return randomPlayers;
     }
 }

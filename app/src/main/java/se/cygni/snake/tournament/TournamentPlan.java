@@ -3,13 +3,12 @@ package se.cygni.snake.tournament;
 import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.game.PlayerManager;
 import se.cygni.snake.player.IPlayer;
+import se.cygni.snake.tournament.util.TournamentUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static se.cygni.snake.tournament.util.TournamentUtil.getMaxNoofPlayersPerGame;
-import static se.cygni.snake.tournament.util.TournamentUtil.getNoofPlayersAdvancing;
 
 public class TournamentPlan {
 
@@ -30,7 +29,7 @@ public class TournamentPlan {
 
     public TournamentLevel getLevelAt(int pos) {
         if (pos < 0 || pos >= levels.size()) {
-            throw new RuntimeException("Idiot, you tried to get a level out of bounds.");
+            throw new RuntimeException("Not good, you tried to get a level out of bounds.");
         }
 
         return levels.get(pos);
@@ -42,22 +41,22 @@ public class TournamentPlan {
 
     private void createPlan() {
 
-        int maxPlayersPerGame = getMaxNoofPlayersPerGame(gameFeatures);
+        int maxPlayersPerGame = gameFeatures.getMaxNoofPlayers();
 
-        int noofPlayersLeft = playerManager.size();
-        boolean notSolved = noofPlayersLeft > maxPlayersPerGame;
-        int index = 0;
-        while (notSolved) {
-            TournamentLevel level = new TournamentLevel(index, noofPlayersLeft, maxPlayersPerGame);
+        int noofLevels = TournamentUtil.getNoofLevels(playerManager.size(), maxPlayersPerGame);
+        int[] gameDistribution = TournamentUtil.getGameDistribution(noofLevels);
+
+        for (int index = 0; index < noofLevels; index++) {
+            int noofPlayersInLevel = 0;
+            if (index == 0) {
+                noofPlayersInLevel = playerManager.size();
+            } else {
+                noofPlayersInLevel = gameDistribution[index] * maxPlayersPerGame;
+            }
+
+            TournamentLevel level = new TournamentLevel(index, gameDistribution[index], noofPlayersInLevel, maxPlayersPerGame);
             levels.add(level);
-
-            noofPlayersLeft = getNoofPlayersAdvancing(noofPlayersLeft, maxPlayersPerGame);
-
-            notSolved = noofPlayersLeft > maxPlayersPerGame;
-            index++;
         }
-        TournamentLevel level = new TournamentLevel(index, noofPlayersLeft, maxPlayersPerGame);
-        levels.add(level);
     }
 
     public GameFeatures getGameFeatures() {

@@ -250,7 +250,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
         List<ActiveGame> activeGames = games.stream().map(game -> {
             List<ActiveGamePlayer> players = game.getPlayerManager().toSet().stream().map(player -> {
-                return new ActiveGamePlayer(player.getName(), player.getPlayerId());
+                return new ActiveGamePlayer(player.getName(), player.getPlayerId(), player.getTotalPoints());
             }).collect(Collectors.toList());
 
             return new ActiveGame(

@@ -7,6 +7,7 @@ public class TournamentGame {
     private String gameId;
     private int expectedNoofPlayers;
     private List<ActiveGamePlayer> players;
+    private boolean gamePlayed;
 
     public TournamentGame() {
     }
@@ -33,5 +34,13 @@ public class TournamentGame {
 
     public void setPlayers(List<ActiveGamePlayer> players) {
         this.players = players;
+    }
+
+    public boolean isGamePlayed() {
+        return gamePlayed;
+    }
+
+    public void setGamePlayed(boolean gamePlayed) {
+        this.gamePlayed = gamePlayed;
     }
 }
