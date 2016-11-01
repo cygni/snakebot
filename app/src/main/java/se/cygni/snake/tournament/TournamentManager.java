@@ -117,7 +117,7 @@ public class TournamentManager {
                 tournamentName,
                 tournamentId);
 
-        playerManager.toSet().stream().forEach( player -> {
+        playerManager.toSet().forEach( player -> {
             player.onTournamentEnded(tee);
         });
 
@@ -140,7 +140,7 @@ public class TournamentManager {
 
         if (currentLevel != 0) {
             playersStillInTournament.clear();
-            TournamentLevel previousLevel = tournamentPlan.getLevelAt(currentLevel-1);
+            TournamentLevel previousLevel = tournamentPlan.getLevelAt(currentLevel-1); // Might be wrong index here
             playersStillInTournament.addAll(previousLevel.getPlayersAdvancing());
         }
 
@@ -161,7 +161,7 @@ public class TournamentManager {
             Game game = gameManager.createGame(gameFeatures);
             game.setOutgoingEventBus(outgoingEventBus);
             tGame.setGame(game);
-            players.stream().forEach(player -> {
+            players.forEach(player -> {
                 game.addPlayer(player);
             });
             games.put(game.getGameId(), game);
@@ -262,6 +262,10 @@ public class TournamentManager {
     }
 
     public void startTournament() {
+
+        if (tournamentStarted) {
+            return;
+        }
 
         // ToDo: Not thread safe
         tournamentStarted = true;

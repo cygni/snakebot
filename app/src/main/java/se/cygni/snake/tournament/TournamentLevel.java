@@ -2,6 +2,8 @@ package se.cygni.snake.tournament;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.cygni.snake.game.GameResult;
+import se.cygni.snake.player.HistoricalPlayer;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.tournament.util.TournamentUtil;
 
@@ -17,50 +19,87 @@ public class TournamentLevel {
     private final int levelIndex;
     private final int expectedNoofPlayers;
     private final int maxNoofPlayersPerGame;
+    private final int noofGamesInLevel;
     private Set<IPlayer> players;
     private List<TournamentPlannedGame> plannedGames;
 
-    public TournamentLevel(int levelIndex, int expectedNoofPlayers, int maxNoofPlayersPerGame) {
+    public TournamentLevel(int levelIndex, int noofGamesInLevel, int expectedNoofPlayers, int maxNoofPlayersPerGame) {
         this.levelIndex = levelIndex;
+        this.noofGamesInLevel = noofGamesInLevel;
         this.expectedNoofPlayers = expectedNoofPlayers;
         this.maxNoofPlayersPerGame = maxNoofPlayersPerGame;
         planGames();
     }
 
     public Set<IPlayer> getPlayersAdvancing() {
-        int diff = TournamentUtil.getNoofPlayersOut(maxNoofPlayersPerGame);
+
         Set<IPlayer> playersAdvancing = new HashSet<>();
 
+        // Store players in GameResult
+        for (TournamentPlannedGame game : plannedGames) {
+            game.createHistoricalGameResult();
+        }
+
+        // Alive winning players always proceed
         for (TournamentPlannedGame game : plannedGames) {
             List<IPlayer> gameResult = game.getGame().getGameResult().getSortedResult();
-            int noofToAdvance;
-
-            // At least one player should advance
-            if (gameResult.size() + diff <= 0) {
-                noofToAdvance = 1;
-            } else {
-                noofToAdvance = gameResult.size() + diff;
-            }
-
-            List<IPlayer> gameAdvancing = new ArrayList<>();
-            boolean addedEnough = false;
-            int added = 0;
-            int index = 0;
-            while (!addedEnough) {
-                IPlayer player = gameResult.get(index);
+            if (gameResult.size() > 0) {
+                IPlayer player = gameResult.get(0);
                 if (player.isConnected()) {
-                    gameAdvancing.add(player);
+                    playersAdvancing.add(player);
+                    HistoricalPlayer hPlayer = game.getHistoricalPlayer(player.getPlayerId());
+                    hPlayer.setMovedUpInTournament(true);
+                    hPlayer.setWinner(true);
+                }
+            }
+        }
+
+        int noofPlayersNeedForNextLevel = (noofGamesInLevel / 2) * maxNoofPlayersPerGame;
+        int diff = noofPlayersNeedForNextLevel - playersAdvancing.size();
+
+        // How many players can we fairly add from all games?
+        int toFairlyAddPerGame = diff / noofGamesInLevel;
+        for (TournamentPlannedGame game : plannedGames) {
+            List<IPlayer> gameResult = game.getGame().getGameResult().getSortedResult();
+
+            int added = 0;
+            int i = 0;
+            boolean done = added == diff;
+            while (!done) {
+                IPlayer player = gameResult.get(i);
+                if (player.isConnected() && !playersAdvancing.contains(player)) {
+                    playersAdvancing.add(player);
+                    HistoricalPlayer hPlayer = game.getHistoricalPlayer(player.getPlayerId());
+                    hPlayer.setMovedUpInTournament(true);
                     added++;
                 }
-                index++;
-                addedEnough = added == noofToAdvance || index >= gameResult.size();
-            }
-            log.info("Noof players in this game: {}, gameResult size: {}, advancing: {}",
-                    game.getGame().getPlayerManager().size(),
-                    gameResult.size(),
-                    gameAdvancing.size());
 
-            playersAdvancing.addAll(gameAdvancing);
+                done = added == diff || i <= gameResult.size();
+            }
+        }
+
+        // Okay, what's the diff now?
+        diff = noofPlayersNeedForNextLevel - playersAdvancing.size();
+
+        if (diff > 0) {
+            GameResult totalGameResult = new GameResult();
+
+            for (TournamentPlannedGame game : plannedGames) {
+                List<IPlayer> gameResult = game.getGame().getGameResult().getSortedResult();
+
+                for (IPlayer player : gameResult) {
+                    if (player.isConnected() && !playersAdvancing.contains(player)) {
+                        totalGameResult.addResult(player);
+                    }
+                }
+            }
+
+            // Add the remaining players with highest score!
+            List<IPlayer> totalRestResult = totalGameResult.getSortedResult();
+            for (int i=0; i < diff; i++) {
+                playersAdvancing.add(totalRestResult.get(i));
+                // ToDo: Add setMovedUpInTournament to HistoricalPlayer here
+            }
         }
 
         for (IPlayer player : playersAdvancing) {
@@ -93,12 +132,13 @@ public class TournamentLevel {
 
     private void planGames() {
         plannedGames = new ArrayList<>();
-        int noofGames = TournamentUtil.getNoofGamesForPlayers(expectedNoofPlayers, maxNoofPlayersPerGame);
-        int[] playerDistribution = TournamentUtil.getPlayerDistribution(expectedNoofPlayers, noofGames);
-        for (int noof : playerDistribution) {
+
+        int[] playerDistribution = TournamentUtil.getNumberOfPlayersPerGame(expectedNoofPlayers, noofGamesInLevel);
+        for (int noofPlayers : playerDistribution) {
             TournamentPlannedGame tpg = new TournamentPlannedGame();
-            tpg.setExpectedNoofPlayers(noof);
+            tpg.setExpectedNoofPlayers(noofPlayers);
             plannedGames.add(tpg);
         }
+
     }
 }
