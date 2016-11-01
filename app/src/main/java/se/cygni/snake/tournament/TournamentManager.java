@@ -48,6 +48,7 @@ public class TournamentManager {
     private PlayerManager playersStillInTournament = new PlayerManager();
     private int currentLevel = 0;
     private HashMap<String, Game> games = new HashMap<>();
+    private HashMap<String, TournamentPlannedGame> tournamentGameMap = new HashMap<>();
 
     @Autowired
     public TournamentManager(GameManager gameManager, EventBus globalEventBus) {
@@ -110,6 +111,8 @@ public class TournamentManager {
             }
         }
 
+        publishTournamentPlan();
+
         TournamentEndedEvent tee = new TournamentEndedEvent(
                 winnerPlayerId,
                 lastGame.getGame().getGameId(),
@@ -140,7 +143,7 @@ public class TournamentManager {
 
         if (currentLevel != 0) {
             playersStillInTournament.clear();
-            TournamentLevel previousLevel = tournamentPlan.getLevelAt(currentLevel-1); // Might be wrong index here
+            TournamentLevel previousLevel = tournamentPlan.getLevelAt(currentLevel-1);
             playersStillInTournament.addAll(previousLevel.getPlayersAdvancing());
         }
 
@@ -164,7 +167,9 @@ public class TournamentManager {
             players.forEach(player -> {
                 game.addPlayer(player);
             });
+
             games.put(game.getGameId(), game);
+            tournamentGameMap.put(game.getGameId(), tGame);
         }
 
         publishTournamentPlan();
@@ -222,8 +227,15 @@ public class TournamentManager {
     public void onInternalGameEvent(InternalGameEvent internalGameEvent) {
         if (internalGameEvent.getGameMessage() instanceof GameEndedEvent) {
             GameEndedEvent gee = (GameEndedEvent)internalGameEvent.getGameMessage();
+
             if (games.containsKey(gee.getGameId())) {
+
                 log.info("GameId: {} ended.", gee.getGameId());
+                TournamentPlannedGame tGame = tournamentGameMap.get(gee.getGameId());
+                if (tGame != null) {
+                    tGame.createHistoricalGameResult();
+                }
+
                 if (areAllGamesInLevelComplete(currentLevel)) {
                     currentLevel++;
                     organizePlayersInLevel();
@@ -292,6 +304,7 @@ public class TournamentManager {
     }
 
     public void publishTournamentPlan() {
+        log.info("Publishing TournamentGamePlan.");
         globalEventBus.post(getTournamentPlan());
     }
 

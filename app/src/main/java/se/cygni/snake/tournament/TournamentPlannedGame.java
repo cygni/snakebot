@@ -12,7 +12,7 @@ public class TournamentPlannedGame {
 
     private int expectedNoofPlayers;
     private Set<IPlayer> players;
-    private Set<HistoricalPlayer> historicalPlayers;
+    private Set<HistoricalPlayer> historicalPlayers = new HashSet<>();
     private GameResult gameResult = new GameResult();
     private Game game;
 
@@ -44,17 +44,32 @@ public class TournamentPlannedGame {
         return gameResult;
     }
 
+    public boolean isGamePlayed() {
+        if (game == null) {
+            return false;
+        }
+
+        return game.isEnded();
+    }
+
     public HistoricalPlayer getHistoricalPlayer(String playerId) {
         return historicalPlayers.stream().filter(player -> player.getPlayerId().equals(playerId)).findFirst().get();
     }
 
     public void createHistoricalGameResult() {
-        historicalPlayers = new HashSet<>();
+        if (historicalPlayers.size() > 0) {
+            return;
+        }
 
         for (IPlayer player : game.getPlayerManager().toSet()) {
             HistoricalPlayer hPlayer = new HistoricalPlayer(player);
             gameResult.addResult(hPlayer);
             historicalPlayers.add(hPlayer);
         }
+
+        // Set winner
+        HistoricalPlayer winner = (HistoricalPlayer)gameResult.getWinner();
+        winner.setWinner(true);
+        winner.setMovedUpInTournament(true);
     }
 }

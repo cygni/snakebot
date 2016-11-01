@@ -33,7 +33,7 @@ public class TournamentPlanConverter {
             return activePlayers;
         }
 
-        players.stream().forEach(player -> {
+        players.forEach(player -> {
             if (player instanceof HistoricalPlayer) {
                 HistoricalPlayer historicalPlayer = (HistoricalPlayer)player;
                 activePlayers.add(new ActiveGamePlayer(historicalPlayer.getName(),
@@ -50,7 +50,7 @@ public class TournamentPlanConverter {
 
     public static List<TournamentLevel> getLevels(List<se.cygni.snake.tournament.TournamentLevel> levels) {
         List<TournamentLevel> tlevels = new ArrayList<>();
-        levels.stream().forEach(level -> {
+        levels.forEach(level -> {
             TournamentLevel tlevel = new TournamentLevel(level.getLevelIndex(), level.getExpectedNoofPlayers());
             tlevel.setPlayers(getPlayers(level.getPlayers()));
             tlevel.setTournamentGames(getTournamentGames(level.getPlannedGames()));
@@ -61,7 +61,7 @@ public class TournamentPlanConverter {
 
     private static List<TournamentGame> getTournamentGames(List<TournamentPlannedGame> plannedGames) {
         List<TournamentGame> games = new ArrayList<>();
-        plannedGames.stream().forEach(tgp -> {
+        plannedGames.forEach(tgp -> {
             TournamentGame game = new TournamentGame();
             game.setExpectedNoofPlayers(tgp.getExpectedNoofPlayers());
 

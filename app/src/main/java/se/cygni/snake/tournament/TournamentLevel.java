@@ -7,10 +7,7 @@ import se.cygni.snake.player.HistoricalPlayer;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.tournament.util.TournamentUtil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TournamentLevel {
 
@@ -47,6 +44,7 @@ public class TournamentLevel {
                 IPlayer player = gameResult.get(0);
                 if (player.isConnected()) {
                     playersAdvancing.add(player);
+
                     HistoricalPlayer hPlayer = game.getHistoricalPlayer(player.getPlayerId());
                     hPlayer.setMovedUpInTournament(true);
                     hPlayer.setWinner(true);
@@ -69,18 +67,21 @@ public class TournamentLevel {
                 IPlayer player = gameResult.get(i);
                 if (player.isConnected() && !playersAdvancing.contains(player)) {
                     playersAdvancing.add(player);
+
                     HistoricalPlayer hPlayer = game.getHistoricalPlayer(player.getPlayerId());
                     hPlayer.setMovedUpInTournament(true);
+
                     added++;
                 }
 
-                done = added == diff || i <= gameResult.size();
+                done = added == diff || i < gameResult.size();
             }
         }
 
         // Okay, what's the diff now?
         diff = noofPlayersNeedForNextLevel - playersAdvancing.size();
 
+        Map<String, TournamentPlannedGame> playerToPlannedGameMap = new HashMap<>();
         if (diff > 0) {
             GameResult totalGameResult = new GameResult();
 
@@ -90,6 +91,7 @@ public class TournamentLevel {
                 for (IPlayer player : gameResult) {
                     if (player.isConnected() && !playersAdvancing.contains(player)) {
                         totalGameResult.addResult(player);
+                        playerToPlannedGameMap.put(player.getPlayerId(), game);
                     }
                 }
             }
@@ -97,8 +99,11 @@ public class TournamentLevel {
             // Add the remaining players with highest score!
             List<IPlayer> totalRestResult = totalGameResult.getSortedResult();
             for (int i=0; i < diff; i++) {
-                playersAdvancing.add(totalRestResult.get(i));
-                // ToDo: Add setMovedUpInTournament to HistoricalPlayer here
+                IPlayer player = totalRestResult.get(i);
+                playersAdvancing.add(player);
+
+                // setMovedUpInTournament to HistoricalPlayer
+                playerToPlannedGameMap.get(player.getPlayerId()).getHistoricalPlayer(player.getPlayerId()).setMovedUpInTournament(true);
             }
         }
 
