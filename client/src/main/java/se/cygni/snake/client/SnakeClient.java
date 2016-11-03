@@ -11,6 +11,8 @@ public interface SnakeClient {
 
     void onSnakeDead(SnakeDeadEvent snakeDeadEvent);
 
+    void onGameResult(GameResultEvent gameResultEvent);
+
     void onGameEnded(GameEndedEvent gameEndedEvent);
 
     void onGameStarting(GameStartingEvent gameStartingEvent);

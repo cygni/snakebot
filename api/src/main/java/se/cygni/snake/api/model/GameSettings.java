@@ -1,6 +1,5 @@
 package se.cygni.snake.api.model;
 
-//@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameSettings {
 
     // Maximum noof players in this game

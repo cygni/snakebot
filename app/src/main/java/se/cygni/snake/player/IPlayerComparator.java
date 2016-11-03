@@ -39,8 +39,11 @@ public class IPlayerComparator implements Comparator<IPlayer> {
         }
 
         // Then when died (they must both be dead if we got this far)
-        return Long.compare(o2.getDiedAtTick(), o1.getDiedAtTick());
+        int deathTickCp = Long.compare(o2.getDiedAtTick(), o1.getDiedAtTick());
+        if (deathTickCp != 0)
+            return deathTickCp;
 
+        return o1.getPlayerId().compareTo(o2.getPlayerId());
     }
 
     private int compareByPointsReason(PointReason reason, IPlayer o1, IPlayer o2) {

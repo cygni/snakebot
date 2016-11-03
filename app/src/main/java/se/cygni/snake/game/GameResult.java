@@ -20,6 +20,7 @@ public class GameResult {
         while (iter.hasNext()) {
             sortedList.add(iter.next());
         }
+
         return sortedList;
     }
 
