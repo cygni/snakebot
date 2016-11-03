@@ -31,7 +31,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     private int port = 8080;
 //    private String host = "snake.cygni.se";
 //    private int port = 80;
-    private GameMode gameMode = GameMode.TOURNAMENT;
+    private GameMode gameMode = GameMode.TRAINING;
 
     public static void main(String[] args) {
 
@@ -64,7 +64,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     @Override
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
-        //ansiPrinter.printMap(mapUpdateEvent);
+        ansiPrinter.printMap(mapUpdateEvent);
 
         // MapUtil contains lot's of useful methods for querying the map!
         MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), getPlayerId());
@@ -96,6 +96,14 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     @Override
     public void onInvalidPlayerName(InvalidPlayerName invalidPlayerName) {
 
+    }
+
+    @Override
+    public void onGameResult(GameResultEvent gameResultEvent) {
+        log.info("Got a Game result:");
+        gameResultEvent.getPlayerRanks().forEach(playerRank -> {
+            log.info(playerRank.toString());
+        });
     }
 
     @Override

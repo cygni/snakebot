@@ -30,6 +30,13 @@ public class RemotePlayer extends BasePlayer {
     }
 
     @Override
+    public void onGameResult(GameResultEvent gre) {
+        GameResultEvent gameResultEvent = new GameResultEvent(gre);
+        gameResultEvent.setReceivingPlayerId(player.getPlayerId());
+        outgoingEventBus.post(gameResultEvent);
+    }
+
+    @Override
     public void onGameEnded(GameEndedEvent gee) {
         GameEndedEvent gameEndedEvent = new GameEndedEvent(gee);
         gameEndedEvent.setReceivingPlayerId(player.getPlayerId());

@@ -10,6 +10,7 @@ import se.cygni.snake.api.type.GameMessageType;
 public class GameEndedEvent extends GameMessage {
 
     private final String playerWinnerId;
+    private final String playerWinnerName;
     private final String gameId;
     private final long gameTick;
     private final Map map;
@@ -18,11 +19,13 @@ public class GameEndedEvent extends GameMessage {
     @JsonCreator
     public GameEndedEvent(
             @JsonProperty("playerWinnerId") String playerWinnerId,
+            @JsonProperty("playerWinnerName") String playerWinnerName,
             @JsonProperty("gameId") String gameId,
             @JsonProperty("gameTick") long gameTick,
             @JsonProperty("map") Map map) {
 
         this.playerWinnerId = playerWinnerId;
+        this.playerWinnerName = playerWinnerName;
         this.gameId = gameId;
         this.gameTick = gameTick;
         this.map = map;
@@ -30,6 +33,7 @@ public class GameEndedEvent extends GameMessage {
 
     public GameEndedEvent(GameEndedEvent gee) {
         this.playerWinnerId = gee.getPlayerWinnerId();
+        this.playerWinnerName = gee.getPlayerWinnerName();
         this.gameId = gee.getGameId();
         this.gameTick = gee.getGameTick();
         this.map = gee.getMap();
@@ -37,6 +41,10 @@ public class GameEndedEvent extends GameMessage {
 
     public String getPlayerWinnerId() {
         return playerWinnerId;
+    }
+
+    public String getPlayerWinnerName() {
+        return playerWinnerName;
     }
 
     public String getGameId() {

@@ -11,6 +11,7 @@ import se.cygni.game.worldobject.Food;
 import se.cygni.game.worldobject.SnakeHead;
 import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.event.GameEndedEvent;
+import se.cygni.snake.api.event.GameResultEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
 import se.cygni.snake.apiconversion.GameMessageConverter;
@@ -200,21 +201,26 @@ public class GameEngine {
                 Set<IPlayer> allPlayers = playerManager.toSet();
                 for (IPlayer player : allPlayers) {
                     gameResult.addResult(player);
+                    log.info("Adding player {} to gameResult", player.getName());
                 }
 
                 gameComplete.set(true);
 
+                // Notify of GameResult
+                GameResultEvent gameResultEvent = GameMessageConverter.onGameResult(gameId, gameResult);
+                notifyPlayers(allPlayers, gameResultEvent);
+
                 // Notify of GameEnded
-                Set<IPlayer> players = playerManager.toSet();
                 GameEndedEvent gameEndedEvent = GameMessageConverter.onGameEnded(
                         gameResult.getWinner().getPlayerId(),
+                        gameResult.getWinner().getName(),
                         gameId,
                         currentWorldTick,
                         world,
-                        players
+                        allPlayers
                 );
+                notifyPlayers(allPlayers, gameEndedEvent);
 
-                notifyPlayers(players, gameEndedEvent);
                 publishGameChanged();
             }
         };

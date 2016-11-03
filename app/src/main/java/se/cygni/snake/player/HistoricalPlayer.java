@@ -130,6 +130,11 @@ public class HistoricalPlayer implements IPlayer {
     }
 
     @Override
+    public void onGameResult(GameResultEvent gameResultEvent) {
+
+    }
+
+    @Override
     public void onSnakeDead(SnakeDeadEvent snakeDeadEvent) {
     }
 

@@ -4,6 +4,7 @@ import se.cygni.game.WorldState;
 import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.model.DeathReason;
 import se.cygni.snake.game.GameFeatures;
+import se.cygni.snake.game.GameResult;
 import se.cygni.snake.player.IPlayer;
 
 import java.util.Set;
@@ -21,9 +22,9 @@ public class GameMessageConverter {
         return new SnakeDeadEvent(reason, playerId, x, y, gameId, gameTick);
     }
 
-    public static GameEndedEvent onGameEnded(String playerWinnerId, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
+    public static GameEndedEvent onGameEnded(String playerWinnerId, String playerWinnerName, String gameId, long gameTick, WorldState worldState, Set<IPlayer> players) {
         return new GameEndedEvent(
-                playerWinnerId, gameId, gameTick,
+                playerWinnerId, playerWinnerName, gameId, gameTick,
                 WorldStateConverter.convertWorldState(worldState, gameTick, players));
     }
 
@@ -37,5 +38,9 @@ public class GameMessageConverter {
 
     public static GameChangedEvent onGameChanged(String gameId) {
         return new GameChangedEvent(gameId);
+    }
+
+    public static GameResultEvent onGameResult(String gameId, GameResult gameResult) {
+        return new GameResultEvent(gameId, GameResultConverter.getPlayerRanks(gameResult));
     }
 }

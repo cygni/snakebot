@@ -191,6 +191,10 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
             if (gameMessage instanceof SnakeDeadEvent)
                 this.onSnakeDead((SnakeDeadEvent) gameMessage);
 
+            if (gameMessage instanceof GameResultEvent) {
+                this.onGameResult((GameResultEvent) gameMessage);
+            }
+
             if (gameMessage instanceof GameEndedEvent) {
                 this.onGameEnded((GameEndedEvent) gameMessage);
                 gameEnded = true;

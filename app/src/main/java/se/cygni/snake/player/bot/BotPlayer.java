@@ -37,6 +37,11 @@ public abstract class BotPlayer extends BasePlayer {
     }
 
     @Override
+    public void onGameResult(GameResultEvent gameResultEvent) {
+
+    }
+
+    @Override
     public void onTournamentEnded(TournamentEndedEvent tournamentEndedEvent) {
 
     }

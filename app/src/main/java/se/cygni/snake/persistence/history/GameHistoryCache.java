@@ -151,6 +151,7 @@ public class GameHistoryCache {
         add(SnakeDeadEvent.class);
         add(GameEndedEvent.class);
         add(TournamentEndedEvent.class);
+        add(GameResultEvent.class);
     }};
 
     private final Set<Class<? extends GameMessage>> gameEndedMessages = new HashSet<Class<? extends GameMessage>>(){{
