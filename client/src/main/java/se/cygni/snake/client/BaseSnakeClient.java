@@ -168,7 +168,6 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         String messageRaw = msgBuffer.toString();
         msgBuffer = new StringBuilder();
 
-        log.debug("Incoming message: {}", messageRaw);
         try {
             // Deserialize message
             GameMessage gameMessage = GameMessageParser.decodeMessage(messageRaw);

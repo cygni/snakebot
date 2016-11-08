@@ -31,7 +31,9 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     private int port = 8080;
 //    private String host = "snake.cygni.se";
 //    private int port = 80;
-    private GameMode gameMode = GameMode.TRAINING;
+    private GameMode gameMode = GameMode.TOURNAMENT;
+
+    SnakeDirection lastDirection;
 
     public static void main(String[] args) {
 
@@ -60,37 +62,45 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
 
     public ExampleSnakePlayer() {
         ansiPrinter = new AnsiPrinter(true);
+        lastDirection = getRandomDirection();
     }
 
     @Override
     public void onMapUpdate(MapUpdateEvent mapUpdateEvent) {
-        ansiPrinter.printMap(mapUpdateEvent);
+//        ansiPrinter.printMap(mapUpdateEvent);
 
         // MapUtil contains lot's of useful methods for querying the map!
         MapUtil mapUtil = new MapUtil(mapUpdateEvent.getMap(), getPlayerId());
 
 
+        SnakeDirection chosenDirection = lastDirection;
         List<SnakeDirection> directions = new ArrayList<>();
 
-        // Let's see in which directions I can move
-        if (mapUtil.canIMoveInDirection(SnakeDirection.LEFT))
-            directions.add(SnakeDirection.LEFT);
-        if (mapUtil.canIMoveInDirection(SnakeDirection.RIGHT))
-            directions.add(SnakeDirection.RIGHT);
-        if (mapUtil.canIMoveInDirection(SnakeDirection.UP))
-            directions.add(SnakeDirection.UP);
-        if (mapUtil.canIMoveInDirection(SnakeDirection.DOWN))
-            directions.add(SnakeDirection.DOWN);
 
-        Random r = new Random();
-        SnakeDirection chosenDirection = SnakeDirection.DOWN;
+        if (!mapUtil.canIMoveInDirection(lastDirection)) {
+            // Let's see in which directions I can move
+            if (mapUtil.canIMoveInDirection(SnakeDirection.LEFT))
+                directions.add(SnakeDirection.LEFT);
+            if (mapUtil.canIMoveInDirection(SnakeDirection.RIGHT))
+                directions.add(SnakeDirection.RIGHT);
+            if (mapUtil.canIMoveInDirection(SnakeDirection.UP))
+                directions.add(SnakeDirection.UP);
+            if (mapUtil.canIMoveInDirection(SnakeDirection.DOWN))
+                directions.add(SnakeDirection.DOWN);
 
-        // Choose a random direction
-        if (!directions.isEmpty())
-            chosenDirection = directions.get(r.nextInt(directions.size()));
+            // Choose a random direction
+            if (!directions.isEmpty())
+                chosenDirection = directions.get(random.nextInt(directions.size()));
+        }
 
         // Register action here!
         registerMove(mapUpdateEvent.getGameTick(), chosenDirection);
+
+        lastDirection = chosenDirection;
+    }
+
+    private SnakeDirection getRandomDirection() {
+        return SnakeDirection.values()[random.nextInt(4)];
     }
 
     @Override
