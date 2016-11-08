@@ -98,17 +98,19 @@ public class GameHistoryStorageElastic implements GameHistoryStorage {
                 .setQuery(QueryBuilders.idsQuery(gameHistoryType).addIds(gameId))
                 .execute().actionGet();
         try {
-            GameHistoryPersisted ghp = (GameHistoryPersisted) ApiMessageParser.decodeMessage(esResponse.getHits().getAt(0).getSourceAsString());
-            List<GameMessage> gameMessages = getGameEventsForGame(gameId);
+            if (esResponse.getHits().totalHits() > 0) {
+                GameHistoryPersisted ghp = (GameHistoryPersisted) ApiMessageParser.decodeMessage(esResponse.getHits().getAt(0).getSourceAsString());
+                List<GameMessage> gameMessages = getGameEventsForGame(gameId);
 
-            GameHistory gameHistory = new GameHistory(
-                    ghp.getGameId(),
-                    ghp.getPlayerNames(),
-                    ghp.getGameDate(),
-                    gameMessages
-            );
+                GameHistory gameHistory = new GameHistory(
+                        ghp.getGameId(),
+                        ghp.getPlayerNames(),
+                        ghp.getGameDate(),
+                        gameMessages
+                );
 
-            return Optional.of(gameHistory);
+                return Optional.of(gameHistory);
+            }
         } catch (Exception e) {
             log.error("Failed to deserialize stored GameHistory", e);
         }

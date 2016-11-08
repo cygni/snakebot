@@ -25,15 +25,14 @@ import se.cygni.snake.eventapi.exception.Unauthorized;
 import se.cygni.snake.eventapi.model.ActiveGame;
 import se.cygni.snake.eventapi.model.ActiveGamePlayer;
 import se.cygni.snake.eventapi.model.TournamentGamePlan;
-import se.cygni.snake.eventapi.model.TournamentInfo;
 import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
 import se.cygni.snake.eventapi.response.NoActiveTournamentEvent;
 import se.cygni.snake.eventapi.response.TournamentCreated;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameManager;
-import se.cygni.snake.tournament.TournamentManager;
 import se.cygni.snake.security.TokenService;
+import se.cygni.snake.tournament.TournamentManager;
 
 import java.io.IOException;
 import java.util.List;
@@ -103,11 +102,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             } else if (apiMessage instanceof GetActiveTournament) {
                 if(tournamentManager.isTournamentActive()) {
-                    sendApiMessage(new TournamentInfo(
-                            tournamentManager.getTournamentId(),
-                            tournamentManager.getTournamentName(),
-                            tournamentManager.getGameSettings(),
-                            tournamentManager.getTournamentPlan()));
+                    sendApiMessage(tournamentManager.getTournamentInfo());
                 } else {
                     sendApiMessage(new NoActiveTournamentEvent());
                 }

@@ -20,11 +20,8 @@ public class TournamentController {
     @RequestMapping("/tournament/active")
     public ResponseEntity<TournamentInfo> getActiveTournament() {
         if (tournamentManager.isTournamentActive()) {
-            return new ResponseEntity<TournamentInfo>(new TournamentInfo(
-                    tournamentManager.getTournamentId(),
-                    tournamentManager.getTournamentName(),
-                    tournamentManager.getGameSettings(),
-                    tournamentManager.getTournamentPlan()),
+
+            return new ResponseEntity<TournamentInfo>(tournamentManager.getTournamentInfo(),
                     HttpStatus.OK);
         } else {
             return new ResponseEntity(HttpStatus.NOT_FOUND);

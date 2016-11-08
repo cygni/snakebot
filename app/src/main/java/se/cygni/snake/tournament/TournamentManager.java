@@ -22,7 +22,9 @@ import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.apiconversion.TournamentPlanConverter;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.eventapi.model.TournamentGamePlan;
+import se.cygni.snake.eventapi.model.TournamentInfo;
 import se.cygni.snake.game.*;
+import se.cygni.snake.player.HistoricalPlayer;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
 import se.cygni.snake.tournament.util.TournamentUtil;
@@ -60,6 +62,23 @@ public class TournamentManager {
 
         incomingEventBus.register(this);
         globalEventBus.register(this);
+    }
+
+    public TournamentInfo getTournamentInfo() {
+        TournamentInfo ti = new TournamentInfo(
+                getTournamentId(),
+                getTournamentName(),
+                getGameSettings(),
+                getTournamentPlan());
+
+        if (isTournamentComplete()) {
+            TournamentPlannedGame lastGame = tournamentPlan.getLevelAt(currentLevel-1).getPlannedGames().get(0);
+            HistoricalPlayer winner = lastGame.getHistoricalPlayer(lastGame.getGameResult().getWinner().getPlayerId());
+
+            ti.setWinner(TournamentPlanConverter.getPlayer(winner));
+        }
+
+        return ti;
     }
 
     public void killTournament() {

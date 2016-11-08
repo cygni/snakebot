@@ -34,18 +34,22 @@ public class TournamentPlanConverter {
         }
 
         players.forEach(player -> {
-            if (player instanceof HistoricalPlayer) {
-                HistoricalPlayer historicalPlayer = (HistoricalPlayer)player;
-                activePlayers.add(new ActiveGamePlayer(historicalPlayer.getName(),
-                        historicalPlayer.getPlayerId(),
-                        historicalPlayer.getTotalPoints(),
-                        historicalPlayer.isWinner(),
-                        historicalPlayer.isMovedUpInTournament()));
-            } else {
-                activePlayers.add(new ActiveGamePlayer(player.getName(), player.getPlayerId(), player.getTotalPoints()));
-            }
+            activePlayers.add(getPlayer(player));
         });
         return activePlayers;
+    }
+
+    public static ActiveGamePlayer getPlayer(IPlayer player) {
+        if (player instanceof HistoricalPlayer) {
+            HistoricalPlayer historicalPlayer = (HistoricalPlayer)player;
+            return new ActiveGamePlayer(historicalPlayer.getName(),
+                    historicalPlayer.getPlayerId(),
+                    historicalPlayer.getTotalPoints(),
+                    historicalPlayer.isWinner(),
+                    historicalPlayer.isMovedUpInTournament());
+        } else {
+            return new ActiveGamePlayer(player.getName(), player.getPlayerId(), player.getTotalPoints());
+        }
     }
 
     public static List<TournamentLevel> getLevels(List<se.cygni.snake.tournament.TournamentLevel> levels) {
