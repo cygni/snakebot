@@ -1,6 +1,7 @@
 package se.cygni.snake.game;
 
 import com.google.common.eventbus.EventBus;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import se.cygni.game.Tile;
@@ -12,6 +13,8 @@ import se.cygni.game.transformation.KeepOnlyObjectsOfType;
 import se.cygni.game.transformation.KeepOnlySnakeWithId;
 import se.cygni.game.transformation.MoveSnake;
 import se.cygni.game.worldobject.*;
+import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.request.RegisterPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +28,7 @@ public class GameEngineTest {
     private GameEngine gameEngine;
     private Game game;
 
-    //@Before
+    @Before
     public void setup() {
         GameFeatures gameFeatures = new GameFeatures();
         gameFeatures.setTimeInMsPerTick(1000);
@@ -37,6 +40,16 @@ public class GameEngineTest {
         game = gameManager.createGame(gameFeatures);
 
         gameEngine = game.getGameEngine();
+    }
+
+    @Test
+    public void testGame() {
+        game.registerPlayer(new RegisterPlayer("emil", new GameSettings()));
+        game.registerPlayer(new RegisterPlayer("lisa", new GameSettings()));
+
+        game.startGame();
+
+
     }
 
     @Test @Ignore

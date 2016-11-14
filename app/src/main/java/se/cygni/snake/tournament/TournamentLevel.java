@@ -75,6 +75,7 @@ public class TournamentLevel {
                 }
 
                 done = added == toFairlyAddPerGame || i >= gameResult.size();
+                i++;
             }
         }
 

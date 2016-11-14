@@ -258,9 +258,9 @@ public class TournamentManager {
                 if (areAllGamesInLevelComplete(currentLevel)) {
                     currentLevel++;
                     organizePlayersInLevel();
-                } else {
-                    publishTournamentPlan();
                 }
+
+                publishTournamentPlan();
             }
         }
     }
