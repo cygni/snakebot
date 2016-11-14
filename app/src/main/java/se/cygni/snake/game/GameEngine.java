@@ -173,11 +173,11 @@ public class GameEngine {
                     try {
                         countDownLatch.await(gameFeatures.getTimeInMsPerTick(), TimeUnit.MILLISECONDS);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        log.error("Waiting for all players moves was interrupted!", e);
                     }
 
                     long timeSpent = System.currentTimeMillis() - tstart;
-                    log.info("GameId: {}, tick: {}, time waiting: " + timeSpent + "ms", gameId, currentWorldTick);
+                    log.info("All moves received, gameId: {}, tick: {}, time waiting: " + timeSpent + "ms", gameId, currentWorldTick);
 
                     try {
                         world = worldTransformer.transform(snakeDirections, gameFeatures, world, spontaneousGrowth(), currentWorldTick);
@@ -201,7 +201,7 @@ public class GameEngine {
                 Set<IPlayer> allPlayers = playerManager.toSet();
                 for (IPlayer player : allPlayers) {
                     gameResult.addResult(player);
-                    log.info("Adding player {} to gameResult", player.getName());
+                    log.debug("Adding player {} to gameResult", player.getName());
                 }
 
                 gameComplete.set(true);

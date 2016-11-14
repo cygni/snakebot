@@ -144,7 +144,6 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             } else if (apiMessage instanceof StartTournamentGame) {
                 StartTournamentGame startGame = (StartTournamentGame) apiMessage;
-
 //                tournamentManager.startGame(startGame.getGameId());
             }
         } catch (Exception e) {
@@ -193,7 +192,6 @@ public class EventSocketHandler extends TextWebSocketHandler {
     @Subscribe
     public void onInternalGameEvent(InternalGameEvent event) {
 
-        log.info("EventSocketHandler got a message: " + event.getGameMessage().getClass());
         GameMessage gameMessage = event.getGameMessage();
 
         if (gameMessage instanceof GameCreatedEvent ||
@@ -235,12 +233,8 @@ public class EventSocketHandler extends TextWebSocketHandler {
         sendGameMessage(heartBeatResponse);
     }
 
-    private void sendTournamentInfo() {
-        log.info("Sending tournament info");
-    }
-
     private void sendListOfActiveGames() {
-        log.info("Sending updated list of games");
+        log.debug("Sending updated list of games");
         List<Game> games = gameManager.listAllGames();
 
         List<ActiveGame> activeGames = games.stream().map(game -> {

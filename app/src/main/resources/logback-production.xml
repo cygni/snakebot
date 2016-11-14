@@ -16,7 +16,7 @@
         <neverBlock>true</neverBlock>
     </appender>
 
-    <logger name="se" level="DEBUG"/>
+    <logger name="se" level="INFO"/>
 
     <root level="INFO">
         <appender-ref ref="ASYNC" />

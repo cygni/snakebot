@@ -25,8 +25,6 @@ public class GameResultConverter {
             c++;
         }
 
-        log.info("Got {} players, playerRank contains: {}", players.size(), playerRanks.size());
-
         return playerRanks;
     }
 }
