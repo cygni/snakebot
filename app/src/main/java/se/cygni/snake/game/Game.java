@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.cygni.game.Player;
 import se.cygni.game.enums.Direction;
+import se.cygni.game.random.XORShiftRandom;
 import se.cygni.snake.api.event.GameLinkEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
@@ -23,11 +24,10 @@ import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
 import se.cygni.snake.player.bot.BotPlayer;
-import se.cygni.snake.player.bot.DumbBot;
 import se.cygni.snake.player.bot.RandomBot;
 import se.cygni.snake.player.bot.StayAliveBot;
+import se.cygni.snake.player.bot.StraightBot;
 
-import java.util.Random;
 import java.util.UUID;
 
 public class Game {
@@ -43,7 +43,7 @@ public class Game {
     private final EventBus globalEventBus;
     private final String viewUrl;
 
-    private Random botSelector = new Random(System.currentTimeMillis());
+    private XORShiftRandom botSelector = new XORShiftRandom();
 
     public Game(GameFeatures gameFeatures, EventBus globalEventBus, boolean trainingGame, String viewUrl) {
 
@@ -214,10 +214,10 @@ public class Game {
                     bot = new StayAliveBot(UUID.randomUUID().toString(), incomingEventBus);
                     break;
                 case 2:
-                    bot = new DumbBot(UUID.randomUUID().toString(), incomingEventBus);
+                    bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
                     break;
                 default:
-                    bot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
+                    bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
                     break;
             }
 

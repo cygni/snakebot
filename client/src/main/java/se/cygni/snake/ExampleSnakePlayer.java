@@ -31,7 +31,7 @@ public class ExampleSnakePlayer extends BaseSnakeClient {
     private int port = 8080;
 //    private String host = "snake.cygni.se";
 //    private int port = 80;
-    private GameMode gameMode = GameMode.TOURNAMENT;
+    private GameMode gameMode = GameMode.TRAINING;
 
     SnakeDirection lastDirection;
 

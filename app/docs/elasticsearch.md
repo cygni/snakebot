@@ -1,5 +1,5 @@
 # Using Elasticsearch
-Elastic search is used (for the production profile) for storing all game events, 
+Elasticsearch is used (for the production profile) for storing all game events, 
 game results and client infos. If starting from scratch it is important that 
 the mappings are defined correctly. The mappings define the data type for
 each field and if there are any special index options.
@@ -11,7 +11,7 @@ There are three indexes in Elasticsearch: clientinfo, gamehistory and
 gameevent.
 
 Since it is not possible to change the mapping after it has been created
-it is import to define this before the server starts storing data. 
+it is important to define this before the server starts storing data. 
 
 ## Setting the index and mapping
 

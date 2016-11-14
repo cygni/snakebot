@@ -172,7 +172,7 @@ public class TournamentManager {
         for (TournamentPlannedGame tGame : tLevel.getPlannedGames()) {
 
             Set<IPlayer> players = TournamentUtil.getRandomPlayers(playersInTournament, tGame.getExpectedNoofPlayers());
-            log.info("adding noof players to new game: {}", players.size());
+            log.info("adding noof: {} players to new game", players.size());
             if (players.size() == 0) {
                 log.error("Hoa, got 0 players to add to game...");
                 continue;

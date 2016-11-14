@@ -8,14 +8,11 @@ import se.cygni.snake.api.type.GameMessageType;
 
 import java.util.UUID;
 
-/**
- * @author Alan Tibbetts
- * @since 14/04/16
- */
 @GameMessageType
 public class ClientInfo extends GameMessage {
 
     private final String id = UUID.randomUUID().toString();
+    private long timestamp;
 
     private final String language;
     private final String languageVersion;
@@ -34,6 +31,7 @@ public class ClientInfo extends GameMessage {
         this.operatingSystem = operatingSystem;
         this.operatingSystemVersion = operatingSystemVersion;
         this.clientVersion = clientVersion;
+        this.timestamp = System.currentTimeMillis();
     }
 
     public String getLanguage() {
@@ -54,6 +52,16 @@ public class ClientInfo extends GameMessage {
 
     public String getClientVersion() {
         return clientVersion;
+    }
+
+    @Override
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     @JsonIgnore
