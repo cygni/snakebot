@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import se.cygni.game.Player;
-import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
@@ -17,7 +16,6 @@ import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
-import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.game.GameManager;
@@ -78,7 +76,6 @@ public class ArenaManager {
         outgoingEventBus.post(playerRegistered);
 
         log.debug("A player registered in the arena");
-        planGame();
     }
 
     @Subscribe
@@ -86,19 +83,6 @@ public class ArenaManager {
         if (currentGame != null) {
             currentGame.registerMove(registerMove);
         }
-    }
-
-    @Subscribe
-    public void onInternalGameEvent(InternalGameEvent internalGameEvent) {
-        if (internalGameEvent.getGameMessage() instanceof GameEndedEvent) {
-            // TODO this does not seem to be a reliable way to detect ended games if players disconnect
-            GameEndedEvent gee = (GameEndedEvent)internalGameEvent.getGameMessage();
-            if (currentGame != null && currentGame.getGameId().equals(gee.getGameId())) {
-                currentGame = null;
-                planGame();
-            }
-        }
-
     }
 
     public void playerLostConnection(String playerId) {
@@ -114,25 +98,42 @@ public class ArenaManager {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     @Scheduled(fixedRate = 1000)
-    public void periodicallyStartGame() {
+    public void runGameScheduler() {
         secondsUntilNextGame--;
-        if (secondsUntilNextGame <= 0) {
-            planGame();
-        } else {
-            log.info(String.format("Waiting %d seconds until next game", secondsUntilNextGame));
-        }
-        // TODO set time left to 10 iff game is ended and time > 0?
+
+        processCurrentGame();
+        planNextGame();
     }
 
-    private void planGame() {
+    private void processCurrentGame() {
+        if (currentGame == null) {
+            return;
+        }
+
+        if (currentGame.isEnded()) {
+            processEndedGame();
+            currentGame = null;
+            // TODO set time left to 10 iff game is ended and time > 0 ???
+        } else if (secondsUntilNextGame < 10) {
+            log.warn("Arena game %s has exceeded maximum game time, aborting and starting a new game", currentGame.getGameId());
+            currentGame.abort();
+            currentGame = null;
+        }
+    }
+
+    private void planNextGame() {
         if (connectedPlayers.size() < 2) {
             log.trace("Not enough players to start arena game");
             return;
         }
 
-        // TODO This arbitrary formula (5 min between games) can use some tweaking
-        secondsUntilNextGame = 60 * 5;
-        startGame();
+        if (secondsUntilNextGame <= 0) {
+            // TODO This arbitrary formula (5 min between games) can use some tweaking
+            secondsUntilNextGame = 60 * 5;
+            startGame();
+        } else {
+            log.trace(String.format("Waiting %d seconds until next game", secondsUntilNextGame));
+        }
     }
 
     private void startGame() {
@@ -149,6 +150,11 @@ public class ArenaManager {
         });
         currentGame.startGame();
         log.info("Started game with id "+currentGame.getGameId());
+    }
+
+    private void processEndedGame() {
+        // TODO calculate rankings
+        // TODO store rankings
     }
 
     public EventBus getOutgoingEventBus() {
