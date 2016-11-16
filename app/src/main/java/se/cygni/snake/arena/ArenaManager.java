@@ -5,6 +5,7 @@ import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.GameEndedEvent;
@@ -23,6 +24,7 @@ import se.cygni.snake.game.GameManager;
 import se.cygni.snake.player.RemotePlayer;
 import se.cygni.snake.tournament.util.TournamentUtil;
 
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -36,6 +38,7 @@ public class ArenaManager {
 
     private GameManager gameManager;
     private Set<Player> connectedPlayers = new HashSet<>();
+    private long secondsUntilNextGame = 0;
     private Game currentGame = null;
 
     @Autowired
@@ -80,7 +83,7 @@ public class ArenaManager {
 
     @Subscribe
     public void registerMove(RegisterMove registerMove) {
-        if (currentGame != null && currentGame.getGameId().equals(registerMove.getGameId())) {
+        if (currentGame != null) {
             currentGame.registerMove(registerMove);
         }
     }
@@ -88,6 +91,7 @@ public class ArenaManager {
     @Subscribe
     public void onInternalGameEvent(InternalGameEvent internalGameEvent) {
         if (internalGameEvent.getGameMessage() instanceof GameEndedEvent) {
+            // TODO this does not seem to be a reliable way to detect ended games if players disconnect
             GameEndedEvent gee = (GameEndedEvent)internalGameEvent.getGameMessage();
             if (currentGame != null && currentGame.getGameId().equals(gee.getGameId())) {
                 currentGame = null;
@@ -107,20 +111,32 @@ public class ArenaManager {
         }
     }
 
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+
+    @Scheduled(fixedRate = 1000)
+    public void periodicallyStartGame() {
+        secondsUntilNextGame--;
+        if (secondsUntilNextGame <= 0) {
+            planGame();
+        } else {
+            log.info(String.format("Waiting %d seconds until next game", secondsUntilNextGame));
+        }
+        // TODO set time left to 10 iff game is ended and time > 0?
+    }
+
     private void planGame() {
-        // TODO wait a little bit between games - how is it done in tournament?
-
-        if (currentGame != null) {
-            log.debug("Arena game is running, will not start new one");
-            return;
-        }
-
         if (connectedPlayers.size() < 2) {
-            log.info("Not enough players to start arena game");
+            log.trace("Not enough players to start arena game");
             return;
         }
 
-        log.info("String new arena game");
+        // TODO This arbitrary formula (5 min between games) can use some tweaking
+        secondsUntilNextGame = 60 * 5;
+        startGame();
+    }
+
+    private void startGame() {
+        log.info("Starting new arena game");
         // TODO add a taboo list and prefer players that have not played before
         Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
 
@@ -132,6 +148,7 @@ public class ArenaManager {
             currentGame.addPlayer(remotePlayer);
         });
         currentGame.startGame();
+        log.info("Started game with id "+currentGame.getGameId());
     }
 
     public EventBus getOutgoingEventBus() {
