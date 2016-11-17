@@ -34,6 +34,8 @@ public class ArenaManager {
     private final EventBus outgoingEventBus;
     private final EventBus incomingEventBus;
 
+    private String arenaName;
+
     private GameManager gameManager;
     private Set<Player> connectedPlayers = new HashSet<>();
     private long secondsUntilNextGame = 0;
@@ -75,7 +77,7 @@ public class ArenaManager {
 
         outgoingEventBus.post(playerRegistered);
 
-        log.debug("A player registered in the arena");
+        log.debug("A player registered in the arena %s", arenaName);
     }
 
     @Subscribe
@@ -137,7 +139,6 @@ public class ArenaManager {
     }
 
     private void startGame() {
-        log.info("Starting new arena game");
         // TODO add a taboo list and prefer players that have not played before
         Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
 
@@ -149,7 +150,7 @@ public class ArenaManager {
             currentGame.addPlayer(remotePlayer);
         });
         currentGame.startGame();
-        log.info("Started game with id "+currentGame.getGameId());
+        log.info("Started game in arena %s with id %s", arenaName, currentGame.getGameId());
     }
 
     private void processEndedGame() {
@@ -163,5 +164,13 @@ public class ArenaManager {
 
     public EventBus getIncomingEventBus() {
         return incomingEventBus;
+    }
+
+    public void setArenaName(String arenaName) {
+        this.arenaName = arenaName;
+    }
+
+    public String getArenaName() {
+        return arenaName;
     }
 }

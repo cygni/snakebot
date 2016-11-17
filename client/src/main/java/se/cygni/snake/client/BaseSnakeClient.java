@@ -42,6 +42,8 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     private boolean gameEnded = false;
     private boolean tournamentEnded = false;
 
+    private String arenaName = null;
+
     public void registerForGame(GameSettings gameSettings) {
         log.info("Register for game...");
         RegisterPlayer registerPlayer = new RegisterPlayer(getName(), gameSettings);
@@ -119,7 +121,8 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
     }
 
     public ListenableFuture<WebSocketSession> connect() {
-        String uri = String.format("ws://%s:%d/%s", getServerHost(), getServerPort(), getGameMode().toString().toLowerCase());
+        String arenaSuffix = getGameMode() == GameMode.ARENA && arenaName != null ? "/"+arenaName : "";
+        String uri = String.format("ws://%s:%d/%s%s", getServerHost(), getServerPort(), getGameMode().toString().toLowerCase(), arenaSuffix);
         log.info("Connecting to {}", uri);
 
         WebSocketClient wsClient = new StandardWebSocketClient();
@@ -252,4 +255,11 @@ public abstract class BaseSnakeClient extends TextWebSocketHandler implements Sn
         return true;
     }
 
+    public String getArenaName() {
+        return arenaName;
+    }
+
+    public void setArenaName(String arenaName) {
+        this.arenaName = arenaName;
+    }
 }

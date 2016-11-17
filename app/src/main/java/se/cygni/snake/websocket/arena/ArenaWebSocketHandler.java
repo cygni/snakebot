@@ -4,30 +4,66 @@ package se.cygni.snake.websocket.arena;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.socket.WebSocketSession;
+import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.arena.ArenaManager;
+import se.cygni.snake.arena.ArenaSelectionManager;
 import se.cygni.snake.websocket.BaseGameSocketHandler;
 
-public class ArenaWebSocketHandler extends BaseGameSocketHandler {
+import java.io.IOException;
 
+public class ArenaWebSocketHandler extends BaseGameSocketHandler {
     private static final Logger log = LoggerFactory.getLogger(ArenaWebSocketHandler.class);
 
-    private final ArenaManager arenaManager;
+    private static final String ARENA_NAME_WHITELIST = "[a-zA-Z0-9-_]+";
+
+    private final ArenaSelectionManager arenaSelectionManager;
+    private ArenaManager arenaManager;
 
     @Autowired
-    public ArenaWebSocketHandler(ArenaManager arenaManager) {
-        // TODO one arena-manager per arena??
+    public ArenaWebSocketHandler(ArenaSelectionManager arenaSelectionManager) {
+        this.arenaSelectionManager = arenaSelectionManager;
+    }
 
-        log.info("Started arena web socket handler");
-        this.arenaManager = arenaManager;
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        super.afterConnectionEstablished(session);
 
+        String uri = session.getUri().getPath();
+
+        String arenaName = "official-ranked";
+        String arenaFromUri = uri.replaceAll(".*/", "");
+        if (arenaFromUri.length() > 0) {
+            if (arenaFromUri.matches(ARENA_NAME_WHITELIST)) {
+                arenaName = arenaFromUri;
+            } else {
+                handleInvalidName(uri, arenaFromUri);
+                return;
+            }
+        }
+
+        this.arenaManager = arenaSelectionManager.getArena(arenaName);
         setOutgoingEventBus(arenaManager.getOutgoingEventBus());
         setIncomingEventBus(arenaManager.getIncomingEventBus());
+        log.info("Started arena web socket handler");
+    }
+
+    private void handleInvalidName(String uri, String arenaFromUri) {
+        try {
+            sendSnakeMessage(new InvalidMessage(
+                    String.format("Arena name %s does not match allowed pattern %s", arenaFromUri, ARENA_NAME_WHITELIST),
+                    uri));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     @Override
     protected void playerLostConnection() {
         log.info("{} lost connection", getPlayerId());
-        arenaManager.playerLostConnection(getPlayerId());
+        if (arenaManager != null) {
+            arenaManager.playerLostConnection(getPlayerId());
+        }
     }
 }
