@@ -1,7 +1,5 @@
 package se.cygni.snake.tournament.util;
 
-import se.cygni.snake.player.IPlayer;
-
 import java.util.*;
 
 public class TournamentUtil {
@@ -80,9 +78,9 @@ public class TournamentUtil {
         return gameDistribution;
     }
 
-    public static Set<IPlayer> getRandomPlayers(Set<IPlayer> players, int noofPlayers) {
-        Set<IPlayer> randomPlayers = new HashSet<>();
-        List<IPlayer> startPlayers = new ArrayList<>(players);
+        public static <T> Set<T> getRandomPlayers(Set<T> players, int noofPlayers) {
+        Set<T> randomPlayers = new HashSet<>();
+        List<T> startPlayers = new ArrayList<>(players);
         Collections.shuffle(startPlayers);
         int actualNoofPlayers = Math.min(noofPlayers, startPlayers.size());
         for (int i = 0; i < actualNoofPlayers; i++) {
