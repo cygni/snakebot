@@ -22,7 +22,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(eventWebSocketHandler(), "/events-native").setAllowedOrigins("*");
         registry.addHandler(snakeTrainingWebSocketHandler(), "/training");
         registry.addHandler(snakeTournamentWebSocketHandler(), "/tournament");
-        registry.addHandler(snakeArenaWebSocketHandler(), "/arena/{arenaName}");
+        registry.addHandler(snakeArenaWebSocketHandler(), "/arena", "/arena/", "/arena/{arenaName}");
     }
 
     @Bean
