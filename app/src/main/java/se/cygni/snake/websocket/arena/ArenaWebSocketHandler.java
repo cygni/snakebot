@@ -31,13 +31,10 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
 
         String uri = session.getUri().getPath();
 
-        String arenaName = "official-ranked";
-        String arenaFromUri = uri.replaceAll(".*/", "");
-        if (arenaFromUri.length() > 0) {
-            if (arenaFromUri.matches(ARENA_NAME_WHITELIST)) {
-                arenaName = arenaFromUri;
-            } else {
-                handleInvalidName(uri, arenaFromUri);
+        String arenaName = uri.replaceAll(".*/", "");
+        if (arenaName.length() > 0) {
+            if (!arenaName.matches(ARENA_NAME_WHITELIST)) {
+                handleInvalidName(uri, arenaName);
                 return;
             }
         }

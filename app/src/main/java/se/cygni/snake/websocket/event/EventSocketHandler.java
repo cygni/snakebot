@@ -18,6 +18,7 @@ import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.request.HeartBeatRequest;
 import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
+import se.cygni.snake.arena.ArenaSelectionManager;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.eventapi.ApiMessage;
 import se.cygni.snake.eventapi.ApiMessageParser;
@@ -53,16 +54,21 @@ public class EventSocketHandler extends TextWebSocketHandler {
     private TournamentManager tournamentManager;
     private TokenService tokenService;
 
+    private String currentArenaName = null;
+    private ArenaSelectionManager arenaSelectionManager;
+
     @Autowired
     public EventSocketHandler(
             EventBus globalEventBus,
             GameManager gameManager,
             TournamentManager tournamentManager,
+            ArenaSelectionManager arenaSelectionManager,
             TokenService tokenService) {
 
         this.globalEventBus = globalEventBus;
         this.gameManager = gameManager;
         this.tournamentManager = tournamentManager;
+        this.arenaSelectionManager = arenaSelectionManager;
         this.tokenService = tokenService;
         log.info("EventSocketHandler started!");
     }
@@ -92,7 +98,9 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             if (apiMessage instanceof ListActiveGames) {
                 sendListOfActiveGames();
-
+            } else if (apiMessage instanceof SetCurrentArena) {
+                setCurrentArena((SetCurrentArena) apiMessage);
+                arenaSelectionManager.getArena(currentArenaName).broadcastState();
             } else if (apiMessage instanceof SetGameFilter) {
                 setActiveGameFilter((SetGameFilter) apiMessage);
 
@@ -210,6 +218,13 @@ public class EventSocketHandler extends TextWebSocketHandler {
             sendListOfActiveGames();
         }
 
+        if (gameMessage instanceof ArenaUpdateEvent) {
+            ArenaUpdateEvent updateEvent = (ArenaUpdateEvent) gameMessage;
+            if (updateEvent.getArenaName().equals(currentArenaName)) {
+                sendGameMessage(gameMessage);
+            }
+        }
+
         sendGameEvent(event.getGameMessage());
     }
 
@@ -252,6 +267,10 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
         ActiveGamesList gamesList = new ActiveGamesList(activeGames);
         sendApiMessage(gamesList);
+    }
+
+    private void setCurrentArena(SetCurrentArena apiMessage) {
+        this.currentArenaName = apiMessage.getCurrentArena();
     }
 
     private void setActiveGameFilter(SetGameFilter gameFilter) {

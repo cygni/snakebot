@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import se.cygni.game.Player;
+import se.cygni.snake.api.event.ArenaUpdateEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
@@ -16,6 +17,7 @@ import se.cygni.snake.api.request.RegisterPlayer;
 import se.cygni.snake.api.response.PlayerRegistered;
 import se.cygni.snake.api.util.MessageUtils;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
+import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.game.GameManager;
@@ -24,7 +26,9 @@ import se.cygni.snake.tournament.util.TournamentUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ArenaManager {
@@ -33,8 +37,10 @@ public class ArenaManager {
 
     private final EventBus outgoingEventBus;
     private final EventBus incomingEventBus;
+    private final EventBus globalEventBus;
 
     private String arenaName;
+    private boolean ranked;
 
     private GameManager gameManager;
     private Set<Player> connectedPlayers = new HashSet<>();
@@ -47,6 +53,7 @@ public class ArenaManager {
 
         this.outgoingEventBus = new EventBus("arena-outgoing");
         this.incomingEventBus = new EventBus("arens-incoming");
+        this.globalEventBus = globalEventBus;
 
         incomingEventBus.register(this);
         globalEventBus.register(this);
@@ -78,6 +85,8 @@ public class ArenaManager {
         outgoingEventBus.post(playerRegistered);
 
         log.debug("A player registered in the arena %s", arenaName);
+
+        broadcastState();
     }
 
     @Subscribe
@@ -107,6 +116,13 @@ public class ArenaManager {
         planNextGame();
     }
 
+    public void broadcastState() {
+        String gameId = currentGame != null ? currentGame.getGameId() : null;
+        List<String> onlinePlayers = connectedPlayers.stream().map(Player::getName).collect(Collectors.toList());
+        globalEventBus.post(new InternalGameEvent(
+                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, onlinePlayers)));
+    }
+
     private void processCurrentGame() {
         if (currentGame == null) {
             return;
@@ -116,6 +132,8 @@ public class ArenaManager {
             processEndedGame();
             currentGame = null;
             // TODO set time left to 10 iff game is ended and time > 0 ???
+            // This needs to take into account the difference between executing game and viewing the game (250ms per frame)
+            secondsUntilNextGame = 10;
         } else if (secondsUntilNextGame < 10) {
             log.warn("Arena game %s has exceeded maximum game time, aborting and starting a new game", currentGame.getGameId());
             currentGame.abort();
@@ -151,11 +169,17 @@ public class ArenaManager {
         });
         currentGame.startGame();
         log.info("Started game in arena %s with id %s", arenaName, currentGame.getGameId());
+
+        broadcastState();
     }
 
     private void processEndedGame() {
-        // TODO calculate rankings
-        // TODO store rankings
+        if (ranked) {
+            // TODO calculate rankings
+            // TODO store rankings
+        }
+
+        broadcastState();
     }
 
     public EventBus getOutgoingEventBus() {
@@ -172,5 +196,9 @@ public class ArenaManager {
 
     public String getArenaName() {
         return arenaName;
+    }
+
+    public void setRanked(boolean ranked) {
+        this.ranked = ranked;
     }
 }
