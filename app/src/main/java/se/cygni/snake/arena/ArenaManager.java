@@ -4,9 +4,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.ArenaUpdateEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
@@ -30,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Component
 public class ArenaManager {
     private static final Logger log = LoggerFactory.getLogger(ArenaManager.class);
     private static final int ARENA_PLAYER_COUNT = 8;
@@ -44,15 +40,15 @@ public class ArenaManager {
 
     private GameManager gameManager;
     private Set<Player> connectedPlayers = new HashSet<>();
-    private long secondsUntilNextGame = 0;
+    private long secondsUntilNextAutostartedGame = 0;
     private Game currentGame = null;
+    private double currentGameStartTime;
 
-    @Autowired
     public ArenaManager(GameManager gameManager, EventBus globalEventBus) {
         this.gameManager = gameManager;
 
         this.outgoingEventBus = new EventBus("arena-outgoing");
-        this.incomingEventBus = new EventBus("arens-incoming");
+        this.incomingEventBus = new EventBus("arena-incoming");
         this.globalEventBus = globalEventBus;
 
         incomingEventBus.register(this);
@@ -104,23 +100,25 @@ public class ArenaManager {
         if (currentGame != null) {
             currentGame.playerLostConnection(playerId);
         }
+
+        broadcastState();
     }
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Scheduled(fixedRate = 1000)
     public void runGameScheduler() {
-        secondsUntilNextGame--;
-
-        processCurrentGame();
-        planNextGame();
+        if (ranked) {
+            processCurrentGame();
+            secondsUntilNextAutostartedGame--;
+            planNextGame();
+        }
     }
 
     public void broadcastState() {
         String gameId = currentGame != null ? currentGame.getGameId() : null;
         List<String> onlinePlayers = connectedPlayers.stream().map(Player::getName).collect(Collectors.toList());
         globalEventBus.post(new InternalGameEvent(
-                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, onlinePlayers)));
+                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, ranked, onlinePlayers)));
     }
 
     private void processCurrentGame() {
@@ -128,37 +126,58 @@ public class ArenaManager {
             return;
         }
 
-        if (currentGame.isEnded()) {
-            processEndedGame();
-            currentGame = null;
-            // TODO set time left to 10 iff game is ended and time > 0 ???
-            // This needs to take into account the difference between executing game and viewing the game (250ms per frame)
-            secondsUntilNextGame = 10;
-        } else if (secondsUntilNextGame < 10) {
+        if (currentGame.isEnded() && viewersHaveFinished(currentGame)) {
+            if (ranked) {
+                processEndedGame();
+                currentGame = null;
+                secondsUntilNextAutostartedGame = 0;
+                broadcastState();
+            }
+            // Else just keep the game until users start a new game
+        }
+    }
+
+    // Because the game engine can run faster than the viewers, we have to calculate if they have finished the game.
+    private boolean viewersHaveFinished(Game currentGame) {
+        long ticks = currentGame.getGameEngine().getCurrentWorldTick();
+        double elapsedSeconds = System.nanoTime() / 1e9 - currentGameStartTime;
+        return elapsedSeconds > 5 + currentGame.getGameEngine().getCurrentWorldTick() * 0.25 + 5;
+    }
+
+    private void planNextGame() {
+        if (currentGame != null && !currentGame.isEnded() && secondsUntilNextAutostartedGame < 10) {
             log.warn("Arena game %s has exceeded maximum game time, aborting and starting a new game", currentGame.getGameId());
             currentGame.abort();
             currentGame = null;
         }
-    }
 
-    private void planNextGame() {
         if (connectedPlayers.size() < 2) {
             log.trace("Not enough players to start arena game");
             return;
         }
 
-        if (secondsUntilNextGame <= 0) {
+        if (secondsUntilNextAutostartedGame <= 0) {
             // TODO This arbitrary formula (5 min between games) can use some tweaking
-            secondsUntilNextGame = 60 * 5;
+            secondsUntilNextAutostartedGame = 60 * 5;
             startGame();
         } else {
-            log.trace(String.format("Waiting %d seconds until next game", secondsUntilNextGame));
+            log.trace(String.format("Waiting %d seconds until next game", secondsUntilNextAutostartedGame));
+        }
+    }
+
+    public void requestGameStart() {
+        if (!ranked) {
+            startGame();
         }
     }
 
     private void startGame() {
-        // TODO add a taboo list and prefer players that have not played before
+        // TODO add a taboo list and prefer players that have not played recently
         Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
+
+        if (currentGame != null && !currentGame.isEnded()) {
+            currentGame.abort();
+        }
 
         currentGame = gameManager.createArenaGame();
         currentGame.setOutgoingEventBus(outgoingEventBus);
@@ -168,6 +187,7 @@ public class ArenaManager {
             currentGame.addPlayer(remotePlayer);
         });
         currentGame.startGame();
+        currentGameStartTime = System.nanoTime() / 1e9;
         log.info("Started game in arena %s with id %s", arenaName, currentGame.getGameId());
 
         broadcastState();

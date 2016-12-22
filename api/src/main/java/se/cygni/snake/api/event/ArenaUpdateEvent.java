@@ -11,6 +11,7 @@ import java.util.List;
 public class ArenaUpdateEvent extends GameMessage {
     private final String arenaName;
     private final String gameId;
+    private final Boolean ranked;
     private final List<String> onlinePlayers;
     // private final Rankings rankings;
 
@@ -18,16 +19,19 @@ public class ArenaUpdateEvent extends GameMessage {
     public ArenaUpdateEvent(
             @JsonProperty("arenaName") String arenaName,
             @JsonProperty("gameId") String gameId,
+            @JsonProperty("ranked") Boolean ranked,
             @JsonProperty("onlinePlayers") List<String> onlinePlayers) {
 
         this.arenaName = arenaName;
         this.gameId = gameId;
+        this.ranked = ranked;
         this.onlinePlayers = onlinePlayers;
     }
 
     public ArenaUpdateEvent(ArenaUpdateEvent other) {
         this.arenaName = other.getArenaName();
         this.gameId = other.getGameId();
+        this.ranked = other.ranked;
         this.onlinePlayers = other.getOnlinePlayers();
     }
 
@@ -37,6 +41,10 @@ public class ArenaUpdateEvent extends GameMessage {
 
     public String getGameId() {
         return gameId;
+    }
+
+    public Boolean getRanked() {
+        return ranked;
     }
 
     public List<String> getOnlinePlayers() {

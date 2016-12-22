@@ -106,8 +106,8 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             } else if (apiMessage instanceof StartGame) {
                 startGame((StartGame) apiMessage);
-
-
+            } else if (apiMessage instanceof StartArenaGame) {
+                startArenaGame((StartArenaGame) apiMessage);
             } else if (apiMessage instanceof GetActiveTournament) {
                 if(tournamentManager.isTournamentActive()) {
                     sendApiMessage(tournamentManager.getTournamentInfo());
@@ -285,6 +285,10 @@ public class EventSocketHandler extends TextWebSocketHandler {
             log.info("Active remote players: {}", game.getPlayerManager().getLiveAndRemotePlayers().size());
             game.startGame();
         }
+    }
+
+    private void startArenaGame(StartArenaGame apiMessage) {
+        arenaSelectionManager.getArena(apiMessage.getArenaName()).requestGameStart();
     }
 
     private boolean verifyTokenSendErrorIfUnauthorized(ApiMessage apiMessage) {
