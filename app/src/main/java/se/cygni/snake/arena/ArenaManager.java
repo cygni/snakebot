@@ -44,6 +44,8 @@ public class ArenaManager {
     private Game currentGame = null;
     private double currentGameStartTime;
 
+
+
     public ArenaManager(GameManager gameManager, EventBus globalEventBus) {
         this.gameManager = gameManager;
 
