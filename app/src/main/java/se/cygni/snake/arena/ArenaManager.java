@@ -44,7 +44,7 @@ public class ArenaManager {
     private Game currentGame = null;
     private double currentGameStartTime;
 
-
+    ArenaRater rater = new ArenaRater();
 
     public ArenaManager(GameManager gameManager, EventBus globalEventBus) {
         this.gameManager = gameManager;
@@ -120,7 +120,7 @@ public class ArenaManager {
         String gameId = currentGame != null ? currentGame.getGameId() : null;
         List<String> onlinePlayers = connectedPlayers.stream().map(Player::getName).collect(Collectors.toList());
         globalEventBus.post(new InternalGameEvent(
-                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, ranked, onlinePlayers)));
+                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, ranked, rater.getRating(), onlinePlayers)));
     }
 
     private void processCurrentGame() {
@@ -197,8 +197,7 @@ public class ArenaManager {
 
     private void processEndedGame() {
         if (ranked) {
-            // TODO calculate rankings
-            // TODO store rankings
+            rater.addGameToResult(currentGame);
         }
 
         broadcastState();

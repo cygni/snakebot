@@ -6,6 +6,7 @@ import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.type.GameMessageType;
 
 import java.util.List;
+import java.util.Map;
 
 @GameMessageType
 public class ArenaUpdateEvent extends GameMessage {
@@ -13,18 +14,20 @@ public class ArenaUpdateEvent extends GameMessage {
     private final String gameId;
     private final Boolean ranked;
     private final List<String> onlinePlayers;
-    // private final Rankings rankings;
+    private final Map<String, Long> rating;
 
     @JsonCreator
     public ArenaUpdateEvent(
             @JsonProperty("arenaName") String arenaName,
             @JsonProperty("gameId") String gameId,
             @JsonProperty("ranked") Boolean ranked,
+            @JsonProperty("rating") Map<String, Long> rating,
             @JsonProperty("onlinePlayers") List<String> onlinePlayers) {
 
         this.arenaName = arenaName;
         this.gameId = gameId;
         this.ranked = ranked;
+        this.rating = rating;
         this.onlinePlayers = onlinePlayers;
     }
 
@@ -32,6 +35,8 @@ public class ArenaUpdateEvent extends GameMessage {
         this.arenaName = other.getArenaName();
         this.gameId = other.getGameId();
         this.ranked = other.ranked;
+        this.rating = other.rating;
+
         this.onlinePlayers = other.getOnlinePlayers();
     }
 
@@ -45,6 +50,10 @@ public class ArenaUpdateEvent extends GameMessage {
 
     public Boolean getRanked() {
         return ranked;
+    }
+
+    public Map<String, Long> getRating() {
+        return rating;
     }
 
     public List<String> getOnlinePlayers() {
