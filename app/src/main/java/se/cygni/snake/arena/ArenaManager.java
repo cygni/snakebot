@@ -65,7 +65,7 @@ public class ArenaManager {
         player.setPlayerId(playerId);
 
         // TODO remove duplicated code and add password or similar anti-fakenicking
-        if (connectedPlayers.contains(player)) {
+        if (connectedPlayers.stream().anyMatch(otherPlayer -> otherPlayer.getName().equals(player.getName()))) {
             int removeDupWarning = 0;
             InvalidPlayerName playerNameTaken = new InvalidPlayerName(InvalidPlayerName.PlayerNameInvalidReason.Taken);
             MessageUtils.copyCommonAttributes(registerPlayer, playerNameTaken);
