@@ -21,6 +21,7 @@ public class ArenaRater {
 
     public static class GameResult {
         LocalDate date;
+        String gameId;
         List<String> positions = new ArrayList<>();
     }
 
@@ -28,11 +29,15 @@ public class ArenaRater {
         return rating;
     }
 
+    public List<GameResult> getGameResults() {
+        return gameResults;
+    }
+
     public void initializeWithPersistedGameResults() {
         // TODO ArenaRater is in memory only for now, but should probably be initialized with game history on startup
     }
 
-    public void addGameToResult(Game game) {
+    public void addGameToResult(Game game, boolean ranked) {
         GameResult res = new GameResult();
         res.date = LocalDate.now();
         res.positions = game.getGameResult()
@@ -40,9 +45,16 @@ public class ArenaRater {
                 .stream()
                 .map(IPlayer::getName)
                 .collect(Collectors.toList());
+        res.gameId = game.getGameId();
         gameResults.add(res);
 
-        calculateRating();
+        if (ranked) {
+            calculateRating();
+        }
+    }
+
+    public boolean hasGame(String gameId) {
+        return gameResults.stream().anyMatch(gr -> gr.gameId.equals(gameId));
     }
 
     // this will redo calculations from scratch on every rating

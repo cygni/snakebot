@@ -109,8 +109,9 @@ public class ArenaManager {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     public void runGameScheduler() {
+        processCurrentGame();
+
         if (ranked) {
-            processCurrentGame();
             secondsUntilNextAutostartedGame--;
             planNextGame();
         }
@@ -119,8 +120,14 @@ public class ArenaManager {
     public void broadcastState() {
         String gameId = currentGame != null ? currentGame.getGameId() : null;
         List<String> onlinePlayers = connectedPlayers.stream().map(Player::getName).collect(Collectors.toList());
+        List<ArenaUpdateEvent.ArenaHistory> history = rater
+                .getGameResults()
+                .stream()
+                .limit(50)
+                .map(gr -> new ArenaUpdateEvent.ArenaHistory(gr.gameId, gr.positions))
+                .collect(Collectors.toList());
         globalEventBus.post(new InternalGameEvent(
-                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, ranked, rater.getRating(), onlinePlayers)));
+                System.currentTimeMillis(), new ArenaUpdateEvent(arenaName, gameId, ranked, rater.getRating(), onlinePlayers, history)));
     }
 
     private void processCurrentGame() {
@@ -129,13 +136,13 @@ public class ArenaManager {
         }
 
         if (currentGame.isEnded() && viewersHaveFinished(currentGame)) {
+            processEndedGame();
             if (ranked) {
-                processEndedGame();
                 currentGame = null;
                 secondsUntilNextAutostartedGame = 0;
                 broadcastState();
             }
-            // Else just keep the game until users start a new game
+            // else: game is left for players to see in the arena
         }
     }
 
@@ -169,6 +176,10 @@ public class ArenaManager {
 
     public void requestGameStart() {
         if (!ranked) {
+            if (currentGame != null && currentGame.isEnded()) {
+                // Sanity check if a game is restarted before viewersHaveFinished is set to true
+                processEndedGame();
+            }
             startGame();
         }
     }
@@ -196,11 +207,10 @@ public class ArenaManager {
     }
 
     private void processEndedGame() {
-        if (ranked) {
-            rater.addGameToResult(currentGame);
+        if (!rater.hasGame(currentGame.getGameId())) {
+            rater.addGameToResult(currentGame, ranked);
+            broadcastState();
         }
-
-        broadcastState();
     }
 
     public EventBus getOutgoingEventBus() {
