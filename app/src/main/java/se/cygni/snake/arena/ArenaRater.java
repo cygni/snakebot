@@ -113,6 +113,10 @@ public class ArenaRater {
     }
 
     // Code for testing and experimenting
+    // Commented out to fix the error:
+    // Unable to find a single main class from the following candidates [se.cygni.snake.SnakeServerApplication, se.cygni.snake.arena.ArenaRater]
+    // TODO convert to test
+    /*
     public static void main(String[] args) {
         ArenaRater testRater = new ArenaRater();
 
@@ -141,5 +145,6 @@ public class ArenaRater {
         System.err.println("Time elapsed "+(System.nanoTime() - time) / 1e9);
         System.err.println(testRater.rating);
     }
+    */
 
 }
