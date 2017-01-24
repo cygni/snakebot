@@ -72,8 +72,6 @@ public class Rating {
 
 	/**
 	 * Set the average skill value, taking in a value in Glicko2 scale.
-	 * 
-	 * @param double
 	 */
 	public void setGlicko2Rating(double rating) {
 		this.rating = RatingCalculator.convertRatingToOriginalGlickoScale(rating);
@@ -107,8 +105,6 @@ public class Rating {
 
 	/**
 	 * Set the rating deviation, taking in a value in Glicko2 scale.
-	 * 
-	 * @param double
 	 */
 	public void setGlicko2RatingDeviation(double ratingDeviation) {
 		this.ratingDeviation = RatingCalculator.convertRatingDeviationToOriginalGlickoScale( ratingDeviation );
