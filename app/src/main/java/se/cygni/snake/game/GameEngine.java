@@ -42,6 +42,7 @@ public class GameEngine {
     private WorldState world;
     private long currentWorldTick = 0;
     private java.util.Map<String, Direction> snakeDirections;
+    private AtomicBoolean gameStarted = new AtomicBoolean(false);
     private AtomicBoolean isRunning = new AtomicBoolean(false);
     private AtomicBoolean gameComplete = new AtomicBoolean(false);
     private final EventBus globalEventBus;
@@ -128,6 +129,7 @@ public class GameEngine {
     }
 
     private void initGame() {
+        gameStarted.set(true);
         world = new WorldState(gameFeatures.getWidth(), gameFeatures.getHeight());
 
         initPlacePlayers();
@@ -265,6 +267,10 @@ public class GameEngine {
         playerManager.toSet().stream().forEach( player -> {
             snakeDirections.put(player.getPlayerId(), getRandomDirection());
         });
+    }
+
+    public boolean isGameStarted() {
+        return gameStarted.get();
     }
 
     public boolean isGameRunning() {
