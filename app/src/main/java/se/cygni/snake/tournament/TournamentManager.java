@@ -110,7 +110,7 @@ public class TournamentManager {
     }
 
     private boolean isTournamentComplete() {
-        return currentLevel >= tournamentPlan.getLevels().size();
+        return tournamentStarted && currentLevel >= tournamentPlan.getLevels().size();
     }
 
     private void completeTournament() {
