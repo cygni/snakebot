@@ -5,4 +5,4 @@ EXPOSE 8080
 
 COPY build/libs/snakebot-app-*.jar /snakebot-app.jar
 
-CMD java -jar -Xmx2048m -Dspring.profiles.active=production /snakebot-app.jar
+CMD java -jar -Xmx4096m -Dspring.profiles.active=production /snakebot-app.jar
