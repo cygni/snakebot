@@ -9,6 +9,7 @@ Several client implementations exist:
 * [Java](https://github.com/cygni/snakebot-client-java)
 * [.NET](https://github.com/cygni/snakebot-client-dotnet)
 * [JavaScript](https://github.com/cygni/snakebot-client-js)
+* [C++](https://github.com/cygni/snakebot-client-cpp)
 * [Rust](https://github.com/cygni/snakebot-client-rust)
 * [ClojureScript](https://github.com/cygni/snakebot-client-clojurescript)
 * [Go](https://github.com/cygni/snakebot-client-golang)
@@ -22,6 +23,12 @@ To run server locally:
 ```
 > ./gradlew bootRun
 ```
+
+To run server locally with increased memory:
+```
+> export JAVA_OPTS="-Xmx4096m" && ./gradlew bootRun
+```
+
 
 To generate Spring Boot self contained artifact:
 ```
