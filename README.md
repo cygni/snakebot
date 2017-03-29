@@ -14,6 +14,8 @@ Several client implementations exist:
 * [ClojureScript](https://github.com/cygni/snakebot-client-clojurescript)
 * [Go](https://github.com/cygni/snakebot-client-golang)
 
+**Note:** you need JavaFX for the server to build properly. So if you haven't already installed it, do so now.
+
 To clean and build:
 ```
 > ./gradlew clean build
