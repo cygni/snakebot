@@ -315,6 +315,8 @@ public class TournamentManager {
             return;
         }
 
+        log.info("Player: {} , playerId: {} lost connection and was therefore killed and removed from further games in the tournament.", player.getName(), playerId);
+
         if (isTournamentStarted()) {
             player.lostConnection(-1);
         } else {
