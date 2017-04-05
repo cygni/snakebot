@@ -29,6 +29,11 @@ To run server locally with increased memory:
 > export JAVA_OPTS="-Xmx4096m" && ./gradlew bootRun
 ```
 
+To run packaged server with overridden setting for game link:
+```
+> ./gradlew clean bootRepackage
+> java -Xmx4096m -Dsnakebot.view.url=http://<your-ip>:8090/#/viewgame/ -jar app/build/libs/snakebot-app-0.1.18.jar
+```
 
 To generate Spring Boot self contained artifact:
 ```
