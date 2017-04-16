@@ -39,21 +39,7 @@ public class MapUtil {
     public boolean canIMoveInDirection(SnakeDirection direction) {
         try {
             MapCoordinate myPos = getMyPosition();
-            MapCoordinate myNewPos = myPos.translateBy(0, 0);
-
-            switch (direction) {
-                case DOWN:
-                    myNewPos = myPos.translateBy(0, 1);
-                    break;
-                case UP:
-                    myNewPos = myPos.translateBy(0, -1);
-                    break;
-                case LEFT:
-                    myNewPos = myPos.translateBy(-1, 0);
-                    break;
-                case RIGHT:
-                    myNewPos = myPos.translateBy(1, 0);
-            }
+            MapCoordinate myNewPos = myPos.translateByDirection(direction);
 
             return isTileAvailableForMovementTo(myNewPos);
         } catch (Exception e) {
@@ -195,7 +181,7 @@ public class MapUtil {
      * @param coordinate
      * @return
      */
-    private int translateCoordinate(MapCoordinate coordinate) {
+    public int translateCoordinate(MapCoordinate coordinate) {
         if (isCoordinateOutOfBounds(coordinate)) {
             String errorMessage = String.format("Coordinate [%s,%s] is out of bounds", coordinate.x, coordinate.y);
             throw new RuntimeException(errorMessage);
@@ -204,7 +190,7 @@ public class MapUtil {
         return coordinate.x + coordinate.y * map.getWidth();
     }
 
-    private MapCoordinate[] translatePositions(int[] positions) {
+    public MapCoordinate[] translatePositions(int[] positions) {
         return Arrays.stream(positions)
                 .mapToObj(pos -> translatePosition(pos))
                 .toArray(MapCoordinate[]::new);

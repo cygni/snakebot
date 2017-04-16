@@ -1,5 +1,7 @@
 package se.cygni.snake.client;
 
+import se.cygni.snake.api.model.SnakeDirection;
+
 public class MapCoordinate {
     public final int x;
     public final int y;
@@ -7,6 +9,21 @@ public class MapCoordinate {
     public MapCoordinate(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public MapCoordinate translateByDirection(SnakeDirection direction) {
+        switch (direction) {
+            case DOWN:
+                return translateBy(0, 1);
+            case UP:
+                return translateBy(0, -1);
+            case LEFT:
+                return translateBy(-1, 0);
+            case RIGHT:
+                return translateBy(1, 0);
+            default:
+                return translateBy(0, 0);
+        }
     }
 
     public MapCoordinate translateBy(int deltaX, int deltaY) {
