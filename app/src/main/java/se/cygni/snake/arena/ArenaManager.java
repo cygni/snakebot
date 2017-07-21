@@ -82,7 +82,7 @@ public class ArenaManager {
 
         outgoingEventBus.post(playerRegistered);
 
-        log.debug("A player registered in the arena %s", arenaName);
+        log.debug("Player: {} registered in the arena {}", player.getName(), arenaName);
 
         broadcastState();
     }
@@ -155,7 +155,7 @@ public class ArenaManager {
 
     private void planNextGame() {
         if (currentGame != null && !currentGame.isEnded() && secondsUntilNextAutostartedGame < 10) {
-            log.warn("Arena game %s has exceeded maximum game time, aborting and starting a new game", currentGame.getGameId());
+            log.warn("Arena game {} has exceeded maximum game time, aborting and starting a new game", currentGame.getGameId());
             currentGame.abort();
             currentGame = null;
         }
@@ -201,7 +201,7 @@ public class ArenaManager {
         });
         currentGame.startGame();
         currentGameStartTime = System.nanoTime() / 1e9;
-        log.info("Started game in arena %s with id %s", arenaName, currentGame.getGameId());
+        log.info("Started game in arena {} with id {}", arenaName, currentGame.getGameId());
 
         broadcastState();
     }

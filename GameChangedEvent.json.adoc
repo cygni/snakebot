@@ -1,0 +1,11 @@
+[[app-listing]]
+[source,javascript]
+GameChangedEvent
+----
+{
+  "type" : "se.cygni.snake.api.event.GameChangedEvent",
+  "gameId" : "7e7e15e4-9ebf-4bb5-a182-a0b9cff58d89",
+  "receivingPlayerId" : "a338ef43-c358-43ff-b4e8-58bda159935c",
+  "timestamp" : 1479997853534
+}
+----

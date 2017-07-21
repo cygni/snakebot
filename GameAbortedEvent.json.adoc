@@ -1,0 +1,11 @@
+[[app-listing]]
+[source,javascript]
+GameAbortedEvent
+----
+{
+  "type" : "se.cygni.snake.api.event.GameAbortedEvent",
+  "gameId" : "e8227f8c-d90a-44f4-9218-661a49ce618e",
+  "receivingPlayerId" : "477e9ce6-899f-4a8e-bbd5-7ca16cff8c9b",
+  "timestamp" : 1479997853532
+}
+----
