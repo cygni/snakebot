@@ -8,7 +8,7 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-      - gradle package
+      - gradle test
 artifacts:
   files:
     - app/build/libs/snakebot-app-*.jar
