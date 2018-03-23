@@ -24,6 +24,7 @@ import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.player.IPlayer;
 import se.cygni.snake.player.RemotePlayer;
 import se.cygni.snake.player.bot.*;
+import se.cygni.snake.player.bot.anakonda.Anakonda;
 
 import java.util.UUID;
 
@@ -203,7 +204,7 @@ public class Game {
         for (int i = 0; i < gameFeatures.getMaxNoofPlayers() - 1; i++) {
             BotPlayer bot;
 
-            switch (Math.abs(botSelector.nextInt() % 5)) {
+            switch (Math.abs(botSelector.nextInt() % 6)) {
                 case 0:
                     bot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
                     break;
@@ -218,6 +219,9 @@ public class Game {
                     break;
                 case 4:
                     bot = new Snakey(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 5:
+                    bot = new Anakonda(UUID.randomUUID().toString(), incomingEventBus);
                     break;
                 default:
                     bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
