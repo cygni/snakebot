@@ -49,7 +49,7 @@ subprojects {
     ext['slf4j.version'] = '1.7.25'
     ext {
         slf4jVersion = '1.7.25'
-        logbackVersion = '1.1.7'
+        logbackVersion = '1.2.3'
         jacksonVersion = '2.9.7'
         springBootVersion = '2.0.5.RELEASE'
         springVersion = '5.1.0.RELEASE'

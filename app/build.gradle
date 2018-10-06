@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '1.4.0.RELEASE'
+        springBootVersion = '2.0.5.RELEASE'
     }
     repositories {
         mavenCentral()
@@ -14,10 +14,14 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+}
 
-apply plugin: 'spring-boot'
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'info.solidsoft.pitest'
 apply plugin: "com.gorylenko.gradle-git-properties"
+
 
 jar {
     baseName = 'snakebot-app'
