@@ -38,8 +38,8 @@ subprojects {
     apply plugin: 'maven-publish'
 
     compileJava {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility = 11
+        targetCompatibility = 11
         options.encoding = 'UTF-8'
     }
 

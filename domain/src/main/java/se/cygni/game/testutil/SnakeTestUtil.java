@@ -29,7 +29,7 @@ public class SnakeTestUtil {
 
     public static <T extends WorldObject> T createWorldObject(Class<T> clazz) {
         try {
-            return clazz.newInstance();
+            return clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Failed to create new instance of " + clazz.getSimpleName(), e);
         }
