@@ -3,7 +3,7 @@ package se.cygni.snake.tournament;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import se.cygni.snake.eventapi.model.TournamentInfo;
 
@@ -17,7 +17,7 @@ public class TournamentController {
         this.tournamentManager = tournamentManager;
     }
 
-    @RequestMapping("/tournament/active")
+    @GetMapping("/tournament/active")
     public ResponseEntity<TournamentInfo> getActiveTournament() {
         if (tournamentManager.isTournamentActive()) {
 
