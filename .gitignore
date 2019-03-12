@@ -21,3 +21,5 @@ out
 #npm stuff
 webclient/node_modules
 
+/.project
+/.settings
