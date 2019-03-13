@@ -21,5 +21,9 @@ out
 #npm stuff
 webclient/node_modules
 
+# Eclipse
 /.project
-/.settings
+/**/.settings
+/**/.classpath
+/**/.project
+/**/bin/
