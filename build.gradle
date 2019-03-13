@@ -60,6 +60,11 @@ subprojects {
         commonsCollectionsVersion = '4.1'
         guavaVersion = '19.0'
     }
+    
+    dependencies {
+	    implementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
+	    implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
+ 	}
 
     task javadocJar (type: Jar, dependsOn: javadoc) {
         classifier = 'javadoc'
