@@ -15,8 +15,11 @@ plugins {
     id "com.gorylenko.gradle-git-properties" version "2.0.0"
 }
 
+apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+
 
 jar {
     archivesBaseName = 'snakebot-app'
@@ -54,10 +57,13 @@ dependencies {
     implementation('org.elasticsearch:elasticsearch:2.4.0')
 
     implementation("com.google.guava:guava:$guavaVersion")
-    implementation("commons-beanutils:commons-beanutils:$commonsBeanutilsVersion")
     
     implementation('org.springframework.boot:spring-boot-starter-actuator')
-    
+    implementation('org.springframework.boot:spring-boot-starter-jersey')
+    implementation('org.springframework.boot:spring-boot-starter-websocket')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-jetty')
+
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
