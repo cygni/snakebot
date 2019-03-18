@@ -18,10 +18,6 @@ plugins {
     id 'jacoco'
 }
 
-jacoco {
-    toolVersion = "0.8.3"
-}
-
 apply plugin: 'com.github.ben-manes.versions'
 
 allprojects {
@@ -113,6 +109,14 @@ subprojects {
             append = false
         }
     }
+    
+    jacocoTestReport {
+	    reports {
+	        xml.enabled false
+	        csv.enabled false
+	        html.destination file("${buildDir}/jacocoHtml")
+	    }
+	}
 }
 
 
