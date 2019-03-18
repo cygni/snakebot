@@ -19,7 +19,7 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java'
 
 jar {
-    baseName = 'snakebot-app'
+    archivesBaseName = 'snakebot-app'
 }
 
 processResources {
