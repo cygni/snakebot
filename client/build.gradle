@@ -14,12 +14,14 @@ dependencies {
     implementation("org.apache.commons:commons-math3:$commonsMathVersion")
     implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
     implementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    // implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("org.springframework.boot:spring-boot-starter-websocket:$springBootVersion")
+    /*
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:jcl-over-slf4j:$slf4jVersion")
     implementation("org.slf4j:log4j-over-slf4j:$slf4jVersion")
     implementation("org.slf4j:jul-to-slf4j:$slf4jVersion")
+    */
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
