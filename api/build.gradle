@@ -6,7 +6,6 @@ dependencies {
     implementation("org.springframework:spring-core:$springVersion")
     implementation("org.springframework:spring-context:$springVersion")
     implementation("org.apache.karaf.shell:org.apache.karaf.shell.table:4.0.6");
-    implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.slf4j:jcl-over-slf4j:$slf4jVersion")

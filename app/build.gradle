@@ -27,7 +27,6 @@ jar {
 
 processResources {
     filesMatching('**/*.properties') { expand(project.properties) }
-//    expand(project.properties)
 }
 
 configurations {
@@ -39,9 +38,9 @@ project.ext {
     buildnumber = "$System.env.BUILD_NUMBER"
 }
 
-//springBoot {
-//    buildInfo()
-//}
+springBoot {
+    buildInfo()
+}
 
 pitest {
     targetClasses = ['se.cygni.snake.*']
