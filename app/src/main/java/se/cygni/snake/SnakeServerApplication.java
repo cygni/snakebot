@@ -4,13 +4,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 
 @SpringBootApplication
 @EnableAutoConfiguration
 @EnableWebSocket
-public class SnakeServerApplication extends SpringBootServletInitializer {
+public class SnakeServerApplication {
     public static void main(String[] args) {
 
 	// If no active profile is set, default to development!
