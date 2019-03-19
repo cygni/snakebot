@@ -1,5 +1,4 @@
-FROM docker.snake.cygni.se:5000/java8:latest
-MAINTAINER emil.breding@bisnode.com
+FROM openjdk:11.0.2-oraclelinux7
 
 EXPOSE 8080
 
