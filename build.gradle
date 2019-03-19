@@ -37,6 +37,7 @@ subprojects {
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'jacoco'
     apply plugin: 'maven-publish'
 
@@ -45,6 +46,13 @@ subprojects {
         targetCompatibility = 1.8
         options.encoding = 'UTF-8'
     }
+    
+    eclipse {
+	    classpath {
+	        downloadJavadoc = true
+	        downloadSources = true
+	    }
+	}
 
     repositories {
         mavenCentral()
