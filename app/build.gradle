@@ -57,6 +57,8 @@ dependencies {
 
     implementation("com.google.guava:guava:$guavaVersion")
     
+    implementation("commons-beanutils:commons-beanutils:$commonsBeanutilsVersion")
+        
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.boot:spring-boot-starter-jersey')
     implementation('org.springframework.boot:spring-boot-starter-websocket')
