@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import se.cygni.snake.eventapi.model.TournamentInfo;
 
 @RestController
@@ -14,17 +15,16 @@ public class TournamentController {
 
     @Autowired
     public TournamentController(TournamentManager tournamentManager) {
-        this.tournamentManager = tournamentManager;
+	this.tournamentManager = tournamentManager;
     }
 
     @RequestMapping("/tournament/active")
     public ResponseEntity<TournamentInfo> getActiveTournament() {
-        if (tournamentManager.isTournamentActive()) {
+	if (tournamentManager.isTournamentActive()) {
 
-            return new ResponseEntity<TournamentInfo>(tournamentManager.getTournamentInfo(),
-                    HttpStatus.OK);
-        } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+	    return new ResponseEntity<>(tournamentManager.getTournamentInfo(), HttpStatus.OK);
+	} else {
+	    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
     }
 }
