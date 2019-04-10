@@ -1,6 +1,6 @@
-include ":api", ":domain", ":app", ":client", ":client-util"
+include ":api", ":app", ":client", ":client-util", ":domain"
 
-rootProject.name = 'Snake Server'
+rootProject.name = 'SnakeServer'
 
 /*
 if (!System.getenv()['JENKINS_HOME']) {

@@ -1,5 +1,3 @@
-apply plugin: 'com.github.ben-manes.versions'
-
 buildscript {
     repositories {
         mavenCentral()
@@ -9,14 +7,20 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.10'
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:1.2"
     }
 }
 
-allprojects {
+plugins {
+    id 'org.springframework.boot' version '2.1.3.RELEASE'
+    id 'jacoco'
+}
 
+apply plugin: 'com.github.ben-manes.versions'
+
+allprojects {
     group = 'se.cygni.snakebot'
     version = '0.1.19'
 
@@ -33,8 +37,8 @@ subprojects {
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'eclipse'
     apply plugin: 'jacoco'
-    //apply plugin: 'org.sonarqube'
     apply plugin: 'maven-publish'
 
     compileJava {
@@ -42,23 +46,26 @@ subprojects {
         targetCompatibility = 1.8
         options.encoding = 'UTF-8'
     }
+    
+    eclipse {
+	    classpath {
+	        downloadJavadoc = true
+	        downloadSources = true
+	    }
+	}
 
     repositories {
         mavenCentral()
     }
-    ext['slf4j.version'] = '1.7.21'
     ext {
-        slf4jVersion = '1.7.21'
-        logbackVersion = '1.1.7'
-        jacksonVersion = '2.8.2'
-        springBootVersion = '1.4.0.RELEASE'
-        springVersion = '4.3.2.RELEASE'
-        springDataMongoVersion = '1.9.2.RELEASE'
+        springBootVersion = '2.1.3.RELEASE'
         commonsMathVersion = '3.6.1'
         commonsLangVersion = '3.4'
         commonsBeanutilsVersion = '1.9.2'
         commonsCollectionsVersion = '4.1'
+        elasticSearchVersion = '2.4.0'
         guavaVersion = '19.0'
+        mockitoVersion = '2.25.1'
     }
 
     task javadocJar (type: Jar, dependsOn: javadoc) {
@@ -94,17 +101,26 @@ subprojects {
     }
 
     dependencies {
+    	implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
+	    implementation("org.apache.commons:commons-math3:$commonsMathVersion")
+	    implementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
+	    
         testCompile "junit:junit:4.12"
         testCompile 'org.hamcrest:hamcrest-library:1.3'
     }
 
-    test {
-        jacoco {
-            append = false
-        }
-    }
+    jacocoTestReport {
+	    reports {
+	        xml.enabled false
+	        csv.enabled false
+	        html.destination file("${buildDir}/jacocoHtml")
+	    }
+	}
+	
+		tasks.withType(JavaCompile) {
+	    options.compilerArgs << '-Xlint:unchecked'
+	    options.deprecation = true
+	}
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.1'
-}
+

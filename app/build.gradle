@@ -1,7 +1,4 @@
 buildscript {
-    ext {
-        springBootVersion = '1.4.0.RELEASE'
-    }
     repositories {
         mavenCentral()
         maven {
@@ -9,23 +6,27 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.16"
     }
 }
 
+plugins {
+    id 'info.solidsoft.pitest'
+    id "com.gorylenko.gradle-git-properties" version "2.0.0"
+}
 
-apply plugin: 'spring-boot'
-apply plugin: 'info.solidsoft.pitest'
-apply plugin: "com.gorylenko.gradle-git-properties"
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
 
 jar {
-    baseName = 'snakebot-app'
+    archivesBaseName = 'snakebot-app'
 }
 
 processResources {
     filesMatching('**/*.properties') { expand(project.properties) }
-//    expand(project.properties)
 }
 
 configurations {
@@ -37,9 +38,9 @@ project.ext {
     buildnumber = "$System.env.BUILD_NUMBER"
 }
 
-//springBoot {
-//    buildInfo()
-//}
+springBoot {
+    buildInfo()
+}
 
 pitest {
     targetClasses = ['se.cygni.snake.*']
@@ -48,27 +49,29 @@ pitest {
 }
 
 dependencies {
-    compile project(':domain')
-    compile project(':api')
-    compile project(':client-util')
+    implementation project(':domain')
+    implementation project(':api')
+    implementation project(':client-util')
+  
+    implementation("org.elasticsearch:elasticsearch:$elasticSearchVersion")
 
-    compile("ch.qos.logback:logback-classic:$logbackVersion")
-    compile("org.slf4j:slf4j-api:$slf4jVersion")
-    compile("org.slf4j:jcl-over-slf4j:$slf4jVersion")
-    compile("org.slf4j:log4j-over-slf4j:$slf4jVersion")
-    compile("org.slf4j:jul-to-slf4j:$slf4jVersion")
+    implementation("com.google.guava:guava:$guavaVersion")
+    
+    implementation("commons-beanutils:commons-beanutils:$commonsBeanutilsVersion")
+        
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
+    implementation('org.springframework.boot:spring-boot-starter-jersey')
+    implementation('org.springframework.boot:spring-boot-starter-websocket')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-jetty')
 
-    compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-jersey')
-    compile('org.springframework.boot:spring-boot-starter-websocket')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-jetty')
-    compile('org.elasticsearch:elasticsearch:2.4.0')
 
-    compile("com.google.guava:guava:$guavaVersion")
-    compile("commons-beanutils:commons-beanutils:$commonsBeanutilsVersion")
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.restdocs:spring-restdocs-mockmvc')
+    testImplementation("org.mockito:mockito-core:${mockitoVersion}")
+}
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.restdocs:spring-restdocs-mockmvc')
-    testCompile('org.mockito:mockito-core:1.10.19')
+tasks.withType(Test) {
+    scanForTestClasses = false
+    include "**/*Test*.class" 
 }

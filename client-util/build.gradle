@@ -3,6 +3,6 @@ jar {
 }
 
 dependencies {
-    compile project(':api')
-    compile("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
+    implementation project(':api')
+    implementation("org.springframework.boot:spring-boot-starter-json:$springBootVersion")
 }
