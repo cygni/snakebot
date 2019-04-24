@@ -81,13 +81,7 @@ import com.bmuschko.gradle.docker.tasks.image.*
 
 task buildDockerImage(type: DockerBuildImage) {
     inputDir = file('.')
-    tags.addAll(['snake-bot:latest', 'docker.snake.cygni.se:5000/snake-bot:latest', "docker.snake.cygni.se:5000/snake-bot:${version}"])
- //   tags.add('docker.snake.cygni.se:5000/snake-bot:latest')
- //   tags.add("tag snake-bot:latest docker.snake.cygni.se:5000/snake-bot:${version}")
- }
+    tags.addAll(['snake-bot:latest', 'docker.snake.cygni.se:5000/snake-bot:latest', 
+    	"docker.snake.cygni.se:5000/snake-bot:${version}"])
+  }
  
- task tagDockerImage(type: DockerTagImage) {
- 	repository = 'snake-bot'
- 	imageId = 'snake-bot:latest'
- 	tag = 'docker.snake.cygni.se:5000/snake-bot:latest'
- }
