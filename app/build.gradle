@@ -79,9 +79,25 @@ tasks.withType(Test) {
 
 import com.bmuschko.gradle.docker.tasks.image.*
 
-task buildDockerImage(type: DockerBuildImage) {
+task(buildDockerImage, type: DockerBuildImage) {
     inputDir = file('.')
     tags.addAll(['snake-bot:latest', 'docker.snake.cygni.se:5000/snake-bot:latest', 
     	"docker.snake.cygni.se:5000/snake-bot:${version}"])
-  }
+}
+
+task(pushDockerLatestImage, type: DockerPushImage) {
+	imageName = 'docker.snake.cygni.se:5000/snake-bot'
+	tag ='latest'
+}
+
+task(pushDockerVersionImage, type: DockerPushImage) {
+	imageName = 'docker.snake.cygni.se:5000/snake-bot'
+	tag ="${version}"
+}
+
+task(dockerBuildAndPush) {
+	dependsOn buildDockerImage
+	dependsOn pushDockerLatestImage
+	dependsOn pushDockerVersionImage
+}
  
