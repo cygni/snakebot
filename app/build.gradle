@@ -100,4 +100,9 @@ task(dockerBuildAndPush) {
 	dependsOn pushDockerLatestImage
 	dependsOn pushDockerVersionImage
 }
+
+task(deployOnServer, type:Exec) {
+	commandLine 'echo', 'Restarting server at snake.cygni.se to release the latest build...'
+	commandLine 'ssh', "jenkins@snake.cygni.se 'sudo /bin/systemctl restart snakebot-docker'"
+}
  
