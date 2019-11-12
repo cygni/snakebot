@@ -15,6 +15,8 @@ public class AuthenticationService {
         put("emil", "lime");
         put("chen", "nehc");
         put("johannes", "sennahoj");
+        put("nisse", "essin");
+        put("oskar", "rakso");
     }};
 
     @Autowired
