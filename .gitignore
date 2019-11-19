@@ -27,3 +27,6 @@ webclient/node_modules
 /**/.classpath
 /**/.project
 /**/bin/
+
+# VS Code
+.vscode

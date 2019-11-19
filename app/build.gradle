@@ -21,6 +21,9 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
+// No need to upload this JAR, it is not a dependency to any other
+// Also, the repo does not allow files larger than 32MB
+uploadArchives.enabled = false
 
 jar {
     archivesBaseName = 'snakebot-app'
