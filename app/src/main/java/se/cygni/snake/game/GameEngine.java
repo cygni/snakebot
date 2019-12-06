@@ -286,7 +286,7 @@ public class GameEngine {
 
         // Move is for wrong gameTick
         if (gameTick != currentWorldTick) {
-            log.warn("Player: {} with id {} sent move within wrong world tick. Current world tick: {}, player's world tick: {}",
+            log.warn("Player: {} with id {} sent move within wrong world tick. Current world tick: {}, player's world tick: {}",
                     playerManager.getPlayerName(playerId), playerId,
                     currentWorldTick, gameTick);
             return;
@@ -294,7 +294,7 @@ public class GameEngine {
 
         // Player has already registered a move
         if (registeredMovesByPlayers.contains(playerId)) {
-            log.warn("Player: {} with id {} sent more than one move. Current world tick: {}, player's world tick: {}",
+            log.warn("Player: {} with id {} sent more than one move. Current world tick: {}, player's world tick: {}",
                     playerManager.getPlayerName(playerId), playerId,
                     currentWorldTick, gameTick);
             return;

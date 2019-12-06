@@ -1,6 +1,6 @@
-jar {
-    baseName = 'snakebot-client-util'
-}
+//jar {
+//    baseName = 'snakebot-client-util'
+//}
 
 dependencies {
     implementation project(':api')
