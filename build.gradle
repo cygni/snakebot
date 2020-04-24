@@ -22,7 +22,7 @@ apply plugin: 'com.github.ben-manes.versions'
 
 allprojects {
     group = 'se.cygni.snakebot'
-    version = '0.1.20'
+    version = '0.1.21'
 
     /* Enable this for compiler warnings
     gradle.projectsEvaluated {
@@ -79,6 +79,11 @@ subprojects {
     task sourceJar (type : Jar) {
         classifier = 'sources'
         from sourceSets.main.allSource
+    }
+
+    artifacts {
+        archives sourceJar
+        archives javadocJar
     }
 
     publishing {
