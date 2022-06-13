@@ -40,7 +40,7 @@ subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'jacoco'
     apply plugin: 'maven-publish'
-    apply plugin: 'maven'
+    //apply plugin: 'maven'
 
     compileJava {
         sourceCompatibility = 1.8
@@ -109,7 +109,7 @@ subprojects {
         }
     }
 
-    uploadArchives {
+    /* uploadArchives {
         repositories {
             mavenDeployer {
                 repository(url: "https://snakebot-maven-repo.appspot.com") {
@@ -117,7 +117,7 @@ subprojects {
                 }
             }
         }
-    }
+    } */
     dependencies {
     	implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
 	    implementation("org.apache.commons:commons-math3:$commonsMathVersion")
