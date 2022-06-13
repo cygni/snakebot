@@ -40,7 +40,6 @@ subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'jacoco'
     apply plugin: 'maven-publish'
-    //apply plugin: 'maven'
 
     compileJava {
         sourceCompatibility = 1.8
@@ -109,22 +108,13 @@ subprojects {
         }
     }
 
-    /* uploadArchives {
-        repositories {
-            mavenDeployer {
-                repository(url: "https://snakebot-maven-repo.appspot.com") {
-                    authentication(userName: "${System.getenv('mvn_snake_user')}", password: "${System.getenv('mvn_snake_pwd')}")
-                }
-            }
-        }
-    } */
     dependencies {
     	implementation("org.apache.commons:commons-lang3:$commonsLangVersion")
 	    implementation("org.apache.commons:commons-math3:$commonsMathVersion")
 	    implementation("org.apache.commons:commons-collections4:$commonsCollectionsVersion")
-	    
-        testCompile "junit:junit:4.12"
-        testCompile 'org.hamcrest:hamcrest-library:2.2'
+
+        testImplementation('junit:junit:4.9')
+        testImplementation('org.hamcrest:hamcrest:2.2')
     }
 
     jacocoTestReport {

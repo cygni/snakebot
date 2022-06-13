@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.16"
+        classpath "com.gorylenko.gradle-git-properties:gradle-git-properties:2.4.1"
     }
 }
 
@@ -23,7 +23,7 @@ apply plugin: 'maven-publish'
 
 // No need to upload this JAR, it is not a dependency to any other
 // Also, the repo does not allow files larger than 32MB
-uploadArchives.enabled = false
+//uploadArchives.enabled = false
 
 jar {
     archivesBaseName = 'app'
