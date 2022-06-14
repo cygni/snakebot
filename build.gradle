@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    id 'org.springframework.boot' version '2.1.3.RELEASE'
+    id 'org.springframework.boot' version '2.3.9.RELEASE'
     id 'jacoco'
 }
 
@@ -24,13 +24,13 @@ allprojects {
     group = 'se.cygni.snakebot'
     version = '0.1.21'
 
-    /* Enable this for compiler warnings
+     //Enable this for compiler warnings
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
             options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         }
     }
-    */
+
 }
 
 subprojects {
@@ -61,7 +61,7 @@ subprojects {
         mavenCentral()
     }
     ext {
-        springBootVersion = '2.1.3.RELEASE'
+        springBootVersion = '2.3.9.RELEASE'
         commonsMathVersion = '3.6.1'
         commonsLangVersion = '3.9'
         commonsBeanutilsVersion = '1.9.4'
