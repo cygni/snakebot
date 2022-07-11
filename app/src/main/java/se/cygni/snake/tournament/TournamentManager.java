@@ -299,7 +299,7 @@ public class TournamentManager {
         if (tournamentStarted) {
             return;
         }
-
+        System.out.println("Tournament started");
         // ToDo: Not thread safe
         tournamentStarted = true;
 
