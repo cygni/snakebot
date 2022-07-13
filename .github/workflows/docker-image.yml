@@ -1,0 +1,40 @@
+name: Docker Image CD
+on:
+  push:
+    tags:
+      - '*.*.*'
+    branches: [ "main", "Bump-to-latest" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          # set latest tag for main branch
+          tags: |
+            type=raw,value=latest
+            type=ref,event=tag
+          images: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
+
+      - name: Build and push Docker image
+        id:   docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          # push main -> tag:latest, release x.x.x main -> tag:latest AND tag:x.x.x
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
