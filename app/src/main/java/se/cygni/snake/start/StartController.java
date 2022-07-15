@@ -10,11 +10,6 @@ public class StartController {
 
     @RequestMapping("/")
     public void index(HttpServletResponse response) throws Exception {
-        response.sendRedirect("http://game.snake.cygni.se");
-    }
-
-    @RequestMapping("/mtd2017")
-    public void mtd2017(HttpServletResponse response) throws Exception {
-        response.sendRedirect("https://docs.google.com/a/cygni.se/forms/d/e/1FAIpQLSe0tZDPLPGvj05wiC57LzieVOv3Y_s26fHtJ6S0KVViLbpUBw/viewform");
+        response.sendRedirect("https://game.snake.cygni.se");
     }
 }
