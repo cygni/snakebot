@@ -38,3 +38,29 @@ jobs:
           # push main -> tag:latest, release x.x.x main -> tag:latest AND tag:x.x.x
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Get commit sha
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Tag digitalocean yml name with date and sha
+        uses: fjogeleit/yaml-update-action@v0.10.0
+        with:
+          valueFile: 'digitalocean-spec.yaml'
+          propertyPath: 'name'
+          value: snakebot-web-${{steps.date.outputs.date}}-${{steps.vars.outputs.sha_short}}
+          commitChange: false
+          updateFile: true
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # Pushing to production
+      - name: Update digitalocean app with new yml spec
+        run: doctl apps update ${{ secrets.DIGITALOCEAN_APP_ID }} --spec digitalocean-spec.yaml
