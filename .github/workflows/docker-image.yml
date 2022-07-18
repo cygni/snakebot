@@ -29,6 +29,11 @@ jobs:
             type=ref,event=tag
           images: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
 
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
       - name: Build and push Docker image
         id:   docker_build
         uses: docker/build-push-action@v2
@@ -38,6 +43,10 @@ jobs:
           # push main -> tag:latest, release x.x.x main -> tag:latest AND tag:x.x.x
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+        # Pushing to production
+      - name: Force rebuild in digitalocean
+        run: doctl apps create-deployment ${{secrets.DIGITALOCEAN_APP_ID}} --force-rebuild --wait
 
       - name: Get commit sha
         id: vars
@@ -56,11 +65,5 @@ jobs:
           commitChange: false
           updateFile: true
 
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
-        with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      # Pushing to production
       - name: Update digitalocean app with new yml spec
         run: doctl apps update ${{ secrets.DIGITALOCEAN_APP_ID }} --spec digitalocean-spec.yaml
