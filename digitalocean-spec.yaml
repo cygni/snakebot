@@ -3,10 +3,14 @@ alerts:
 domains:
 - domain: snake.cygni.se
   type: PRIMARY
-name: snakebot
+name: snakebot-DATE-SHA
 region: ams
 services:
-- http_port: 8080
+- envs:
+  - key: PROFILE_FLAG
+    scope: RUN_AND_BUILD_TIME
+    value: -Dspring.profiles.active=digitalocean
+  http_port: 8080
   image:
     registry: cygni
     registry_type: DOCKER_HUB
