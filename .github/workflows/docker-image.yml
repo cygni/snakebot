@@ -52,7 +52,7 @@ jobs:
         with:
           valueFile: 'digitalocean-spec.yaml'
           propertyPath: 'name'
-          value: snakebot-web-${{steps.date.outputs.date}}-${{steps.vars.outputs.sha_short}}
+          value: snakebot-${{steps.date.outputs.date}}-${{steps.vars.outputs.sha_short}}
           commitChange: false
           updateFile: true
 
