@@ -43,6 +43,7 @@ public class ArenaManager {
     private long secondsUntilNextAutostartedGame = 0;
     private Game currentGame = null;
     private double currentGameStartTime;
+    private int inactiveTicks = 0;
 
     ArenaRater rater = new ArenaRater();
 
@@ -135,7 +136,7 @@ public class ArenaManager {
             return;
         }
 
-        if (currentGame.isEnded() && viewersHaveFinished(currentGame)) {
+        if (currentGame.isEnded()) {
             processEndedGame();
             if (ranked) {
                 currentGame = null;
@@ -146,12 +147,13 @@ public class ArenaManager {
         }
     }
 
-    // Because the game engine can run faster than the viewers, we have to calculate if they have finished the game.
-    private boolean viewersHaveFinished(Game currentGame) {
-        long ticks = currentGame.getGameEngine().getCurrentWorldTick();
-        double elapsedSeconds = System.nanoTime() / 1e9 - currentGameStartTime;
-        return elapsedSeconds > 5 + currentGame.getGameEngine().getCurrentWorldTick() * 0.25 + 5;
-    }
+    // NOT USED ANYMORE
+    // // Because the game engine can run faster than the viewers, we have to calculate if they have finished the game.
+    // private boolean viewersHaveFinished(Game currentGame) {
+    //     long ticks = currentGame.getGameEngine().getCurrentWorldTick();
+    //     double elapsedSeconds = System.nanoTime() / 1e9 - currentGameStartTime;
+    //     return elapsedSeconds > 5 + currentGame.getGameEngine().getCurrentWorldTick() * 0.25 + 5;
+    // }
 
     private void planNextGame() {
         if (currentGame != null && !currentGame.isEnded() && secondsUntilNextAutostartedGame < 10) {
@@ -211,6 +213,18 @@ public class ArenaManager {
             rater.addGameToResult(currentGame, ranked);
             broadcastState();
         }
+    }
+
+    public boolean isActive() {
+        if (connectedPlayers.isEmpty()) {
+            inactiveTicks++;
+            if (inactiveTicks >= 60 * 5) { // 5min, Tick == 1s (fixedRate in runGameScheduler)
+                return false;
+            }
+        } else {
+            inactiveTicks = 0;
+        }
+        return true;
     }
 
     public EventBus getOutgoingEventBus() {

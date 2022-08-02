@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.WebSocketSession;
+import se.cygni.snake.api.exception.InvalidArenaName;
 import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.arena.ArenaManager;
 import se.cygni.snake.arena.ArenaSelectionManager;
@@ -40,9 +41,27 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
         }
 
         this.arenaManager = arenaSelectionManager.getArena(arenaName);
+        if (this.arenaManager == null) {
+            // TODO: Fix exceptions occuring since eventbus is null after this
+            handleInvalidArenaName(session);
+            return;
+        }
+
         setOutgoingEventBus(arenaManager.getOutgoingEventBus());
         setIncomingEventBus(arenaManager.getIncomingEventBus());
         log.info("Started arena web socket handler");
+
+    }
+
+    private void handleInvalidArenaName(WebSocketSession session) {
+        InvalidArenaName invalidArenaName = new InvalidArenaName(InvalidArenaName.ArenaNameInvalidReason.Nonexistent);
+        invalidArenaName.setReceivingPlayerId(this.getPlayerId());
+        try {
+            sendSnakeMessage(invalidArenaName);
+            session.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void handleInvalidName(String uri, String arenaFromUri) {

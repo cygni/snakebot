@@ -18,6 +18,7 @@ import se.cygni.snake.api.event.*;
 import se.cygni.snake.api.request.HeartBeatRequest;
 import se.cygni.snake.api.response.HeartBeatResponse;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
+import se.cygni.snake.arena.ArenaManager;
 import se.cygni.snake.arena.ArenaSelectionManager;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.eventapi.ApiMessage;
@@ -98,14 +99,18 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             if (apiMessage instanceof ListActiveGames) {
                 sendListOfActiveGames();
-            } else if (apiMessage instanceof SetCurrentArena) {
-                setCurrentArena((SetCurrentArena) apiMessage);
-                arenaSelectionManager.getArena(currentArenaName).broadcastState();
+            // } else if (apiMessage instanceof SetCurrentArena) {
+            //     setCurrentArena((SetCurrentArena) apiMessage);
+            //     arenaSelectionManager.getArena(currentArenaName).broadcastState();
             } else if (apiMessage instanceof SetGameFilter) {
                 setActiveGameFilter((SetGameFilter) apiMessage);
 
             } else if (apiMessage instanceof StartGame) {
                 startGame((StartGame) apiMessage);
+            } else if (apiMessage instanceof CreateArena) {
+                ArenaManager arena = arenaSelectionManager.createArena();
+                setCurrentArena(arena.getArenaName());
+                arena.broadcastState();
             } else if (apiMessage instanceof StartArenaGame) {
                 startArenaGame((StartArenaGame) apiMessage);
             } else if (apiMessage instanceof GetActiveTournament) {
@@ -149,11 +154,11 @@ public class EventSocketHandler extends TextWebSocketHandler {
             } else if (apiMessage instanceof StartTournament) {
 
                 tournamentManager.startTournament();
-
-            } else if (apiMessage instanceof StartTournamentGame) {
-                StartTournamentGame startGame = (StartTournamentGame) apiMessage;
-//                tournamentManager.startGame(startGame.getGameId());
             }
+//             } else if (apiMessage instanceof StartTournamentGame) {
+//                 StartTournamentGame startGame = (StartTournamentGame) apiMessage;
+// //                tournamentManager.startGame(startGame.getGameId());
+//             }
         } catch (Exception e) {
             log.debug("Got exception when handling API message", e);
             return false;
@@ -179,7 +184,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message)
             throws Exception {
         String msg = message.getPayload();
-        log.debug(msg);
+        log.debug("Trying to handle {}",msg);
 
         if (!tryToHandleGameMessage(msg)) {
             if (!tryToHandleApiMessage(msg)) {
@@ -201,6 +206,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
     public void onInternalGameEvent(InternalGameEvent event) {
 
         GameMessage gameMessage = event.getGameMessage();
+        log.debug("Sending: {}", gameMessage.toString());
 
         if (gameMessage instanceof GameCreatedEvent ||
                 gameMessage instanceof GameChangedEvent ||
@@ -222,6 +228,14 @@ public class EventSocketHandler extends TextWebSocketHandler {
             ArenaUpdateEvent updateEvent = (ArenaUpdateEvent) gameMessage;
             if (updateEvent.getArenaName().equals(currentArenaName)) {
                 sendGameMessage(gameMessage);
+            }
+        }
+
+        if (gameMessage instanceof ArenaEndedEvent) {
+            ArenaEndedEvent endedEvent = (ArenaEndedEvent) gameMessage;
+            if (endedEvent.getArenaName().equals(currentArenaName)) {
+                sendGameMessage(endedEvent);
+                setCurrentArena(null);
             }
         }
 
@@ -269,9 +283,13 @@ public class EventSocketHandler extends TextWebSocketHandler {
         sendApiMessage(gamesList);
     }
 
-    private void setCurrentArena(SetCurrentArena apiMessage) {
-        this.currentArenaName = apiMessage.getCurrentArena();
+    private void setCurrentArena(String arenaName) {
+        this.currentArenaName = arenaName;
     }
+
+    // private void setCurrentArena(SetCurrentArena apiMessage) {
+    //     this.currentArenaName = apiMessage.getCurrentArena();
+    // }
 
     private void setActiveGameFilter(SetGameFilter gameFilter) {
         this.filterGameIds = gameFilter.getIncludedGameIds();
