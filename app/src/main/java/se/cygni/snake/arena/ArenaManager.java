@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class ArenaManager {
     private static final Logger log = LoggerFactory.getLogger(ArenaManager.class);
     private static final int ARENA_PLAYER_COUNT = 8;
+    private static final int INACTIVE_TICKS_UNTIL_REMOVAL = 60 * 5; // 5min, Tick == 1s (fixedRate in runGameScheduler)
 
     private final EventBus outgoingEventBus;
     private final EventBus incomingEventBus;
@@ -99,6 +100,10 @@ public class ArenaManager {
         Player player = new Player("name_unknown");
         player.setPlayerId(playerId);
         connectedPlayers.remove(player);
+
+        if (connectedPlayers.isEmpty()) {
+            inactiveTicks = INACTIVE_TICKS_UNTIL_REMOVAL; // Trigger removal of arena when last player leaves
+        }
 
         if (currentGame != null) {
             currentGame.playerLostConnection(playerId);
@@ -218,7 +223,7 @@ public class ArenaManager {
     public boolean isActive() {
         if (connectedPlayers.isEmpty()) {
             inactiveTicks++;
-            if (inactiveTicks >= 60 * 5) { // 5min, Tick == 1s (fixedRate in runGameScheduler)
+            if (inactiveTicks >= INACTIVE_TICKS_UNTIL_REMOVAL) {
                 return false;
             }
         } else {

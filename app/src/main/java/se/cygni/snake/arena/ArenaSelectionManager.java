@@ -89,8 +89,6 @@ public class ArenaSelectionManager {
 
     @Scheduled(fixedRate = 1000)
     public void runGameScheduler() {
-        System.out.println("Arenas: "+arenas.size());
-
         List<ArenaManager> inActiveArenas = new ArrayList<ArenaManager>();
         for (ArenaManager arena : arenas.values()) {
             if (!arena.isActive()) inActiveArenas.add(arena);
