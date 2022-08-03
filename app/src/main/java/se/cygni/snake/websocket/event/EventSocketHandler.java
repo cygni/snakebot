@@ -29,9 +29,11 @@ import se.cygni.snake.eventapi.model.ActiveGamePlayer;
 import se.cygni.snake.eventapi.model.TournamentGamePlan;
 import se.cygni.snake.eventapi.request.*;
 import se.cygni.snake.eventapi.response.ActiveGamesList;
+import se.cygni.snake.eventapi.response.DefaultGameSettings;
 import se.cygni.snake.eventapi.response.NoActiveTournamentEvent;
 import se.cygni.snake.eventapi.response.TournamentCreated;
 import se.cygni.snake.game.Game;
+import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.game.GameManager;
 import se.cygni.snake.security.TokenService;
 import se.cygni.snake.tournament.TournamentManager;
@@ -160,6 +162,8 @@ public class EventSocketHandler extends TextWebSocketHandler {
             } else if (apiMessage instanceof StartTournament) {
 
                 tournamentManager.startTournament();
+            } else if (apiMessage instanceof GetDefaultGameSettings) {
+                sendApiMessage(new DefaultGameSettings(GameSettingsConverter.toGameSettings(new GameFeatures())));
             }
 //             } else if (apiMessage instanceof StartTournamentGame) {
 //                 StartTournamentGame startGame = (StartTournamentGame) apiMessage;
