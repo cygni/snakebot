@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Component
 public class ArenaSelectionManager {
-    public static final String OFFICIAL_ARENA_NAME = "official";
+    // public static final String OFFICIAL_ARENA_NAME = "official";
     private static final Logger log = LoggerFactory.getLogger(ArenaSelectionManager.class);
 
     private final GameManager gameManager;

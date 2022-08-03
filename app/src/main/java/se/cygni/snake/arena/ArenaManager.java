@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 public class ArenaManager {
     private static final Logger log = LoggerFactory.getLogger(ArenaManager.class);
-    private static final int ARENA_PLAYER_COUNT = 8;
     private static final int INACTIVE_TICKS_UNTIL_REMOVAL = 60 * 5; // 5min, Tick == 1s (fixedRate in runGameScheduler)
 
     private final EventBus outgoingEventBus;
@@ -44,6 +43,8 @@ public class ArenaManager {
     private long secondsUntilNextAutostartedGame = 0;
     private Game currentGame = null;
     private double currentGameStartTime;
+
+    private GameFeatures gameFeatures = new GameFeatures();
     private int inactiveTicks = 0;
 
     ArenaRater rater = new ArenaRater();
@@ -193,15 +194,17 @@ public class ArenaManager {
 
     private void startGame() {
         // TODO add a taboo list and prefer players that have not played recently
-        Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
+        // Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
 
         if (currentGame != null && !currentGame.isEnded()) {
             currentGame.abort();
         }
 
-        currentGame = gameManager.createArenaGame();
+        // currentGame = gameManager.createArenaGame();
+        currentGame = gameManager.createGame(gameFeatures);
+
         currentGame.setOutgoingEventBus(outgoingEventBus);
-        players.forEach(player -> {
+        connectedPlayers.forEach(player -> {
             // This object is mutable, we need a new one each game
             RemotePlayer remotePlayer = new RemotePlayer(player, outgoingEventBus);
             currentGame.addPlayer(remotePlayer);
@@ -218,6 +221,10 @@ public class ArenaManager {
             rater.addGameToResult(currentGame, ranked);
             broadcastState();
         }
+    }
+
+    public boolean isFull() {
+        return connectedPlayers.size() >= gameFeatures.getMaxNoofPlayers();
     }
 
     public boolean isActive() {
@@ -250,5 +257,9 @@ public class ArenaManager {
 
     public void setRanked(boolean ranked) {
         this.ranked = ranked;
+    }
+
+    public void setGameFeatures(GameFeatures gameFeatures) {
+        this.gameFeatures = gameFeatures;
     }
 }

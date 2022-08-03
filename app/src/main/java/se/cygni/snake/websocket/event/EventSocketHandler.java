@@ -108,8 +108,14 @@ public class EventSocketHandler extends TextWebSocketHandler {
             } else if (apiMessage instanceof StartGame) {
                 startGame((StartGame) apiMessage);
             } else if (apiMessage instanceof CreateArena) {
+                CreateArena createArena = (CreateArena) apiMessage;
                 ArenaManager arena = arenaSelectionManager.createArena();
                 setCurrentArena(arena.getArenaName());
+                arena.setGameFeatures(
+                    GameSettingsConverter.toGameFeatures(
+                        createArena.getGameSettings()
+                    )
+                );
                 arena.broadcastState();
             } else if (apiMessage instanceof StartArenaGame) {
                 startArenaGame((StartArenaGame) apiMessage);
