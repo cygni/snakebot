@@ -1,7 +1,6 @@
 package se.cygni.snake.websocket.arena;
 
 
-import org.eclipse.jetty.websocket.api.CloseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +29,6 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
         this.arenaSelectionManager = arenaSelectionManager;
     }
 
-    // @Override
-    // public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-    //     super.afterConnectionClosed(session, status);
-    //     session.close(CloseStatus.SERVER_ERROR);
-    //     outgoingEventBus.unregister(this);
-    //     playerLostConnection();
-
-    //     log.info("afterConnectionClosed aa{}", status);
-    // }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
