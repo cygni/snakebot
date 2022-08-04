@@ -1,10 +1,14 @@
 package se.cygni.snake.websocket.arena;
 
 
+import org.eclipse.jetty.websocket.api.CloseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.WebSocketSession;
+
+import com.google.common.eventbus.EventBus;
+
 import se.cygni.snake.api.exception.InvalidArenaName;
 import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.arena.ArenaManager;
@@ -25,6 +29,16 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
     public ArenaWebSocketHandler(ArenaSelectionManager arenaSelectionManager) {
         this.arenaSelectionManager = arenaSelectionManager;
     }
+
+    // @Override
+    // public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    //     super.afterConnectionClosed(session, status);
+    //     session.close(CloseStatus.SERVER_ERROR);
+    //     outgoingEventBus.unregister(this);
+    //     playerLostConnection();
+
+    //     log.info("afterConnectionClosed aa{}", status);
+    // }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -49,9 +63,13 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
     private void handleInvalidArenaName(WebSocketSession session) {
         InvalidArenaName invalidArenaName = new InvalidArenaName(InvalidArenaName.ArenaNameInvalidReason.Nonexistent);
         invalidArenaName.setReceivingPlayerId(this.getPlayerId());
+
+        // Setting event bus to prevent exceptions
+        setOutgoingEventBus(new EventBus("arena-outgoing"));
+        setIncomingEventBus(new EventBus("arena-incoming"));
+
         try {
             sendSnakeMessage(invalidArenaName);
-            session.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
