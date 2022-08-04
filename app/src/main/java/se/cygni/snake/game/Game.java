@@ -95,7 +95,7 @@ public class Game {
         MessageUtils.copyCommonAttributes(registerPlayer, playerRegistered);
 
         outgoingEventBus.post(playerRegistered);
-        sendGameLink(player);
+        sendGameLink(player.getPlayerId());
         publishGameChanged();
     }
 
@@ -130,6 +130,12 @@ public class Game {
             return;
         }
 
+        if (!trainingGame) { // Game link was already sent in the RegisterPlayer event
+            playerManager.getLiveAndRemotePlayers().forEach(player -> {
+                sendGameLink(player.getPlayerId());
+            });
+        }
+
         initBotPlayers();
         gameEngine.startGame();
     }
@@ -139,9 +145,9 @@ public class Game {
         publishGameChanged();
     }
 
-    private void sendGameLink(Player player) {
+    private void sendGameLink(String playerId) {
         GameLinkEvent gle = new GameLinkEvent(gameId, viewUrl + gameId);
-        gle.setReceivingPlayerId(player.getPlayerId());
+        gle.setReceivingPlayerId(playerId);
         outgoingEventBus.post(gle);
     }
 
