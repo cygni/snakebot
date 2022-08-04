@@ -164,6 +164,8 @@ public class EventSocketHandler extends TextWebSocketHandler {
                 tournamentManager.startTournament();
             } else if (apiMessage instanceof GetDefaultGameSettings) {
                 sendApiMessage(new DefaultGameSettings(GameSettingsConverter.toGameSettings(new GameFeatures())));
+            } else if (apiMessage instanceof DisconnectFromArena) {
+                currentArenaName = null;
             }
 //             } else if (apiMessage instanceof StartTournamentGame) {
 //                 StartTournamentGame startGame = (StartTournamentGame) apiMessage;
