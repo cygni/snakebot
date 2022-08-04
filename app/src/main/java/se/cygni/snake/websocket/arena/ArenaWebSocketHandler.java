@@ -33,12 +33,6 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
         String uri = session.getUri().getPath();
 
         String arenaName = uri.replaceAll(".*/", "");
-        if (arenaName.length() > 0) {
-            if (!arenaName.matches(ARENA_NAME_WHITELIST)) {
-                handleInvalidName(uri, arenaName);
-                return;
-            }
-        }
 
         this.arenaManager = arenaSelectionManager.getArena(arenaName);
         if (this.arenaManager == null) {
@@ -50,22 +44,6 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
         setOutgoingEventBus(arenaManager.getOutgoingEventBus());
         setIncomingEventBus(arenaManager.getIncomingEventBus());
         log.info("Started arena web socket handler");
-        
-        if (this.arenaManager.isFull()) {
-            handleArenaFull(session, uri);
-        }
-    }
-
-    private void handleArenaFull(WebSocketSession session, String uri) {
-        try {
-            log.warn("Arena {} full, closing connection", arenaManager.getArenaName());
-            InvalidMessage message = new InvalidMessage("Arena full, disconnecting...", uri);
-            message.setReceivingPlayerId(this.getPlayerId());
-            sendSnakeMessage(message);
-            session.close();
-        } catch (IOException e) {
-            log.error("Failed to close websocket session", e);
-        }
     }
 
     private void handleInvalidArenaName(WebSocketSession session) {

@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.ArenaUpdateEvent;
+import se.cygni.snake.api.exception.ArenaIsFull;
+import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
@@ -74,6 +76,14 @@ public class ArenaManager {
             MessageUtils.copyCommonAttributes(registerPlayer, playerNameTaken);
             playerNameTaken.setReceivingPlayerId(playerId);
             outgoingEventBus.post(playerNameTaken);
+            return;
+        }
+
+        if (isFull()) {
+            ArenaIsFull message = new ArenaIsFull(connectedPlayers.size());
+            MessageUtils.copyCommonAttributes(registerPlayer, message);
+            message.setReceivingPlayerId(playerId);
+            outgoingEventBus.post(message);
             return;
         }
 
