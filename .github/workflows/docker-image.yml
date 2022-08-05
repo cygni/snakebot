@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - '*.*.*'
-    branches: [ "master", "Bump-to-latest" ]
+    branches: [ "master" ]
 
 jobs:
   build:
