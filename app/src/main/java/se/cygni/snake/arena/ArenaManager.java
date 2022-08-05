@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.ArenaUpdateEvent;
+import se.cygni.snake.api.exception.ArenaIsFull;
+import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
@@ -29,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class ArenaManager {
     private static final Logger log = LoggerFactory.getLogger(ArenaManager.class);
-    private static final int ARENA_PLAYER_COUNT = 8;
+    private static final int INACTIVE_TICKS_UNTIL_REMOVAL = 60 * 5; // 5min, Tick == 1s (fixedRate in runGameScheduler)
 
     private final EventBus outgoingEventBus;
     private final EventBus incomingEventBus;
@@ -43,6 +45,9 @@ public class ArenaManager {
     private long secondsUntilNextAutostartedGame = 0;
     private Game currentGame = null;
     private double currentGameStartTime;
+
+    private GameFeatures gameFeatures = new GameFeatures();
+    private int inactiveTicks = 0;
 
     ArenaRater rater = new ArenaRater();
 
@@ -74,6 +79,14 @@ public class ArenaManager {
             return;
         }
 
+        if (isFull()) {
+            ArenaIsFull message = new ArenaIsFull(connectedPlayers.size());
+            MessageUtils.copyCommonAttributes(registerPlayer, message);
+            message.setReceivingPlayerId(playerId);
+            outgoingEventBus.post(message);
+            return;
+        }
+
         connectedPlayers.add(player);
 
         GameSettings gameSettings = GameSettingsConverter.toGameSettings(new GameFeatures());
@@ -98,6 +111,10 @@ public class ArenaManager {
         Player player = new Player("name_unknown");
         player.setPlayerId(playerId);
         connectedPlayers.remove(player);
+
+        if (connectedPlayers.isEmpty()) {
+            inactiveTicks = INACTIVE_TICKS_UNTIL_REMOVAL; // Trigger removal of arena when last player leaves
+        }
 
         if (currentGame != null) {
             currentGame.playerLostConnection(playerId);
@@ -135,7 +152,7 @@ public class ArenaManager {
             return;
         }
 
-        if (currentGame.isEnded() && viewersHaveFinished(currentGame)) {
+        if (currentGame.isEnded()) {
             processEndedGame();
             if (ranked) {
                 currentGame = null;
@@ -146,12 +163,13 @@ public class ArenaManager {
         }
     }
 
-    // Because the game engine can run faster than the viewers, we have to calculate if they have finished the game.
-    private boolean viewersHaveFinished(Game currentGame) {
-        long ticks = currentGame.getGameEngine().getCurrentWorldTick();
-        double elapsedSeconds = System.nanoTime() / 1e9 - currentGameStartTime;
-        return elapsedSeconds > 5 + currentGame.getGameEngine().getCurrentWorldTick() * 0.25 + 5;
-    }
+    // NOT USED ANYMORE
+    // // Because the game engine can run faster than the viewers, we have to calculate if they have finished the game.
+    // private boolean viewersHaveFinished(Game currentGame) {
+    //     long ticks = currentGame.getGameEngine().getCurrentWorldTick();
+    //     double elapsedSeconds = System.nanoTime() / 1e9 - currentGameStartTime;
+    //     return elapsedSeconds > 5 + currentGame.getGameEngine().getCurrentWorldTick() * 0.25 + 5;
+    // }
 
     private void planNextGame() {
         if (currentGame != null && !currentGame.isEnded() && secondsUntilNextAutostartedGame < 10) {
@@ -186,15 +204,17 @@ public class ArenaManager {
 
     private void startGame() {
         // TODO add a taboo list and prefer players that have not played recently
-        Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
+        // Set<Player> players = TournamentUtil.getRandomPlayers(connectedPlayers, ARENA_PLAYER_COUNT);
 
         if (currentGame != null && !currentGame.isEnded()) {
             currentGame.abort();
         }
 
-        currentGame = gameManager.createArenaGame();
+        // currentGame = gameManager.createArenaGame();
+        currentGame = gameManager.createGame(gameFeatures);
+
         currentGame.setOutgoingEventBus(outgoingEventBus);
-        players.forEach(player -> {
+        connectedPlayers.forEach(player -> {
             // This object is mutable, we need a new one each game
             RemotePlayer remotePlayer = new RemotePlayer(player, outgoingEventBus);
             currentGame.addPlayer(remotePlayer);
@@ -211,6 +231,22 @@ public class ArenaManager {
             rater.addGameToResult(currentGame, ranked);
             broadcastState();
         }
+    }
+
+    public boolean isFull() {
+        return connectedPlayers.size() >= gameFeatures.getMaxNoofPlayers();
+    }
+
+    public boolean isActive() {
+        if (connectedPlayers.isEmpty()) {
+            inactiveTicks++;
+            if (inactiveTicks >= INACTIVE_TICKS_UNTIL_REMOVAL) {
+                return false;
+            }
+        } else {
+            inactiveTicks = 0;
+        }
+        return true;
     }
 
     public EventBus getOutgoingEventBus() {
@@ -231,5 +267,9 @@ public class ArenaManager {
 
     public void setRanked(boolean ranked) {
         this.ranked = ranked;
+    }
+
+    public void setGameFeatures(GameFeatures gameFeatures) {
+        this.gameFeatures = gameFeatures;
     }
 }

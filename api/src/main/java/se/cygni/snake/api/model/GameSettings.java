@@ -3,7 +3,7 @@ package se.cygni.snake.api.model;
 public class GameSettings {
 
     // Maximum noof players in this game
-    private int maxNoofPlayers = 5;
+    private int maxNoofPlayers = 10;
 
     // The starting length of a snake
     private int startSnakeLength = 1;
@@ -237,7 +237,7 @@ public class GameSettings {
     }
 
     public static class GameSettingsBuilder {
-        private int maxNoofPlayers = 5;
+        private int maxNoofPlayers = 10;
         private int startSnakeLength = 1;
         private int timeInMsPerTick = 250;
         private boolean obstaclesEnabled = true;

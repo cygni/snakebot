@@ -1,0 +1,23 @@
+alerts:
+- rule: DEPLOYMENT_FAILED
+domains:
+- domain: snake.cygni.se
+  type: PRIMARY
+name: snakebot-DATE-SHA
+region: ams
+services:
+- envs:
+  - key: PROFILE_FLAG
+    scope: RUN_AND_BUILD_TIME
+    value: -Dspring.profiles.active=digitalocean
+  http_port: 8080
+  image:
+    registry: cygni
+    registry_type: DOCKER_HUB
+    repository: snakebot
+    tag: latest
+  instance_count: 1
+  instance_size_slug: basic-s
+  name: cygni-snakebot
+  routes:
+  - path: /

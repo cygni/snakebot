@@ -12,6 +12,7 @@ import se.cygni.snake.websocket.arena.ArenaWebSocketHandler;
 import se.cygni.snake.websocket.event.EventSocketHandler;
 import se.cygni.snake.websocket.tournament.TournamentWebSocketHandler;
 import se.cygni.snake.websocket.training.TrainingWebSocketHandler;
+import org.springframework.boot.autoconfigure.websocket.servlet.TomcatWebSocketServletWebServerCustomizer;
 
 @Configuration
 public class WebSocketConfig implements WebSocketConfigurer {
@@ -51,6 +52,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
         container.setMaxTextMessageBufferSize(512000);
         container.setMaxBinaryMessageBufferSize(512000);
         return container;
+    }
+
+    @Bean
+    public TomcatWebSocketServletWebServerCustomizer tomcatWebSocketServletWebServerCustomizer() {
+        return new TomcatWebSocketServletWebServerCustomizer();
     }
 
     @Bean

@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Profile({"!production"})
+@Profile({ "!production" })
 @Component
 public class GameHistoryStorageInMemory implements GameHistoryStorage {
 
-    private static final int MAX_NOOF_GAMES_IN_MEMORY = 100;
+    private static final int MAX_NOOF_GAMES_IN_MEMORY = 300;
     private static Logger log = LoggerFactory
             .getLogger(GameHistoryStorageInMemory.class);
 
@@ -65,8 +65,7 @@ public class GameHistoryStorageInMemory implements GameHistoryStorage {
                     return new GameHistorySearchItem(
                             gameHistory.getGameId(),
                             gameHistory.getPlayerNames(),
-                            gameHistory.getGameDate()
-                    );
+                            gameHistory.getGameDate());
                 })
                 .collect(Collectors.toList());
 

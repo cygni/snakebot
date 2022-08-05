@@ -5,6 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.WebSocketSession;
+
+import com.google.common.eventbus.EventBus;
+
+import se.cygni.snake.api.exception.InvalidArenaName;
 import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.arena.ArenaManager;
 import se.cygni.snake.arena.ArenaSelectionManager;
@@ -25,6 +29,7 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
         this.arenaSelectionManager = arenaSelectionManager;
     }
 
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         super.afterConnectionEstablished(session);
@@ -32,17 +37,32 @@ public class ArenaWebSocketHandler extends BaseGameSocketHandler {
         String uri = session.getUri().getPath();
 
         String arenaName = uri.replaceAll(".*/", "");
-        if (arenaName.length() > 0) {
-            if (!arenaName.matches(ARENA_NAME_WHITELIST)) {
-                handleInvalidName(uri, arenaName);
-                return;
-            }
-        }
 
         this.arenaManager = arenaSelectionManager.getArena(arenaName);
+        if (this.arenaManager == null) {
+            // TODO: Fix exceptions occuring since eventbus is null after this
+            handleInvalidArenaName(session);
+            return;
+        }
+
         setOutgoingEventBus(arenaManager.getOutgoingEventBus());
         setIncomingEventBus(arenaManager.getIncomingEventBus());
         log.info("Started arena web socket handler");
+    }
+
+    private void handleInvalidArenaName(WebSocketSession session) {
+        InvalidArenaName invalidArenaName = new InvalidArenaName(InvalidArenaName.ArenaNameInvalidReason.Nonexistent);
+        invalidArenaName.setReceivingPlayerId(this.getPlayerId());
+
+        // Setting event bus to prevent exceptions
+        setOutgoingEventBus(new EventBus("arena-outgoing"));
+        setIncomingEventBus(new EventBus("arena-incoming"));
+
+        try {
+            sendSnakeMessage(invalidArenaName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void handleInvalidName(String uri, String arenaFromUri) {

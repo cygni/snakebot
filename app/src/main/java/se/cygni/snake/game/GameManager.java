@@ -36,13 +36,6 @@ public class GameManager {
 	globalEventBus.register(this);
     }
 
-    public Game createArenaGame() {
-	final GameFeatures gameFeatures = new GameFeatures();
-	final Game game = new Game(gameFeatures, globalEventBus, false, viewUrl);
-	registerGame(game);
-
-	return game;
-    }
 
     public Game createGame(GameFeatures gameFeatures) {
 	final Game game = new Game(gameFeatures, globalEventBus, false, viewUrl);
