@@ -82,6 +82,18 @@ public class TournamentManager {
     }
 
     public void killTournament() {
+        // Disconnect all players
+        TournamentEndedEvent tee = new TournamentEndedEvent(
+                "aborted",
+                "aborted",
+                new ArrayList<PlayerPoints>(),
+                tournamentName,
+                tournamentId);
+
+        playerManager.toSet().forEach( player -> {
+            player.onTournamentEnded(tee);
+        });
+
         tournamentActive = false;
         tournamentStarted = false;
 
