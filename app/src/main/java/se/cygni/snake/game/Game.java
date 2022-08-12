@@ -86,7 +86,7 @@ public class Game {
         // If this is a training game changes to settings are allowed
         GameSettings requestedGameSettings = registerPlayer.getGameSettings();
         if (trainingGame && requestedGameSettings != null) {
-            gameFeatures = GameSettingsConverter.toGameFeatures(requestedGameSettings);
+            gameFeatures = GameSettingsConverter.toGameFeatures(requestedGameSettings, gameFeatures);
             gameEngine.reApplyGameFeatures(gameFeatures);
         }
 

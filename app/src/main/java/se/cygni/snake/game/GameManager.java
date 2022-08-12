@@ -47,6 +47,7 @@ public class GameManager {
     public Game createTrainingGame() {
 	final GameFeatures gameFeatures = new GameFeatures();
 	gameFeatures.setTrainingGame(true);
+    gameFeatures.setMaxNoofPlayers(5);
 	final Game game = new Game(gameFeatures, globalEventBus, true, viewUrl);
 
 	registerGame(game);
