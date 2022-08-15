@@ -22,18 +22,6 @@ Following client implementations are up to date:
 
 #
 
-### **Updates and Docker**
-
-**IMPORTANT**: Commits on the **main** branch will launch an action that builds and **overrides** the docker image tagged as the latest on [DockerHub](https://hub.docker.com/repository/docker/cygni/snakebot). Therefore it is important to **ONLY** push changes to **main** that works and have been tested, to ensure that latest image works for anyone who wants to use it. If a commit is deemed **stable** you can also add a **tag** to that commit to ensure it remains on [DockerHub](https://hub.docker.com/repository/docker/cygni/snakebot) without getting overwritten. E.g creating a release with a tag will both push the newly build docker image with the tag latest **AND** the tag name given as long as it follows the standard **X.X.X** name.
-
-Because of what mentioned above, when adding a new feature or changing some behavior, make sure to work on a **different branch** first before pushing to **main**.
-
-### **Production**
-
-**IMPORTANT**: Commits to the main branch will also act as commits towards production. Rebuilding the images on DockerHub through commits from main will cause the production server to reboot with the updated version of the image.
-
-#
-
 ## To run locally
 
 <br>
@@ -55,6 +43,36 @@ To run server locally with increased memory:
 ```
 > export JAVA_OPTS="-Xmx4096m" && ./gradlew bootRun
 ```
+
+#
+
+### **Contact information for DockerHub and DigitalOcean access**
+
+emil.breding@cygni.se
+
+a.johansson@cygni.se
+
+#
+
+### **Updates and Docker**
+
+**IMPORTANT**: Commits on the **main** branch will launch an action that builds and **overrides** the docker image tagged as the latest on [DockerHub](https://hub.docker.com/r/cygni/snakebot/tags). Therefore it is important to **ONLY** push changes to **main** that works and have been tested, to ensure that latest image works for anyone who wants to use it. If a commit is deemed **stable** you can also add a **tag** to that commit to ensure it remains on [DockerHub](https://hub.docker.com/r/cygni/snakebot/tags) without getting overwritten. E.g creating a release with a tag will both push the newly build docker image with the tag latest **AND** the tag name given as long as it follows the standard **X.X.X** name.
+
+Because of what mentioned above, when adding a new feature or changing some behavior, make sure to work on a **different branch** first before pushing to **main**.
+
+### **Production**
+
+**IMPORTANT**: Commits to the main branch will also act as commits towards production. Rebuilding the images on DockerHub through commits from main will cause the production server to reboot with the updated version of the image.
+
+#
+
+### **Hosting and Version tracking**
+
+This system is hosted on the **_digitalocean_** platform. As mentioned above, commits to the main branch will automatically cause a forced rebuild and deployment of the updated image that is created. What version of the system that is currently running can be identified by a date and hashcode for that release. This can be seen in the app's name in the digitalocean repository. The hashcode is retrieved from the latest commit, allowing us to overview what version and changes that are made on the current version.
+
+To change the version/tag of the docker image that is run on production, we have to modify this manually. Head over to the [digitalocean app](https://cloud.digitalocean.com/apps/389bcc1a-15cb-4512-89f2-cdc0d52aa3ea/overview) and navigate to the webclient component via the link on the overview page. Press the edit button for the "Source setting". New releases will automatically have the tag 'latest'. If you've added a custom tag for a commit and want to run this version on production, simply change the input in this field to the corresponding tag name.
+
+![image info](./digitaloceanimg.png)
 
 <!-- To run packaged server with overridden setting for game link:
 
