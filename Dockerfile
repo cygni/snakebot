@@ -1,5 +1,5 @@
 # Build
-FROM gradle:7.4.2-jdk17
+FROM gradle:jdk18
 WORKDIR /app
 COPY . .
 ENV PORT=8080
@@ -7,7 +7,7 @@ EXPOSE 8080
 RUN gradle clean build
 
 # Run
-FROM azul/zulu-openjdk:17-jre
+FROM azul/zulu-openjdk:15.0.8-15.42.15-jre-headless-arm64
 WORKDIR /app
 COPY --from=0 /app/app/build/libs/app-0.1.21.jar .
 
