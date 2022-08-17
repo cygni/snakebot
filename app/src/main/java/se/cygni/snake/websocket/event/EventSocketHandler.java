@@ -23,6 +23,7 @@ import se.cygni.snake.arena.ArenaSelectionManager;
 import se.cygni.snake.event.InternalGameEvent;
 import se.cygni.snake.eventapi.ApiMessage;
 import se.cygni.snake.eventapi.ApiMessageParser;
+import se.cygni.snake.eventapi.exception.InvalidArenaName;
 import se.cygni.snake.eventapi.exception.Unauthorized;
 import se.cygni.snake.eventapi.model.ActiveGame;
 import se.cygni.snake.eventapi.model.ActiveGamePlayer;
@@ -101,12 +102,18 @@ public class EventSocketHandler extends TextWebSocketHandler {
 
             if (apiMessage instanceof ListActiveGames) {
                 sendListOfActiveGames();
-            // } else if (apiMessage instanceof SetCurrentArena) {
-            //     setCurrentArena((SetCurrentArena) apiMessage);
-            //     arenaSelectionManager.getArena(currentArenaName).broadcastState();
+            } else if (apiMessage instanceof SetCurrentArena) {
+                SetCurrentArena setCurrentArena = (SetCurrentArena) apiMessage;
+                String arenaName = setCurrentArena.getCurrentArena();
+                ArenaManager arenaManager = arenaSelectionManager.getArena(arenaName);
+                if (arenaManager == null) {
+                    sendApiMessage(new InvalidArenaName());
+                } else {
+                    setCurrentArena(arenaName);
+                    arenaManager.broadcastState();
+                }
             } else if (apiMessage instanceof SetGameFilter) {
                 setActiveGameFilter((SetGameFilter) apiMessage);
-
             } else if (apiMessage instanceof StartGame) {
                 startGame((StartGame) apiMessage);
             } else if (apiMessage instanceof CreateArena) {
@@ -165,6 +172,7 @@ public class EventSocketHandler extends TextWebSocketHandler {
             } else if (apiMessage instanceof GetDefaultGameSettings) {
                 sendApiMessage(new DefaultGameSettings(GameSettingsConverter.toGameSettings(new GameFeatures())));
             } else if (apiMessage instanceof DisconnectFromArena) {
+                log.info("Disconnected from arena {}", currentArenaName);
                 currentArenaName = null;
             }
 //             } else if (apiMessage instanceof StartTournamentGame) {

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import se.cygni.game.Player;
 import se.cygni.snake.api.event.ArenaUpdateEvent;
 import se.cygni.snake.api.exception.ArenaIsFull;
-import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
@@ -21,7 +20,6 @@ import se.cygni.snake.game.Game;
 import se.cygni.snake.game.GameFeatures;
 import se.cygni.snake.game.GameManager;
 import se.cygni.snake.player.RemotePlayer;
-import se.cygni.snake.tournament.util.TournamentUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -112,9 +110,6 @@ public class ArenaManager {
         player.setPlayerId(playerId);
         connectedPlayers.remove(player);
 
-        if (connectedPlayers.isEmpty()) {
-            inactiveTicks = INACTIVE_TICKS_UNTIL_REMOVAL; // Trigger removal of arena when last player leaves
-        }
 
         if (currentGame != null) {
             currentGame.playerLostConnection(playerId);
