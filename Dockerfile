@@ -14,4 +14,5 @@ COPY --from=0 /app/app/build/libs/app-0.1.21.jar .
 # To run in digitalocean profile, send in env variable PROFILE_FLAG=-Dspring.profiles.active=digitalocean
 # Note: There is a problem with the way this is setup. Ctrl+C will not work.
 # Using Spring Boot's environment variable did not work when we tried to use it.
+EXPOSE 8080
 CMD java -jar $PROFILE_FLAG app-0.1.21.jar
