@@ -1,5 +1,5 @@
 # Build
-FROM gradle:jdk18
+FROM gradle:7.4.2-jdk17
 WORKDIR /app
 COPY . .
 ENV PORT=8080
