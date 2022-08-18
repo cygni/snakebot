@@ -208,28 +208,27 @@ public class Game {
 
         for (int i = 0; i < gameFeatures.getMaxNoofPlayers() - 1; i++) {
             BotPlayer bot;
-            bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
 
-            // switch (Math.abs(botSelector.nextInt() % 5)) {
-            //     case 0:
-            //         bot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
-            //         break;
-            //     case 1:
-            //         bot = new StayAliveBot(UUID.randomUUID().toString(), incomingEventBus);
-            //         break;
-            //     case 2:
-            //         bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
-            //         break;
-            //     case 3:
-            //         bot = new BrainySnakePlayer(UUID.randomUUID().toString(), incomingEventBus);
-            //         break;
-            //     case 4:
-            //         bot = new Snakey(UUID.randomUUID().toString(), incomingEventBus);
-            //         break;
-            //     default:
-            //         bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
-            //         break;
-            // }
+            switch (Math.abs(botSelector.nextInt() % 5)) {
+                case 0:
+                    bot = new RandomBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 1:
+                    bot = new StayAliveBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 2:
+                    bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 3:
+                    bot = new BrainySnakePlayer(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                case 4:
+                    bot = new Snakey(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+                default:
+                    bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
+                    break;
+            }
 
             addPlayer(bot);
         }
