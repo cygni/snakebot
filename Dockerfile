@@ -7,7 +7,7 @@ EXPOSE 8080
 RUN gradle clean build
 
 # Run
-FROM amazoncorretto:17.0.4
+FROM openjdk:jdk
 WORKDIR /app
 COPY --from=0 /app/app/build/libs/app-0.1.21.jar .
 

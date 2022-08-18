@@ -177,14 +177,6 @@ public class GameEngine {
                     }
 
                     long timeSpent = System.currentTimeMillis() - tstart;
-                    if (timeSpent <= 10) {
-                        try {
-                            Thread.sleep(10);
-                            timeSpent += 10;
-                        } catch (InterruptedException e) {
-                            log.error("Sleeping (because a move was too quick) was interrupted!", e);
-                        }
-                    }
                     log.info("All moves received, gameId: {}, tick: {}, time waiting: " + timeSpent + "ms", gameId, currentWorldTick);
 
                     try {
