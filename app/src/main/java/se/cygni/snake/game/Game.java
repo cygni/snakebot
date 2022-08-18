@@ -208,7 +208,7 @@ public class Game {
 
         for (int i = 0; i < gameFeatures.getMaxNoofPlayers() - 1; i++) {
             BotPlayer bot;
-            bot = new Snakey(UUID.randomUUID().toString(), incomingEventBus);
+            bot = new StraightBot(UUID.randomUUID().toString(), incomingEventBus);
 
             // switch (Math.abs(botSelector.nextInt() % 5)) {
             //     case 0:

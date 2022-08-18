@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - '*.*.*'
-    branches: [ "master" ]
+    branches: [ "master", "docker-testing" ]
 
 jobs:
   build:
