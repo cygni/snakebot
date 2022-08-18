@@ -7,7 +7,7 @@ EXPOSE 8080
 RUN gradle clean build
 
 # Run
-FROM azul/zulu-openjdk:latest
+FROM ibmjava:jre
 WORKDIR /app
 COPY --from=0 /app/app/build/libs/app-0.1.21.jar .
 
