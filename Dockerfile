@@ -7,7 +7,7 @@ EXPOSE 8080
 RUN gradle clean build
 
 # Run
-FROM ibmjava:jre
+FROM amazoncorretto:17.0.4
 WORKDIR /app
 COPY --from=0 /app/app/build/libs/app-0.1.21.jar .
 
@@ -16,4 +16,4 @@ COPY --from=0 /app/app/build/libs/app-0.1.21.jar .
 # Using Spring Boot's environment variable did not work when we tried to use it.
 EXPOSE 8080
 ENV PROFILE development
-CMD java -jar app-0.1.21.jar --spring.profiles.active=${PROFILE}
+CMD java -jar -Xms1G -Xmx1433m app-0.1.21.jar --spring.profiles.active=${PROFILE}
