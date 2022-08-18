@@ -126,7 +126,7 @@ public class Game {
     }
 
     public void startGame() {
-        if (gameEngine.isGameRunning()) {
+        if (gameEngine.isGameStarted()) {
             return;
         }
 
