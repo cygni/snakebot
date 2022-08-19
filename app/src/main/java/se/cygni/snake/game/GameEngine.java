@@ -14,6 +14,7 @@ import se.cygni.snake.api.event.GameEndedEvent;
 import se.cygni.snake.api.event.GameResultEvent;
 import se.cygni.snake.api.event.GameStartingEvent;
 import se.cygni.snake.api.event.MapUpdateEvent;
+import se.cygni.snake.api.exception.InvalidMessage;
 import se.cygni.snake.apiconversion.GameMessageConverter;
 import se.cygni.snake.apiconversion.GameSettingsConverter;
 import se.cygni.snake.event.InternalGameEvent;
@@ -285,9 +286,11 @@ public class GameEngine {
                 .count();
     }
 
-    public void registerMove(long gameTick, String playerId, Direction direction) {
+    // Returns an GameMessage if something went wrong, null otherwise
+    // TODO: The 'correct' way to do this is to not return anything but use the event bus (RegisterMove in Game is doing this now instead)
+    public GameMessage registerMove(long gameTick, String playerId, Direction direction) {
         if (!isGameRunning()) {
-            return;
+            return null;
         }
 
         // Move is for wrong gameTick
@@ -295,7 +298,12 @@ public class GameEngine {
             log.warn("Player: {} with id {} sent move within wrong world tick. Current world tick: {}, player's world tick: {}",
                     playerManager.getPlayerName(playerId), playerId,
                     currentWorldTick, gameTick);
-            return;
+
+            InvalidMessage invalidMessage = new InvalidMessage("Sent move within wrong world tick. Current world tick: "
+                    + currentWorldTick + ", player's world tick: " + gameTick, direction.toString());
+
+            invalidMessage.setReceivingPlayerId(playerId);
+            return invalidMessage;
         }
 
         // Player has already registered a move
@@ -303,12 +311,18 @@ public class GameEngine {
             log.warn("Player: {} with id {} sent more than one move. Current world tick: {}, player's world tick: {}",
                     playerManager.getPlayerName(playerId), playerId,
                     currentWorldTick, gameTick);
-            return;
+
+            InvalidMessage invalidMessage = new InvalidMessage("Sent more than one move. Current world tick: "
+                    + currentWorldTick + ", player's world tick: " + gameTick, direction.toString());
+
+            invalidMessage.setReceivingPlayerId(playerId);
+            return invalidMessage;
         }
 
         registeredMovesByPlayers.add(playerId);
         snakeDirections.put(playerId, direction);
         countDownLatch.countDown();
+        return null;
     }
 
     private Direction getRandomDirection() {

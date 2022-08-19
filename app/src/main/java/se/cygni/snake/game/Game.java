@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import se.cygni.game.Player;
 import se.cygni.game.enums.Direction;
 import se.cygni.game.random.XORShiftRandom;
+import se.cygni.snake.api.GameMessage;
 import se.cygni.snake.api.event.GameLinkEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
@@ -112,11 +113,15 @@ public class Game {
             return;
         }
 
-        gameEngine.registerMove(
+        GameMessage possibleErrorMessage = gameEngine.registerMove(
                 gameTick,
                 playerId,
                 direction
         );
+
+        if (possibleErrorMessage != null) {
+            outgoingEventBus.post(possibleErrorMessage);
+        }
     }
 
     @Subscribe
