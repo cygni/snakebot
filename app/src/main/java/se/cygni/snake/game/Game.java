@@ -13,6 +13,7 @@ import se.cygni.snake.api.event.GameLinkEvent;
 import se.cygni.snake.api.exception.InvalidPlayerName;
 import se.cygni.snake.api.model.GameMode;
 import se.cygni.snake.api.model.GameSettings;
+import se.cygni.snake.api.model.SnakeDirection;
 import se.cygni.snake.api.request.ClientInfo;
 import se.cygni.snake.api.request.RegisterMove;
 import se.cygni.snake.api.request.RegisterPlayer;
@@ -104,7 +105,14 @@ public class Game {
     public void registerMove(RegisterMove registerMove) {
         long gameTick = registerMove.getGameTick();
         String playerId = registerMove.getReceivingPlayerId();
-        Direction direction = DirectionConverter.toDirection(registerMove.getDirection());
+        SnakeDirection snakeDirection = registerMove.getDirection();
+
+        if (!(snakeDirection instanceof SnakeDirection)) {
+            log.error("Invalid snake direction: {}", snakeDirection);
+            return;
+        }
+
+        Direction direction = DirectionConverter.toDirection(snakeDirection);
 
         if (!gameId.equals(registerMove.getGameId())) {
             log.warn("Player: {}, playerId: {}, tried to register move for wrong game. Aborting that move.",
