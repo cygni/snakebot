@@ -1,5 +1,6 @@
 package se.cygni.game.transformation;
 
+import java.util.Objects;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
@@ -15,7 +16,6 @@ public class MoveSnake implements WorldTransformation {
     private Direction direction;
     private boolean forceGrowth;
     private boolean consumedFood;
-    private boolean allowNibble;
     private boolean growthExecuted;
 
     public MoveSnake(SnakeHead snakeHead, Direction direction) {
@@ -55,12 +55,22 @@ public class MoveSnake implements WorldTransformation {
             Tile targetTile = currentWorld.getTile(targetSnakePos);
             WorldObject targetContent = targetTile.getContent();
 
-            if (targetContent instanceof Obstacle)
+            if (targetContent instanceof Obstacle) {
                 throw new ObstacleCollision(targetSnakePos);
+            }
 
-            if (targetContent instanceof SnakePart) {
+            // Snakes are allowed to follow their own tail as long as
+            // they don't grow or their tail comes after their head.
+            // Collision with an opponent's tail is not allowed here because
+            // we don't know if its tail will move.
+            if (targetContent instanceof SnakePart &&
+                (forceGrowth  ||
+                !((SnakePart)targetContent).isTail() ||
+                !Objects.equals(((SnakePart)targetContent).getPlayerId(), snakeHead.getPlayerId()) ||
+                 (snakeHead.getNextSnakePart() != null && snakeHead.getNextSnakePart().isTail()))) {
                 throw new SnakeCollision(targetSnakePos, snakeHead);
             }
+
             if (targetContent instanceof Food) {
                 consumedFood = true;
             }

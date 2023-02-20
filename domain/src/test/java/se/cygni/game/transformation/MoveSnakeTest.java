@@ -136,9 +136,9 @@ public class MoveSnakeTest {
         int startPos = 55;
         int otherSnakePos = 56;
 
-        SnakeHead head = new SnakeHead("test", "id", startPos);
+        SnakeHead head = new SnakeHead("test1", "id1", startPos);
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, new SnakeHead("test2", "id", otherSnakePos), otherSnakePos);
+        ws = SnakeTestUtil.replaceWorldObjectAt(ws, new SnakeHead("test2", "id2", otherSnakePos), otherSnakePos);
         MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT);
         moveSnake.transform(ws);
     }
@@ -210,6 +210,39 @@ public class MoveSnakeTest {
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
         MoveSnake moveSnake = new MoveSnake(head, null);
         ws = moveSnake.transform(ws);
+    }
+
+    @Test
+    public void testMoveFollowTail() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        int[] positions = {55, 45, 46, 56};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT, false);
+        moveSnake.transform(ws);
+    }
+
+    @Test(expected = SnakeCollision.class)
+    public void testSnakeCollisionFollowTailGrowth() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        int[] positions = {55, 45, 46, 56};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT, true);
+        moveSnake.transform(ws);
+    }
+
+    @Test(expected = SnakeCollision.class)
+    public void testSnakeCollisionTurnAround() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        int[] positions = {55, 56};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT, false);
+        moveSnake.transform(ws);
     }
 
 }
