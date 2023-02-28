@@ -130,15 +130,13 @@ public class MoveSnakeTest {
     }
 
     @Test(expected = SnakeCollision.class)
-    public void testSnakeCollision() throws Exception {
+    public void testSnakeCollisionWithSelf() throws Exception {
         WorldState ws = new WorldState(10, 10);
 
-        int startPos = 55;
-        int otherSnakePos = 56;
-
-        SnakeHead head = new SnakeHead("test1", "id1", startPos);
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, new SnakeHead("test2", "id2", otherSnakePos), otherSnakePos);
+        int[] positions = {12,2,3,13,23};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
         MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT);
         moveSnake.transform(ws);
     }
@@ -162,30 +160,6 @@ public class MoveSnakeTest {
         assertArrayEquals(new int[]{startPos}, ws.listPositionsWithContentOf(SnakeBody.class));
         assertArrayEquals(new int[]{}, ws.listFoodPositions());
 
-    }
-
-    @Test(expected = SnakeCollision.class)
-    public void testNibbleOnSnakeHead() throws Exception {
-        WorldState ws = new WorldState(10, 10);
-
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 12);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 22, 23);
-
-
-        ws = SnakeTestUtil.addSnake(ws, parts1);
-        ws = SnakeTestUtil.addSnake(ws, parts2);
-
-        SnakeHead snakeHead1 = ws.getSnakeHeadForBodyAt(12);
-        SnakeHead snakeHead2 = ws.getSnakeHeadForBodyAt(23);
-
-        assertEquals(1, snakeHead1.getLength());
-        assertEquals(2, snakeHead2.getLength());
-
-        assertEquals(12, snakeHead1.getPosition());
-        assertEquals(22, snakeHead2.getPosition());
-
-        MoveSnake moveSnake = new MoveSnake(snakeHead2, Direction.UP, false);
-        ws = moveSnake.transform(ws);
     }
 
     @Test(expected = TransformationException.class)

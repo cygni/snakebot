@@ -30,6 +30,9 @@ public class MoveSnake implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) throws TransformationException {
+        if (currentWorld.listSnakeIds().size() > 1) {
+            throw new TransformationException("Expected only one snake in this world transformation");
+        }
         if (snakeHead == null) {
             throw new TransformationException("SnakeHead is null!!");
         }
@@ -37,6 +40,7 @@ public class MoveSnake implements WorldTransformation {
         if (direction == null) {
             throw new TransformationException("Direction is null!");
         }
+
 
         int snakeHeadPos = snakeHead.getPosition();
         int targetSnakePos = 0;
@@ -48,7 +52,7 @@ public class MoveSnake implements WorldTransformation {
             throw new WallCollision(snakeHeadPos);
         }
 
-        // Target tile is not empty, check what's in it (rember that this
+        // Target tile is not empty, check what's in it (remember that this
         // move is in a World where only this Snake exists).
         if (!currentWorld.isTileEmpty(targetSnakePos)) {
 
@@ -61,13 +65,12 @@ public class MoveSnake implements WorldTransformation {
 
             // Snakes are allowed to follow their own tail as long as
             // they don't grow or their tail comes after their head.
-            // Collision with an opponent's tail is not allowed here because
-            // we don't know if its tail will move.
+            // Collision with an opponent's tail cannot happen here because
+            // this transformer expects only one snake in the world.
             if (targetContent instanceof SnakePart &&
                 (forceGrowth  ||
                 !((SnakePart)targetContent).isTail() ||
-                !Objects.equals(((SnakePart)targetContent).getPlayerId(), snakeHead.getPlayerId()) ||
-                 (snakeHead.getNextSnakePart() != null && snakeHead.getNextSnakePart().isTail()))) {
+                  snakeHead.getLength() == 2)) {
                 throw new SnakeCollision(targetSnakePos, snakeHead);
             }
 
