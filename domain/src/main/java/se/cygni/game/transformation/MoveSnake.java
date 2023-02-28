@@ -1,5 +1,6 @@
 package se.cygni.game.transformation;
 
+import java.util.Objects;
 import se.cygni.game.Tile;
 import se.cygni.game.WorldState;
 import se.cygni.game.enums.Direction;
@@ -15,7 +16,6 @@ public class MoveSnake implements WorldTransformation {
     private Direction direction;
     private boolean forceGrowth;
     private boolean consumedFood;
-    private boolean allowNibble;
     private boolean growthExecuted;
 
     public MoveSnake(SnakeHead snakeHead, Direction direction) {
@@ -30,6 +30,9 @@ public class MoveSnake implements WorldTransformation {
 
     @Override
     public WorldState transform(WorldState currentWorld) throws TransformationException {
+        if (currentWorld.listSnakeIds().size() > 1) {
+            throw new TransformationException("Expected only one snake in this world transformation");
+        }
         if (snakeHead == null) {
             throw new TransformationException("SnakeHead is null!!");
         }
@@ -37,6 +40,7 @@ public class MoveSnake implements WorldTransformation {
         if (direction == null) {
             throw new TransformationException("Direction is null!");
         }
+
 
         int snakeHeadPos = snakeHead.getPosition();
         int targetSnakePos = 0;
@@ -48,19 +52,28 @@ public class MoveSnake implements WorldTransformation {
             throw new WallCollision(snakeHeadPos);
         }
 
-        // Target tile is not empty, check what's in it (rember that this
+        // Target tile is not empty, check what's in it (remember that this
         // move is in a World where only this Snake exists).
         if (!currentWorld.isTileEmpty(targetSnakePos)) {
 
             Tile targetTile = currentWorld.getTile(targetSnakePos);
             WorldObject targetContent = targetTile.getContent();
 
-            if (targetContent instanceof Obstacle)
+            if (targetContent instanceof Obstacle) {
                 throw new ObstacleCollision(targetSnakePos);
+            }
 
-            if (targetContent instanceof SnakePart) {
+            // Snakes are allowed to follow their own tail as long as
+            // they don't grow or their tail comes after their head.
+            // Collision with an opponent's tail cannot happen here because
+            // this transformer expects only one snake in the world.
+            if (targetContent instanceof SnakePart &&
+                (forceGrowth  ||
+                !((SnakePart)targetContent).isTail() ||
+                  snakeHead.getLength() == 2)) {
                 throw new SnakeCollision(targetSnakePos, snakeHead);
             }
+
             if (targetContent instanceof Food) {
                 consumedFood = true;
             }

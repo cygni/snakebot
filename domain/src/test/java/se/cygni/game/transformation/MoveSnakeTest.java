@@ -130,15 +130,13 @@ public class MoveSnakeTest {
     }
 
     @Test(expected = SnakeCollision.class)
-    public void testSnakeCollision() throws Exception {
+    public void testSnakeCollisionWithSelf() throws Exception {
         WorldState ws = new WorldState(10, 10);
 
-        int startPos = 55;
-        int otherSnakePos = 56;
-
-        SnakeHead head = new SnakeHead("test", "id", startPos);
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
-        ws = SnakeTestUtil.replaceWorldObjectAt(ws, new SnakeHead("test2", "id", otherSnakePos), otherSnakePos);
+        int[] positions = {12,2,3,13,23};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
         MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT);
         moveSnake.transform(ws);
     }
@@ -164,30 +162,6 @@ public class MoveSnakeTest {
 
     }
 
-    @Test(expected = SnakeCollision.class)
-    public void testNibbleOnSnakeHead() throws Exception {
-        WorldState ws = new WorldState(10, 10);
-
-        SnakePart[] parts1 = SnakeTestUtil.createSnake("test1", "id1", 12);
-        SnakePart[] parts2 = SnakeTestUtil.createSnake("test2", "id2", 22, 23);
-
-
-        ws = SnakeTestUtil.addSnake(ws, parts1);
-        ws = SnakeTestUtil.addSnake(ws, parts2);
-
-        SnakeHead snakeHead1 = ws.getSnakeHeadForBodyAt(12);
-        SnakeHead snakeHead2 = ws.getSnakeHeadForBodyAt(23);
-
-        assertEquals(1, snakeHead1.getLength());
-        assertEquals(2, snakeHead2.getLength());
-
-        assertEquals(12, snakeHead1.getPosition());
-        assertEquals(22, snakeHead2.getPosition());
-
-        MoveSnake moveSnake = new MoveSnake(snakeHead2, Direction.UP, false);
-        ws = moveSnake.transform(ws);
-    }
-
     @Test(expected = TransformationException.class)
     public void testMoveSnakeIsNull() throws TransformationException {
         WorldState ws = new WorldState(10, 10);
@@ -210,6 +184,39 @@ public class MoveSnakeTest {
         ws = SnakeTestUtil.replaceWorldObjectAt(ws, head, startPos);
         MoveSnake moveSnake = new MoveSnake(head, null);
         ws = moveSnake.transform(ws);
+    }
+
+    @Test
+    public void testMoveFollowTail() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        int[] positions = {55, 45, 46, 56};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT, false);
+        moveSnake.transform(ws);
+    }
+
+    @Test(expected = SnakeCollision.class)
+    public void testSnakeCollisionFollowTailGrowth() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        int[] positions = {55, 45, 46, 56};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT, true);
+        moveSnake.transform(ws);
+    }
+
+    @Test(expected = SnakeCollision.class)
+    public void testSnakeCollisionTurnAround() throws Exception {
+        WorldState ws = new WorldState(10, 10);
+        int[] positions = {55, 56};
+        SnakePart[] snake = SnakeTestUtil.createSnake("test", "id", positions);
+        ws = SnakeTestUtil.addSnake(ws, snake);
+        SnakeHead head = ws.getSnakeHeadForBodyAt(positions[0]);
+        MoveSnake moveSnake = new MoveSnake(head, Direction.RIGHT, false);
+        moveSnake.transform(ws);
     }
 
 }
