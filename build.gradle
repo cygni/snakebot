@@ -80,6 +80,9 @@ subprojects {
         from sourceSets.main.allSource
     }
 
+    javadocJar.enabled = false
+    sourceJar.enabled = false
+
     artifacts {
         archives sourceJar
         archives javadocJar
