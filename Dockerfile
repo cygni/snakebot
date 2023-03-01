@@ -16,3 +16,6 @@ COPY --from=0 /app/app/build/libs/app-*.jar ./snakebot.jar
 # Using Spring Boot's environment variable did not work when we tried to use it.
 EXPOSE 8080
 CMD java -jar -Xms1G snakebot.jar
+
+ENV PROFILE development
+CMD java -jar -Xms1G snakebot.jar --spring.profiles.active=${PROFILE}

@@ -7,9 +7,9 @@ name: snakebot-DATE-SHA
 region: ams
 services:
 - envs:
-  - key: PROFILE_FLAG
+  - key: PROFILE
     scope: RUN_AND_BUILD_TIME
-    value: -Dspring.profiles.active=digitalocean
+    value: digitalocean
   http_port: 8080
   image:
     registry: cygni
