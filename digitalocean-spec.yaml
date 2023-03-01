@@ -7,9 +7,9 @@ name: snakebot-DATE-SHA
 region: ams
 services:
 - envs:
-  - key: PROFILE
+  - key: PROFILE_FLAG
     scope: RUN_AND_BUILD_TIME
-    value: digitalocean
+    value: -Dspring.profiles.active=digitalocean
   http_port: 8080
   image:
     registry: cygni
@@ -17,7 +17,7 @@ services:
     repository: snakebot
     tag: latest
   instance_count: 1
-  instance_size_slug: basic-s
+  instance_size_slug: basic-m
   name: cygni-snakebot
   routes:
   - path: /
