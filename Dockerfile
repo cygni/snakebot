@@ -2,8 +2,6 @@
 FROM gradle:7.4.2-jdk17
 WORKDIR /app
 COPY . .
-ENV PORT=8080
-EXPOSE 8080
 RUN gradle clean build
 
 # Run
@@ -17,5 +15,5 @@ COPY --from=0 /app/app/build/libs/app-*.jar ./snakebot.jar
 EXPOSE 8080
 CMD java -jar -Xms1G snakebot.jar
 
-ENV PROFILE development
-CMD java -jar -Xms1G snakebot.jar --spring.profiles.active=${PROFILE}
+#ENV PROFILE development
+#CMD java -jar -Xms1G snakebot.jar --spring.profiles.active=${PROFILE}
