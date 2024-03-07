@@ -1,0 +1,31 @@
+name: Build and upload binary artifact
+
+on:
+  push:
+    branches:
+      - master
+      - artifact_push_action
+
+jobs:
+  create-artifact:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "17"
+
+      - name: Build and package
+        run: |
+          ./gradlew build
+
+      - name: Java application binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: snakebot_backend
+          path: ./app/build/libs/app-0.1.21.jar
