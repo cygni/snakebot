@@ -1,4 +1,4 @@
-name: Build and upload binary artifact
+name: Build and upload jar binary as artifact
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - artifact_push_action
 
 jobs:
-  create-artifact:
+  build-artifact:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
           ./gradlew build
 
       - name: Java application binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: snakebot_backend
-          path: ./app/build/libs/app-0.1.21.jar
+          path: ./app/build/libs/app-*.jar
+          if-no-files-found: error
