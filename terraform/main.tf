@@ -44,6 +44,7 @@ module "gke_cluster" {
 
 module "kubernetes_config" {
   source = "./kubernetes-config"
+  region = local.region
 }
 
 output "cluster_name" {

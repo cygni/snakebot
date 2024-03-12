@@ -7,6 +7,11 @@ terraform {
   }
 }
 
+module "static_ip" {
+  source = "../static_ip"
+  region = var.region
+}
+
 resource "kubernetes_deployment" "snakebot_server" {
   metadata {
     name = "snakebot-server"
@@ -38,8 +43,8 @@ resource "kubernetes_deployment" "snakebot_server" {
             "-jar",
             "-Xms1G",
             "snakebot.jar",
-            "--snakebot.redirect.url=http://${kubernetes_service.snakebot_web_service.status.0.load_balancer.0.ingress.0.ip}:8090/",
-            "--snakebot.view.url=http://${kubernetes_service.snakebot_web_service.status.0.load_balancer.0.ingress.0.ip}:8090/viewgame/"
+            "--snakebot.redirect.url=http://${module.static_ip.static_ip_address}:8090/",
+            "--snakebot.view.url=http://${module.static_ip.static_ip_address}:8090/viewgame/"
           ]
         }
       }
@@ -62,7 +67,8 @@ resource "kubernetes_service" "snakebot_server_service" {
       target_port = 8080
     }
 
-    type = "LoadBalancer"
+    type             = "LoadBalancer"
+    load_balancer_ip = module.static_ip.static_ip_address
   }
 }
 
@@ -94,7 +100,7 @@ resource "kubernetes_deployment" "snakebot_web" {
 
           env {
             name  = "API_URL"
-            value = "http://${kubernetes_service.snakebot_server_service.status.0.load_balancer.0.ingress.0.ip}:8080"
+            value = "http://${module.static_ip.static_ip_address}:8080"
           }
 
           env {
@@ -126,6 +132,7 @@ resource "kubernetes_service" "snakebot_web_service" {
       target_port = 80
     }
 
-    type = "LoadBalancer"
+    type             = "LoadBalancer"
+    load_balancer_ip = module.static_ip.static_ip_address
   }
 }
