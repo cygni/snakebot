@@ -12,8 +12,6 @@ terraform {
 }
 
 provider "google" {
-  credentials = file("account.json")
-
   project = local.project
   region  = local.region
   zone    = local.zone
@@ -43,8 +41,9 @@ module "gke_cluster" {
 }
 
 module "kubernetes_config" {
-  source = "./kubernetes-config"
-  region = local.region
+  source           = "./kubernetes-config"
+  region           = local.region
+  load_balancer_ip = local.external_ip
 }
 
 output "cluster_name" {
@@ -55,10 +54,6 @@ output "cluster_endpoint" {
   value = data.google_container_cluster.default.endpoint
 }
 
-# output "web_service_ip" {
-#   value = kubernetes_service.snakebot_web_service.status.0.load_balancer.0.ingress.0.ip
-# }
-#
-# output "server_service_ip" {
-#   value = kubernetes_service.snakebot_server_service.status.0.load_balancer.0.ingress.0.ip
-# }
+output "external_ip" {
+  value = local.external_ip
+}
