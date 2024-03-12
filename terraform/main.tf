@@ -41,7 +41,7 @@ module "gke_cluster" {
 }
 
 module "kubernetes_config" {
-  source           = "./kubernetes-config"
+  source           = "./kubernetes_config"
   region           = local.region
   load_balancer_ip = local.external_ip
 }
