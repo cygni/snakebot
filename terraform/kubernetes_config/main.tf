@@ -38,8 +38,8 @@ resource "kubernetes_deployment" "snakebot_server" {
             "-jar",
             "-Xms1G",
             "snakebot.jar",
-            "--snakebot.redirect.url=http://${var.load_balancer_ip}:8090/",
-            "--snakebot.view.url=http://${var.load_balancer_ip}:8090/viewgame/"
+            "--snakebot.redirect.url=http://${var.load_balancer_ip}/",
+            "--snakebot.view.url=http://${var.load_balancer_ip}/viewgame/"
           ]
         }
       }
@@ -123,7 +123,7 @@ resource "kubernetes_service" "snakebot_web_service" {
     }
 
     port {
-      port        = 8090
+      port        = 80
       target_port = 80
     }
 
